@@ -11,7 +11,6 @@ function Hero() {
   return (
     <section className="bg-offwhite min-h-screen flex items-center px-80">
       <div className="w-full grid grid-cols-2 gap-16 items-center">
-        {/* Left Content */}
         <div className="space-y-6">
           <div className='border-b border-primary border-shadow-md pb-4 mb-6'>
             <h1 className="text-5xl font-bold leading-tight">
@@ -43,7 +42,7 @@ function Hero() {
             </div>
           </div>
 
-          {/* Action Buttons */}
+
           <div className="flex gap-4">
             <button className="bg-white text-primary px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 flex items-center gap-2">
               <FolderOpenIcon sx={{ fontSize: 20 }} /> Browse Datasets
@@ -53,7 +52,6 @@ function Hero() {
             </button>
           </div>
 
-          {/* Statistics */}
           <div className="flex gap-9 pt-6 border-t border-gray-300">
             <div className='border-r-2 border-primary pr-6'>
               <div className="text-3xl font-bold text-primary">2,355</div>
@@ -63,18 +61,17 @@ function Hero() {
               <div className="text-3xl font-bold text-primary">12</div>
               <div className="text-sm text-gray-600">VEGETABLE TYPES</div>
             </div>
-            <div>
+            <div className='border-r-2 border-primary pr-6'>
               <div className="text-3xl font-bold text-primary">89%</div>
               <div className="text-sm text-gray-600">AVG ACCURACY</div>
             </div>
-            <div>
+            <div className='border-r-2 border-primary pr-6'>
               <div className="text-3xl font-bold text-primary">1.2K+</div>
               <div className="text-sm text-gray-600">DOWNLOADS</div>
             </div>
           </div>
         </div>
 
-        {/* Right Side - Placeholder for GIF/Carousel */}
         <div className="space-y-6">
           <div className="bg-linear-to-br from-green-100 to-green-300 rounded-3xl h-125 flex items-center justify-center shadow-2xl">
             <div className="text-center space-y-4 text-gray-600">
