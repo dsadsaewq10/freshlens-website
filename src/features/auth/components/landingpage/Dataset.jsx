@@ -1,6 +1,14 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import AnimatedSection from '../../../../components/AnimatedSection'
+import yolov8Logo from '../../../../assets/icons/yolo-logo.svg'
+import tensorflowLogo from '../../../../assets/icons/tensorflow.png'
+import tfliteLogo from '../../../../assets/icons/tflite.png'
+import pythonLogo from '../../../../assets/icons/python.png'
+import cabbageImg from '../../../../assets/icons/cabbage.webp'
+import tomatoImg from '../../../../assets/icons/tomato.png'
+import carrotImg from '../../../../assets/icons/carrot.png'
+import pepperImg from '../../../../assets/icons/pepper.png'
 
 function Dataset() {
   // Dataset statistics - update these with actual values
@@ -17,25 +25,29 @@ function Dataset() {
       name: 'YOLOv8',
       version: 'v8.x.x', // PLACEHOLDER: Add actual version
       description: 'Object detection model for real-time inference',
-      badge: 'Primary'
+      badge: 'Primary',
+      logo: yolov8Logo
     },
     {
       name: 'TensorFlow',
       version: 'v2.x.x', // PLACEHOLDER: Add actual version
       description: 'Deep learning framework for model training',
-      badge: 'Framework'
+      badge: 'Framework',
+      logo: tensorflowLogo
     },
     {
       name: 'TFLite',
       version: 'v2.x.x', // PLACEHOLDER: Add actual version
       description: 'Lightweight model for mobile deployment',
-      badge: 'Mobile'
+      badge: 'Mobile',
+      logo: tfliteLogo
     },
     {
       name: 'Python',
       version: '3.x.x', // PLACEHOLDER: Add actual version
       description: 'Programming environment for training scripts',
-      badge: 'Runtime'
+      badge: 'Runtime',
+      logo: pythonLogo
     }
   ]
 
@@ -46,28 +58,32 @@ function Dataset() {
       images: 'X,XXX', // PLACEHOLDER: Add actual count
       classes: ['Fresh', 'Mild Decay', 'Moderate Decay', 'Severe Decay', 'Spoiled'],
       format: 'YOLO Format',
-      size: 'XX MB' // PLACEHOLDER: Add actual size
+      size: 'XX MB', // PLACEHOLDER: Add actual size
+      image: cabbageImg
     },
     {
       name: 'Tomato Dataset',
       images: 'X,XXX', // PLACEHOLDER: Add actual count
       classes: ['Fresh', 'Half Fresh', 'Spoiled'],
       format: 'YOLO Format',
-      size: 'XX MB' // PLACEHOLDER: Add actual size
+      size: 'XX MB', // PLACEHOLDER: Add actual size
+      image: tomatoImg
     },
     {
       name: 'Carrot Dataset',
       images: 'X,XXX', // PLACEHOLDER: Add actual count
       classes: ['Fresh', 'Mild Decay', 'Moderate Decay', 'Spoiled'],
       format: 'YOLO Format',
-      size: 'XX MB' // PLACEHOLDER: Add actual size
+      size: 'XX MB', // PLACEHOLDER: Add actual size
+      image: carrotImg
     },
     {
       name: 'Pepper Dataset',
       images: 'X,XXX', // PLACEHOLDER: Add actual count
       classes: ['Fresh', 'Mild Decay', 'Moderate Decay', 'Severe Decay', 'Spoiled'],
       format: 'YOLO Format',
-      size: 'XX MB' // PLACEHOLDER: Add actual size
+      size: 'XX MB', // PLACEHOLDER: Add actual size
+      image: pepperImg
     }
   ]
 
@@ -264,8 +280,7 @@ function Dataset() {
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                      {/* PLACEHOLDER: Add technology icon */}
-                      <div className="w-5 h-5 bg-primary/30 rounded" />
+                      <img src={model.logo} alt={`${model.name} logo`} className="w-6 h-6" />
                     </div>
                     <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
                       {model.badge}
@@ -296,15 +311,10 @@ function Dataset() {
                 className="bg-background rounded-2xl p-6 border border-gray-200 hover:border-primary/30 hover:shadow-lg transition-all"
               >
                 <div className="flex items-start gap-4">
-                  {/* Dataset Image Placeholder */}
+                  {/* Dataset Image */}
                   <div className="w-24 h-24 bg-primary/10 rounded-xl flex-shrink-0 flex items-center justify-center">
-                    {/* PLACEHOLDER: Add vegetable image here */}
-                    <div className="text-center text-primary/50">
-                      <div className="w-12 h-12 bg-primary/20 rounded-lg mx-auto mb-1" />
-                      <span className="text-xs">Image</span>
-                    </div>
+                    <img src={dataset.image} alt={dataset.name} className="w-16 h-16 object-contain" />
                   </div>
-
                   <div className="flex-1">
                     <h4 className="font-semibold text-accent text-lg mb-2">
                       {dataset.name}

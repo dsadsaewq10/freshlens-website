@@ -1,31 +1,43 @@
 import React from 'react'
 import AnimatedSection from '../../../../components/AnimatedSection'
+import realtimeIcon from '../../../../assets/icons/realtime.svg'
+import accuracyIcon from '../../../../assets/icons/accuracy.svg'
+import freshIcon from '../../../../assets/icons/fresh.svg'
+import offlineIcon from '../../../../assets/icons/offline.svg'
+import scanIcon from '../../../../assets/icons/scan.svg'
+import mobileIcon from '../../../../assets/icons/mobile.svg'
 
 function Features() {
   const features = [
     {
       title: 'Real-Time Detection',
-      description: 'Instant freshness analysis with sub-second processing using optimized YOLOv8 inference.'
+      description: 'Instant freshness analysis with sub-second processing using optimized YOLOv8 inference.',
+      icon: realtimeIcon
     },
     {
       title: 'High Accuracy',
-      description: '89% average accuracy across all vegetable classes for reliable freshness assessment.'
+      description: '89% average accuracy across all vegetable classes for reliable freshness assessment.',
+      icon: accuracyIcon
     },
     {
       title: 'Multi-Class Classification',
-      description: 'Classify vegetables into 3-5 freshness levels from fresh to spoiled.'
+      description: 'Classify vegetables into 3-5 freshness levels from fresh to spoiled.',
+      icon: freshIcon
     },
     {
       title: 'Offline Capable',
-      description: 'Works without internet connection after initial model download for use anywhere.'
+      description: 'Works without internet connection after initial model download for use anywhere.',
+      icon: offlineIcon
     },
     {
       title: 'Easy to Use',
-      description: 'Simple point-and-scan interface designed for quick and intuitive operation.'
+      description: 'Simple point-and-scan interface designed for quick and intuitive operation.',
+      icon: scanIcon
     },
     {
       title: 'Mobile Optimized',
-      description: 'Lightweight model optimized for smooth performance on Android devices.'
+      description: 'Lightweight model optimized for smooth performance on Android devices.',
+      icon: mobileIcon
     }
   ]
 
@@ -46,10 +58,11 @@ function Features() {
           {features.map((feature, index) => (
             <AnimatedSection key={feature.title} delay={index * 0.1}>
               <div className="bg-background rounded-2xl p-6 h-full hover:shadow-lg transition-shadow">
-                {/* Icon placeholder */}
+                {/* Icon */}
                 <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center mb-5">
-                  {/* PLACEHOLDER: Add feature icon here */}
-                  <div className="w-7 h-7 bg-white/30 rounded-lg" />
+                  <div className="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
+                    <img src={feature.icon} alt={feature.title} className="w-6 h-6 brightness-0 invert" />
+                  </div>
                 </div>
                 
                 <h3 className="text-xl font-semibold text-accent mb-3">

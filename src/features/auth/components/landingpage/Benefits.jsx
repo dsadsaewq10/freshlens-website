@@ -1,5 +1,9 @@
 import React from 'react'
 import AnimatedSection from '../../../../components/AnimatedSection'
+import groceryIcon from '../../../../assets/icons/grocery.svg'
+import kitchenIcon from '../../../../assets/icons/kitchen.png'
+import homeIcon from '../../../../assets/icons/home.svg'
+import supplyIcon from '../../../../assets/icons/supply.svg'
 
 function Benefits() {
   const benefits = [
@@ -38,19 +42,23 @@ function Benefits() {
   const useCases = [
     {
       title: 'Grocery Shopping',
-      description: 'Scan vegetables before purchase to ensure you are getting the freshest produce available.'
+      description: 'Scan vegetables before purchase to ensure you are getting the freshest produce available.',
+      icon: groceryIcon
     },
     {
       title: 'Restaurant Kitchens',
-      description: 'Quality control for incoming produce deliveries to maintain food safety standards.'
+      description: 'Quality control for incoming produce deliveries to maintain food safety standards.',
+      icon: kitchenIcon
     },
     {
       title: 'Home Use',
-      description: 'Check stored vegetables to plan meals and reduce household food waste.'
+      description: 'Check stored vegetables to plan meals and reduce household food waste.',
+      icon: homeIcon
     },
     {
       title: 'Supply Chain',
-      description: 'Monitor produce quality throughout distribution for better inventory management.'
+      description: 'Monitor produce quality throughout distribution for better inventory management.',
+      icon: supplyIcon
     }
   ]
 
@@ -106,10 +114,9 @@ function Benefits() {
           {useCases.map((useCase, index) => (
             <AnimatedSection key={useCase.title} delay={index * 0.1}>
               <div className="bg-white rounded-xl p-6 shadow-sm border-l-4 border-primary flex gap-4">
-                {/* Icon placeholder */}
+                {/* Icon */}
                 <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
-                  {/* PLACEHOLDER: Add use case icon here */}
-                  <div className="w-6 h-6 bg-white/30 rounded" />
+                  <img src={useCase.icon} alt={useCase.title} className="w-6 h-6 brightness-0 invert" />
                 </div>
                 <div>
                   <h4 className="text-lg font-semibold text-accent mb-2">

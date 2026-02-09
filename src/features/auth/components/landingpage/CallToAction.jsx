@@ -1,5 +1,8 @@
 import React from 'react'
 import AnimatedSection from '../../../../components/AnimatedSection'
+import playstoreIcon from '../../../../assets/icons/playstore.png'
+import downloadIcon from '../../../../assets/icons/download.png'
+import playstoreAppImg from '../../../../assets/images/playstoreapp.png'
 
 function CallToAction() {
   return (
@@ -52,8 +55,8 @@ function CallToAction() {
                 href="#"
                 className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-xl font-semibold transition-colors flex items-center justify-center gap-3"
               >
-                {/* PLACEHOLDER: Add Google Play icon */}
-                <div className="w-6 h-6 bg-white/20 rounded" />
+                {/* Google Play icon */}
+                <img src={playstoreIcon} alt="Google Play" className="w-6 h-6" />
                 <div className="text-left">
                   <span className="text-xs text-white/70 block">Get it on</span>
                   <span className="text-lg">Google Play</span>
@@ -65,8 +68,8 @@ function CallToAction() {
                 href="#"
                 className="bg-white/10 hover:bg-white/20 border border-white/30 text-white px-8 py-4 rounded-xl font-semibold transition-colors flex items-center justify-center gap-3"
               >
-                {/* PLACEHOLDER: Add download icon */}
-                <div className="w-6 h-6 bg-white/20 rounded" />
+                {/* Download icon */}
+                <img src={downloadIcon} alt="Download" className="w-6 h-6" />
                 <div className="text-left">
                   <span className="text-xs text-white/70 block">Direct</span>
                   <span className="text-lg">Download APK</span>
@@ -83,16 +86,16 @@ function CallToAction() {
                 {/* Phone frame */}
                 <div className="w-72 h-[580px] bg-gradient-to-b from-gray-800 to-gray-900 rounded-[3rem] p-3 shadow-2xl">
                   {/* Screen */}
-                  <div className="w-full h-full bg-gradient-to-b from-primary/20 to-primary/40 rounded-[2.5rem] flex flex-col items-center justify-center">
+                  <div className="w-full h-full bg-black rounded-[2.5rem] overflow-hidden relative">
                     {/* Notch */}
-                    <div className="absolute top-6 w-24 h-6 bg-gray-900 rounded-full" />
+                    <div className="absolute top-6 left-1/2 -translate-x-1/2 w-24 h-6 bg-gray-900 rounded-full z-10" />
                     
-                    {/* Placeholder content */}
-                    <div className="text-center text-white/60 p-8">
-                      <div className="w-20 h-20 bg-white/20 rounded-2xl mx-auto mb-6" />
-                      <p className="font-semibold mb-2">App Screenshot</p>
-                      <p className="text-sm">Add your phone mockup asset here</p>
-                    </div>
+                    {/* App Screenshot */}
+                    <img 
+                      src={playstoreAppImg} 
+                      alt="FreshLens App Screenshot" 
+                      className="w-full h-full object-contain object-center" 
+                    />
                   </div>
                 </div>
 
