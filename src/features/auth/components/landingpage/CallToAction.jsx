@@ -1,0 +1,135 @@
+import React from 'react'
+import AnimatedSection from '../../../../components/AnimatedSection'
+
+function CallToAction() {
+  return (
+    <section id="download" className="bg-accent py-20 lg:py-28">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Content */}
+          <AnimatedSection>
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
+              Ready to Detect Freshness?
+            </h2>
+            <p className="text-white/80 text-lg mb-8 leading-relaxed">
+              Download FreshLens today and start making smarter decisions about 
+              your vegetables. Available now for Android devices.
+            </p>
+
+            {/* Features list */}
+            <ul className="space-y-4 mb-8">
+              <li className="flex items-center gap-3 text-white/90">
+                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                  {/* PLACEHOLDER: Add checkmark icon */}
+                  <div className="w-3 h-3 bg-white rounded-sm" />
+                </div>
+                Free to download and use
+              </li>
+              <li className="flex items-center gap-3 text-white/90">
+                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-3 h-3 bg-white rounded-sm" />
+                </div>
+                No account required
+              </li>
+              <li className="flex items-center gap-3 text-white/90">
+                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-3 h-3 bg-white rounded-sm" />
+                </div>
+                Works offline after initial setup
+              </li>
+              <li className="flex items-center gap-3 text-white/90">
+                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-3 h-3 bg-white rounded-sm" />
+                </div>
+                Regular model updates
+              </li>
+            </ul>
+
+            {/* Download buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              {/* PLACEHOLDER: Replace with actual Google Play badge/link */}
+              <a
+                href="#"
+                className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-xl font-semibold transition-colors flex items-center justify-center gap-3"
+              >
+                {/* PLACEHOLDER: Add Google Play icon */}
+                <div className="w-6 h-6 bg-white/20 rounded" />
+                <div className="text-left">
+                  <span className="text-xs text-white/70 block">Get it on</span>
+                  <span className="text-lg">Google Play</span>
+                </div>
+              </a>
+              
+              {/* PLACEHOLDER: Replace with actual APK download link */}
+              <a
+                href="#"
+                className="bg-white/10 hover:bg-white/20 border border-white/30 text-white px-8 py-4 rounded-xl font-semibold transition-colors flex items-center justify-center gap-3"
+              >
+                {/* PLACEHOLDER: Add download icon */}
+                <div className="w-6 h-6 bg-white/20 rounded" />
+                <div className="text-left">
+                  <span className="text-xs text-white/70 block">Direct</span>
+                  <span className="text-lg">Download APK</span>
+                </div>
+              </a>
+            </div>
+          </AnimatedSection>
+
+          {/* Phone mockup placeholder */}
+          <AnimatedSection delay={0.2}>
+            <div className="relative flex justify-center lg:justify-end">
+              {/* PLACEHOLDER: Add your Android phone mockup image here */}
+              <div className="relative">
+                {/* Phone frame */}
+                <div className="w-72 h-[580px] bg-gradient-to-b from-gray-800 to-gray-900 rounded-[3rem] p-3 shadow-2xl">
+                  {/* Screen */}
+                  <div className="w-full h-full bg-gradient-to-b from-primary/20 to-primary/40 rounded-[2.5rem] flex flex-col items-center justify-center">
+                    {/* Notch */}
+                    <div className="absolute top-6 w-24 h-6 bg-gray-900 rounded-full" />
+                    
+                    {/* Placeholder content */}
+                    <div className="text-center text-white/60 p-8">
+                      <div className="w-20 h-20 bg-white/20 rounded-2xl mx-auto mb-6" />
+                      <p className="font-semibold mb-2">App Screenshot</p>
+                      <p className="text-sm">Add your phone mockup asset here</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Decorative elements */}
+                <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/30 rounded-full blur-2xl" />
+                <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-primary/20 rounded-full blur-2xl" />
+              </div>
+            </div>
+          </AnimatedSection>
+        </div>
+
+        {/* Stats bar */}
+        <AnimatedSection delay={0.3}>
+          <div className="mt-16 pt-12 border-t border-white/10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div>
+                <p className="text-3xl lg:text-4xl font-bold text-white">9,355+</p>
+                <p className="text-white/60 mt-1">Training Images</p>
+              </div>
+              <div>
+                <p className="text-3xl lg:text-4xl font-bold text-white">89%</p>
+                <p className="text-white/60 mt-1">Average Accuracy</p>
+              </div>
+              <div>
+                <p className="text-3xl lg:text-4xl font-bold text-white">6</p>
+                <p className="text-white/60 mt-1">Vegetable Types</p>
+              </div>
+              <div>
+                <p className="text-3xl lg:text-4xl font-bold text-white">&lt;1s</p>
+                <p className="text-white/60 mt-1">Detection Time</p>
+              </div>
+            </div>
+          </div>
+        </AnimatedSection>
+      </div>
+    </section>
+  )
+}
+
+export default CallToAction

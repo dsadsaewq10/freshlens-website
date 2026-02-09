@@ -1,89 +1,66 @@
 import React from 'react'
-import SyncIcon from '@mui/icons-material/Sync'
-import SettingsIcon from '@mui/icons-material/Settings'
-import ShieldIcon from '@mui/icons-material/Shield'
-import BarChartIcon from '@mui/icons-material/BarChart'
-import RocketLaunchIcon from '@mui/icons-material/RocketLaunch'
-import FilterListIcon from '@mui/icons-material/FilterList'
+import AnimatedSection from '../../../../components/AnimatedSection'
 
 function Features() {
+  const features = [
+    {
+      title: 'Real-Time Detection',
+      description: 'Instant freshness analysis with sub-second processing using optimized YOLOv8 inference.'
+    },
+    {
+      title: 'High Accuracy',
+      description: '89% average accuracy across all vegetable classes for reliable freshness assessment.'
+    },
+    {
+      title: 'Multi-Class Classification',
+      description: 'Classify vegetables into 3-5 freshness levels from fresh to spoiled.'
+    },
+    {
+      title: 'Offline Capable',
+      description: 'Works without internet connection after initial model download for use anywhere.'
+    },
+    {
+      title: 'Easy to Use',
+      description: 'Simple point-and-scan interface designed for quick and intuitive operation.'
+    },
+    {
+      title: 'Mobile Optimized',
+      description: 'Lightweight model optimized for smooth performance on Android devices.'
+    }
+  ]
+
   return (
-    <section className="bg-offwhite py-20 px-40">
-      <div className="text-center mb-16 max-w-4xl mx-auto">
-        <h2 className="text-5xl font-bold text-primary mb-6">FreshLens</h2>
-        <p className="text-gray-700 text-lg">
-          The ultimate platform for AI-powered freshness detection enhanced with
-          cutting-edge YOLO deep learning technology.
-        </p>
-      </div>
-
-
-      <div className="grid grid-cols-3 gap-6 max-w-7xl mx-auto">
-
-        <div className="bg-primary rounded-xl p-6 space-y-3">
-          <div className="w-12 h-12 bg-white bg-opacity-20 rounded-3xl flex items-center justify-center">
-            <SyncIcon className="text-primary" sx={{ fontSize: 28 }} />
-          </div>
-          <h3 className="text-xl font-bold text-offwhite">Real-Time Scanning</h3>
-          <p className="text-green-100 leading-relaxed text-sm">
-            Instant freshness analysis using YOLO deep learning model with 
-            sub-second accuracy for immediate results.
+    <section id="features" className="bg-white py-20 lg:py-28">
+      <div className="max-w-6xl mx-auto px-6">
+        <AnimatedSection className="text-center mb-16">
+          <h2 className="text-3xl lg:text-4xl font-bold text-accent mb-4">
+            Key Features
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+            FreshLens combines cutting-edge AI technology with an intuitive 
+            interface to deliver accurate vegetable freshness detection.
           </p>
-        </div>
+        </AnimatedSection>
 
-        <div className="bg-primary rounded-xl p-6 space-y-3">
-          <div className="w-12 h-12 bg-white bg-opacity-20 rounded-3xl flex items-center justify-center">
-            <SettingsIcon className="text-primary" sx={{ fontSize: 28 }} />
-          </div>
-          <h3 className="text-xl font-bold text-offwhite">Dataset Management</h3>
-          <p className="text-green-100 leading-relaxed text-sm">
-            Centralized interface for accessing 9,355+ annotated vegetable images 
-            with smart classification and organization tools.
-          </p>
-        </div>
-
-
-        <div className="bg-primary rounded-xl p-6 space-y-3">
-          <div className="w-12 h-12 bg-white bg-opacity-20 rounded-3xl flex items-center justify-center">
-            <ShieldIcon className="text-primary" sx={{ fontSize: 28 }} />
-          </div>
-          <h3 className="text-xl font-bold text-offwhite">High Accuracy Models</h3>
-          <p className="text-green-100 leading-relaxed text-sm">
-            89% average accuracy across all vegetable classes featuring 
-            top-tier trained models and reliable predictions.
-          </p>
-        </div>
-
-
-        <div className="bg-primary rounded-xl p-6 space-y-3">
-          <div className="w-12 h-12 bg-white bg-opacity-20 rounded-3xl flex items-center justify-center">
-            <BarChartIcon className="text-primary" sx={{ fontSize: 28 }} />
-          </div>
-          <h3 className="text-xl font-bold text-offwhite">Performance Insights</h3>
-          <p className="text-green-100 leading-relaxed text-sm">
-            Live analytics and visual representation of detection results with 
-            predictive insights to enhance efficiency.
-          </p>
-        </div>
-        <div className="bg-primary rounded-xl p-6 space-y-3">
-          <div className="w-12 h-12 bg-white bg-opacity-20 rounded-3xl flex items-center justify-center">
-            <RocketLaunchIcon className="text-primary" sx={{ fontSize: 28 }} />
-          </div>
-          <h3 className="text-xl font-bold text-offwhite">Easy Integration</h3>
-          <p className="text-green-100 leading-relaxed text-sm">
-            AI-driven API transitions ensuring no downtime with seamless 
-            alignment to your existing workflow.
-          </p>
-        </div>
-        <div className="bg-primary rounded-xl p-6 space-y-3">
-          <div className="w-12 h-12 bg-white bg-opacity-20 rounded-3xl flex items-center justify-center">
-            <FilterListIcon className="text-primary" sx={{ fontSize: 28 }} />
-          </div>
-          <h3 className="text-xl font-bold text-offwhite">Multi-Class Detection</h3>
-          <p className="text-green-100 leading-relaxed text-sm">
-            Adaptive classification system with 3-5 freshness levels that 
-            evolves based on usage patterns for improved efficiency.
-          </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((feature, index) => (
+            <AnimatedSection key={feature.title} delay={index * 0.1}>
+              <div className="bg-background rounded-2xl p-6 h-full hover:shadow-lg transition-shadow">
+                {/* Icon placeholder */}
+                <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center mb-5">
+                  {/* PLACEHOLDER: Add feature icon here */}
+                  <div className="w-7 h-7 bg-white/30 rounded-lg" />
+                </div>
+                
+                <h3 className="text-xl font-semibold text-accent mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            </AnimatedSection>
+          ))}
         </div>
       </div>
     </section>
