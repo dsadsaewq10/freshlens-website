@@ -1,43 +1,37 @@
 import React from 'react'
-import AnimatedSection from '../../../../components/AnimatedSection'
-import realtimeIcon from '../../../../assets/icons/realtime.svg'
-import accuracyIcon from '../../../../assets/icons/accuracy.svg'
-import freshIcon from '../../../../assets/icons/fresh.svg'
-import offlineIcon from '../../../../assets/icons/offline.svg'
-import scanIcon from '../../../../assets/icons/scan.svg'
-import mobileIcon from '../../../../assets/icons/mobile.svg'
+import AnimatedSection from '../../../components/AnimatedSection'
 
 function Features() {
   const features = [
     {
       title: 'Real-Time Detection',
       description: 'Instant freshness analysis with sub-second processing using optimized YOLOv8 inference.',
-      icon: realtimeIcon
+      icon: '/assets/icons/realtime.svg'
     },
     {
       title: 'High Accuracy',
       description: '89% average accuracy across all vegetable classes for reliable freshness assessment.',
-      icon: accuracyIcon
+      icon: '/assets/icons/accuracy.svg'
     },
     {
       title: 'Multi-Class Classification',
       description: 'Classify vegetables into 3-5 freshness levels from fresh to spoiled.',
-      icon: freshIcon
+      icon: '/assets/icons/fresh.svg'
     },
     {
       title: 'Offline Capable',
       description: 'Works without internet connection after initial model download for use anywhere.',
-      icon: offlineIcon
+      icon: '/assets/icons/offline.svg'
     },
     {
       title: 'Easy to Use',
       description: 'Simple point-and-scan interface designed for quick and intuitive operation.',
-      icon: scanIcon
+      icon: '/assets/icons/scan.svg'
     },
     {
       title: 'Mobile Optimized',
       description: 'Lightweight model optimized for smooth performance on Android devices.',
-      icon: mobileIcon
+      icon: '/assets/icons/mobile.svg'
     }
   ]
 

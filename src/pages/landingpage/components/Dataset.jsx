@@ -1,14 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import AnimatedSection from '../../../../components/AnimatedSection'
-import yolov8Logo from '../../../../assets/icons/yolo-logo.svg'
-import tensorflowLogo from '../../../../assets/icons/tensorflow.png'
-import tfliteLogo from '../../../../assets/icons/tflite.png'
-import pythonLogo from '../../../../assets/icons/python.png'
-import cabbageImg from '../../../../assets/icons/cabbage.webp'
-import tomatoImg from '../../../../assets/icons/tomato.png'
-import carrotImg from '../../../../assets/icons/carrot.png'
-import pepperImg from '../../../../assets/icons/pepper.png'
+import AnimatedSection from '../../../components/AnimatedSection'
 
 function Dataset() {
   // Dataset statistics - update these with actual values
@@ -26,28 +18,28 @@ function Dataset() {
       version: 'v8.x.x', // PLACEHOLDER: Add actual version
       description: 'Object detection model for real-time inference',
       badge: 'Primary',
-      logo: yolov8Logo
+      logo: '/assets/icons/yolo-logo.svg'
     },
     {
       name: 'TensorFlow',
       version: 'v2.x.x', // PLACEHOLDER: Add actual version
       description: 'Deep learning framework for model training',
       badge: 'Framework',
-      logo: tensorflowLogo
+      logo: '/assets/icons/tensorflow.png'
     },
     {
       name: 'TFLite',
       version: 'v2.x.x', // PLACEHOLDER: Add actual version
       description: 'Lightweight model for mobile deployment',
       badge: 'Mobile',
-      logo: tfliteLogo
+      logo: '/assets/icons/tflite.png'
     },
     {
       name: 'Python',
       version: '3.x.x', // PLACEHOLDER: Add actual version
       description: 'Programming environment for training scripts',
       badge: 'Runtime',
-      logo: pythonLogo
+      logo: '/assets/icons/python.png'
     }
   ]
 
@@ -59,7 +51,7 @@ function Dataset() {
       classes: ['Fresh', 'Mild Decay', 'Moderate Decay', 'Severe Decay', 'Spoiled'],
       format: 'YOLO Format',
       size: 'XX MB', // PLACEHOLDER: Add actual size
-      image: cabbageImg
+      image: '/assets/icons/cabbage.webp'
     },
     {
       name: 'Tomato Dataset',
@@ -67,7 +59,7 @@ function Dataset() {
       classes: ['Fresh', 'Half Fresh', 'Spoiled'],
       format: 'YOLO Format',
       size: 'XX MB', // PLACEHOLDER: Add actual size
-      image: tomatoImg
+      image: '/assets/icons/tomato.png'
     },
     {
       name: 'Carrot Dataset',
@@ -75,7 +67,7 @@ function Dataset() {
       classes: ['Fresh', 'Mild Decay', 'Moderate Decay', 'Spoiled'],
       format: 'YOLO Format',
       size: 'XX MB', // PLACEHOLDER: Add actual size
-      image: carrotImg
+      image: '/assets/icons/carrot.png'
     },
     {
       name: 'Pepper Dataset',
@@ -83,7 +75,7 @@ function Dataset() {
       classes: ['Fresh', 'Mild Decay', 'Moderate Decay', 'Severe Decay', 'Spoiled'],
       format: 'YOLO Format',
       size: 'XX MB', // PLACEHOLDER: Add actual size
-      image: pepperImg
+      image: '/assets/icons/pepper.png'
     }
   ]
 

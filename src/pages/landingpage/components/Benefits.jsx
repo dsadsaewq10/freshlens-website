@@ -1,9 +1,5 @@
 import React from 'react'
-import AnimatedSection from '../../../../components/AnimatedSection'
-import groceryIcon from '../../../../assets/icons/grocery.svg'
-import kitchenIcon from '../../../../assets/icons/kitchen.png'
-import homeIcon from '../../../../assets/icons/home.svg'
-import supplyIcon from '../../../../assets/icons/supply.svg'
+import AnimatedSection from '../../../components/AnimatedSection'
 
 function Benefits() {
   const benefits = [
@@ -43,22 +39,22 @@ function Benefits() {
     {
       title: 'Grocery Shopping',
       description: 'Scan vegetables before purchase to ensure you are getting the freshest produce available.',
-      icon: groceryIcon
+      icon: '/assets/icons/grocery.svg'
     },
     {
       title: 'Restaurant Kitchens',
       description: 'Quality control for incoming produce deliveries to maintain food safety standards.',
-      icon: kitchenIcon
+      icon: '/assets/icons/kitchen.png'
     },
     {
       title: 'Home Use',
       description: 'Check stored vegetables to plan meals and reduce household food waste.',
-      icon: homeIcon
+      icon: '/assets/icons/home.svg'
     },
     {
       title: 'Supply Chain',
       description: 'Monitor produce quality throughout distribution for better inventory management.',
-      icon: supplyIcon
+      icon: '/assets/icons/supply.svg'
     }
   ]
 

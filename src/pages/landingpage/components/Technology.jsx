@@ -1,5 +1,5 @@
 import React from 'react'
-import AnimatedSection from '../../../../components/AnimatedSection'
+import AnimatedSection from '../../../components/AnimatedSection'
 
 function Technology() {
   const technologies = [

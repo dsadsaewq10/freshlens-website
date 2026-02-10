@@ -1,8 +1,5 @@
 import React from 'react'
-import AnimatedSection from '../../../../components/AnimatedSection'
-import playstoreIcon from '../../../../assets/icons/playstore.png'
-import downloadIcon from '../../../../assets/icons/download.png'
-import playstoreAppImg from '../../../../assets/images/playstoreapp.png'
+import AnimatedSection from '../../../components/AnimatedSection'
 
 function CallToAction() {
   return (
@@ -56,7 +53,7 @@ function CallToAction() {
                 className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-xl font-semibold transition-colors flex items-center justify-center gap-3"
               >
                 {/* Google Play icon */}
-                <img src={playstoreIcon} alt="Google Play" className="w-6 h-6" />
+                <img src="/assets/icons/playstore.png" alt="Google Play" className="w-6 h-6" />
                 <div className="text-left">
                   <span className="text-xs text-white/70 block">Get it on</span>
                   <span className="text-lg">Google Play</span>
@@ -69,7 +66,7 @@ function CallToAction() {
                 className="bg-white/10 hover:bg-white/20 border border-white/30 text-white px-8 py-4 rounded-xl font-semibold transition-colors flex items-center justify-center gap-3"
               >
                 {/* Download icon */}
-                <img src={downloadIcon} alt="Download" className="w-6 h-6" />
+                <img src="/assets/icons/download.png" alt="Download" className="w-6 h-6" />
                 <div className="text-left">
                   <span className="text-xs text-white/70 block">Direct</span>
                   <span className="text-lg">Download APK</span>
@@ -92,7 +89,7 @@ function CallToAction() {
                     
                     {/* App Screenshot */}
                     <img 
-                      src={playstoreAppImg} 
+                      src="/assets/images/playstoreapp.png" 
                       alt="FreshLens App Screenshot" 
                       className="w-full h-full object-contain object-center" 
                     />
