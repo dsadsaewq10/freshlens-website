@@ -113,18 +113,6 @@ function SplashScreen({ onComplete }) {
           />
         </motion.div>
 
-        {/* Camera Shutter Flash Effect */}
-        <AnimatePresence>
-          {phase === 'capture' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0, 1, 0] }}
-              transition={{ duration: 0.3, times: [0, 0.1, 1] }}
-              className="absolute -inset-20 bg-white rounded-full z-20"
-            />
-          )}
-        </AnimatePresence>
-
         {/* Logo Container with Scanning Effect */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
