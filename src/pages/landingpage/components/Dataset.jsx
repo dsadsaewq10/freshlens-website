@@ -200,60 +200,7 @@ function Dataset() {
             </div>
           </div>
         </AnimatedSection>
-
-        {/* Contribute to Dataset Section */}
-        <AnimatedSection delay={0.25}>
-          <div className="mb-16">
-            <div className="text-center mb-10">
-              <h3 className="text-2xl lg:text-3xl font-bold text-accent mb-3">
-                Contribute to the Dataset
-              </h3>
-              <p className="text-gray-600 max-w-xl mx-auto">
-                Help us grow the dataset and improve model accuracy. 
-                Every contribution makes a difference in food waste reduction.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {contributionSteps.map((item, index) => (
-                <motion.div
-                  key={item.step}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="relative"
-                >
-                  {/* Connector line for desktop */}
-                  {index < contributionSteps.length - 1 && (
-                    <div className="hidden lg:block absolute top-8 left-[60%] w-full h-0.5 bg-primary/20" />
-                  )}
-                  
-                  <div className="bg-background rounded-2xl p-6 relative z-10 h-full border border-gray-100">
-                    <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center mb-4">
-                      <span className="text-white font-bold text-lg">{item.step}</span>
-                    </div>
-                    <h4 className="font-semibold text-accent text-lg mb-2">{item.title}</h4>
-                    <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Contribution Guidelines Link */}
-            <div className="text-center mt-8">
-              <a
-                href="#" // PLACEHOLDER: Add contribution guidelines link
-                className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
-              >
-                {/* PLACEHOLDER: Add document icon */}
-                <span>Read Full Contribution Guidelines</span>
-                <span>→</span>
-              </a>
-            </div>
-          </div>
-        </AnimatedSection>
-
+          
         {/* Model Versions */}
         <AnimatedSection delay={0.3}>
           <div className="mb-16">

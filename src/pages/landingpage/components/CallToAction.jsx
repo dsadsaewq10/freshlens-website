@@ -19,26 +19,26 @@ function CallToAction() {
             {/* Features list */}
             <ul className="space-y-4 mb-8">
               <li className="flex items-center gap-3 text-white/90">
-                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center shrink-0">
                   {/* PLACEHOLDER: Add checkmark icon */}
                   <div className="w-3 h-3 bg-white rounded-sm" />
                 </div>
                 Free to download and use
               </li>
               <li className="flex items-center gap-3 text-white/90">
-                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center shrink-0">
                   <div className="w-3 h-3 bg-white rounded-sm" />
                 </div>
                 No account required
               </li>
               <li className="flex items-center gap-3 text-white/90">
-                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center shrink-0">
                   <div className="w-3 h-3 bg-white rounded-sm" />
                 </div>
                 Works offline after initial setup
               </li>
               <li className="flex items-center gap-3 text-white/90">
-                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center shrink-0">
                   <div className="w-3 h-3 bg-white rounded-sm" />
                 </div>
                 Regular model updates
@@ -81,7 +81,7 @@ function CallToAction() {
               {/* PLACEHOLDER: Add your Android phone mockup image here */}
               <div className="relative">
                 {/* Phone frame */}
-                <div className="w-72 h-[580px] bg-gradient-to-b from-gray-800 to-gray-900 rounded-[3rem] p-3 shadow-2xl">
+                <div className="w-72 h-145 bg-linear-to-b from-gray-800 to-gray-900 rounded-[3rem] p-3 shadow-2xl">
                   {/* Screen */}
                   <div className="w-full h-full bg-black rounded-[2.5rem] overflow-hidden relative">
                     {/* Notch */}
@@ -103,30 +103,6 @@ function CallToAction() {
             </div>
           </AnimatedSection>
         </div>
-
-        {/* Stats bar */}
-        <AnimatedSection delay={0.3}>
-          <div className="mt-16 pt-12 border-t border-white/10">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div>
-                <p className="text-3xl lg:text-4xl font-bold text-white">9,355+</p>
-                <p className="text-white/60 mt-1">Training Images</p>
-              </div>
-              <div>
-                <p className="text-3xl lg:text-4xl font-bold text-white">89%</p>
-                <p className="text-white/60 mt-1">Average Accuracy</p>
-              </div>
-              <div>
-                <p className="text-3xl lg:text-4xl font-bold text-white">6</p>
-                <p className="text-white/60 mt-1">Vegetable Types</p>
-              </div>
-              <div>
-                <p className="text-3xl lg:text-4xl font-bold text-white">&lt;1s</p>
-                <p className="text-white/60 mt-1">Detection Time</p>
-              </div>
-            </div>
-          </div>
-        </AnimatedSection>
       </div>
     </section>
   )

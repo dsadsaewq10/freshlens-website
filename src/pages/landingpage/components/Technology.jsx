@@ -2,124 +2,70 @@ import React from 'react'
 import AnimatedSection from '../../../components/AnimatedSection'
 
 function Technology() {
-  const technologies = [
-    {
-      title: 'YOLOv8',
-      subtitle: 'Object Detection',
-      description: 'State-of-the-art real-time object detection model optimized for speed and accuracy in vegetable classification tasks.',
-      stats: [
-        { label: 'Detection Speed', value: '<50ms' },
-        { label: 'Accuracy', value: '89%+' }
-      ]
-    },
-    {
-      title: 'Computer Vision',
-      subtitle: 'Image Analysis',
-      description: 'Advanced image processing techniques to extract visual features like color, texture, and shape for freshness assessment.',
-      stats: [
-        { label: 'Resolution', value: '640px' },
-        { label: 'Formats', value: 'JPG/PNG' }
-      ]
-    },
-    {
-      title: 'Deep Learning',
-      subtitle: 'Neural Networks',
-      description: 'Convolutional neural networks trained on thousands of annotated vegetable images for reliable freshness classification.',
-      stats: [
-        { label: 'Training Images', value: '9,355+' },
-        { label: 'Classes', value: '3-5' }
-      ]
-    }
+  const stats = [
+    { label: 'Model', value: 'YOLOv8' },
+    { label: 'Accuracy', value: '89%+' },
+    { label: 'Inference Speed', value: '<50ms' },
+    { label: 'Training Images', value: '9,355+' },
+    { label: 'Resolution', value: '640×640' },
+    { label: 'Classes', value: '3–5' }
+  ]
+
+  const highlights = [
+    'Fine-tuned YOLOv8 for vegetable freshness classification',
+    'TensorFlow Lite optimized for on-device mobile inference',
+    'Multi-class detection from Fresh to Spoiled with confidence scores',
+    'Trained on a curated dataset of annotated vegetable images'
   ]
 
   return (
-    <section id="technology" className="bg-primary py-20 lg:py-28">
-      <div className="max-w-6xl mx-auto px-6">
-        <AnimatedSection className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
-            Powered by Advanced Technology
-          </h2>
-          <p className="text-white/80 max-w-2xl mx-auto text-lg">
-            FreshLens leverages cutting-edge AI and computer vision technologies 
-            to deliver accurate and reliable freshness detection.
-          </p>
-        </AnimatedSection>
+    <section id="technology" className="bg-background py-20 lg:py-28 min-h-screen flex items-center">
+      <div className="max-w-6xl mx-auto px-6 w-full">
+        <AnimatedSection>
+          <div className="bg-primary rounded-3xl p-10 lg:p-16 relative overflow-hidden">
+            {/* Subtle gradient overlays */}
+            <div className="absolute top-0 right-0 w-1/4 h-full bg-white/3 rounded-l-full" />
+            <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-white/3 rounded-tr-full" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {technologies.map((tech, index) => (
-            <AnimatedSection key={tech.title} delay={index * 0.15}>
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-colors h-full">
-                {/* Icon placeholder */}
-                <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mb-6">
-                  {/* PLACEHOLDER: Add technology icon here */}
-                  <div className="w-8 h-8 bg-white/30 rounded-lg" />
-                </div>
-
-                <div className="mb-4">
-                  <h3 className="text-2xl font-bold text-white mb-1">
-                    {tech.title}
-                  </h3>
-                  <span className="text-primary/60 text-white/60 text-sm font-medium">
-                    {tech.subtitle}
-                  </span>
-                </div>
-
-                <p className="text-white/80 mb-6 leading-relaxed">
-                  {tech.description}
-                </p>
-
-                {/* Stats */}
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/20">
-                  {tech.stats.map((stat) => (
-                    <div key={stat.label}>
-                      <p className="text-2xl font-bold text-white">{stat.value}</p>
-                      <p className="text-white/60 text-sm">{stat.label}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </AnimatedSection>
-          ))}
-        </div>
-
-        {/* Additional tech info */}
-        <AnimatedSection delay={0.4}>
-          <div className="mt-16 bg-white/5 rounded-2xl p-8 border border-white/10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+              {/* Left - Text */}
               <div>
-                <h3 className="text-2xl font-bold text-white mb-4">
-                  Model Architecture
-                </h3>
-                <p className="text-white/80 leading-relaxed mb-4">
-                  Our system uses a fine-tuned YOLOv8 model specifically trained 
-                  for vegetable freshness detection. The model processes images 
-                  through multiple convolutional layers to extract features and 
-                  classify freshness levels with high accuracy.
+                <h2 className="text-3xl lg:text-4xl font-bold text-white mb-5">
+                  Powered by Advanced AI
+                </h2>
+                <p className="text-white/70 text-lg leading-relaxed mb-8">
+                  FreshLens uses a fine-tuned YOLOv8 model with TensorFlow Lite, 
+                  trained on thousands of vegetable images for real-time 
+                  freshness detection directly on mobile devices — no server required.
                 </p>
-                <ul className="space-y-2 text-white/70">
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-white/50 rounded-full" />
-                    Real-time inference on mobile devices
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-white/50 rounded-full" />
-                    Optimized for Android deployment
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-white/50 rounded-full" />
-                    Continuous model improvements
-                  </li>
+
+                <ul className="space-y-3 mb-10">
+                  {highlights.map((item, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 bg-white/50 rounded-full mt-2.5 shrink-0" />
+                      <span className="text-white/60 leading-relaxed">{item}</span>
+                    </li>
+                  ))}
                 </ul>
-              </div>
-              
-              {/* Architecture diagram placeholder */}
-              <div className="bg-white/10 rounded-xl h-64 flex items-center justify-center">
-                {/* PLACEHOLDER: Add model architecture diagram here */}
-                <div className="text-center text-white/50">
-                  <div className="w-16 h-16 bg-white/20 rounded-lg mx-auto mb-4" />
-                  <p className="font-medium">Architecture Diagram</p>
-                  <p className="text-sm">Add your diagram asset here</p>
+
+                <div className="flex flex-wrap gap-3">
+                  <a href="#how-it-works" className="bg-white text-primary font-semibold px-7 py-3.5 rounded-full text-sm hover:bg-white/90 transition-colors">
+                    Learn More
+                  </a>
+                  <a href="https://github.com/dsadsaewq10/freshlens-website" target="_blank" rel="noopener noreferrer" className="border border-white/30 text-white font-semibold px-7 py-3.5 rounded-full text-sm hover:bg-white/10 transition-colors">
+                    View on GitHub
+                  </a>
                 </div>
+              </div>
+
+              {/* Right - Stats Grid */}
+              <div className="grid grid-cols-2 gap-4 lg:mt-10">
+                {stats.map((stat) => (
+                  <div key={stat.label} className="bg-white/10 border border-white/15 rounded-xl p-6">
+                    <p className="text-white/50 text-sm mb-2">{stat.label}</p>
+                    <p className="text-white font-bold text-xl">{stat.value}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

@@ -10,13 +10,13 @@ function Features() {
     },
     {
       title: 'High Accuracy',
-      description: '89% average accuracy across all vegetable classes for reliable freshness assessment.',
+      description: 'High average accuracy across all vegetable classes for reliable freshness assessment.',
       icon: '/assets/icons/accuracy.svg'
     },
     {
       title: 'Multi-Class Classification',
       description: 'Classify vegetables into 3-5 freshness levels from fresh to spoiled.',
-      icon: '/assets/icons/fresh.svg'
+      icon: '/assets/icons/icon_vegetables.svg'
     },
     {
       title: 'Offline Capable',
@@ -25,12 +25,7 @@ function Features() {
     },
     {
       title: 'Easy to Use',
-      description: 'Simple point-and-scan interface designed for quick and intuitive operation.',
-      icon: '/assets/icons/scan.svg'
-    },
-    {
-      title: 'Mobile Optimized',
-      description: 'Lightweight model optimized for smooth performance on Android devices.',
+      description: 'Simple point-and-scan interface with a lightweight model optimized for smooth performance on Android devices.',
       icon: '/assets/icons/mobile.svg'
     }
   ]
@@ -48,9 +43,9 @@ function Features() {
           </p>
         </AnimatedSection>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
           {features.map((feature, index) => (
-            <AnimatedSection key={feature.title} delay={index * 0.1}>
+            <AnimatedSection key={feature.title} delay={index * 0.1} className={index < 3 ? 'lg:col-span-2' : 'lg:col-span-3'}>
               <div className="bg-background rounded-2xl p-6 h-full hover:shadow-lg transition-shadow">
                 {/* Icon */}
                 <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center mb-5">

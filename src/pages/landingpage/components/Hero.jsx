@@ -25,7 +25,7 @@ function Hero({ isLoaded }) {
   }
 
   return (
-    <section className="bg-background min-h-screen flex items-center pt-20 overflow-hidden">
+    <section className="bg-background w-full flex items-center pt-20 overflow-hidden">
       <div className="max-w-6xl mx-auto px-6 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Text Content */}

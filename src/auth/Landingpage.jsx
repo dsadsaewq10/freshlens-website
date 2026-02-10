@@ -43,15 +43,30 @@ function Landingpage() {
       {/* Main Content */}
       <Header isLoaded={isLoaded} />
       <main>
-        <Hero isLoaded={isLoaded} />
-        <Features />
-        <HowItWorks />
-        <Technology />
-        <Dataset />
-        <Benefits />
-        <CallToAction />
+        <div className="snap-section">
+          <Hero isLoaded={isLoaded} />
+        </div>
+        <div className="snap-section">
+          <Benefits />
+        </div>
+        <div className="snap-section">
+          <Technology />
+        </div>
+        <div className="snap-section">
+          <Dataset />
+        </div>
+        <div className="snap-section">
+          <Features />
+        </div>
+        <div className="snap-section">
+          <HowItWorks />
+        </div>
+      
+        <div className="snap-section">
+          <CallToAction />
+          <Footer />
+        </div>
       </main>
-      <Footer />
     </div>
   )
 }
