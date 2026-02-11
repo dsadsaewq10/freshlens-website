@@ -12,22 +12,27 @@ import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'fra
  *   Phase 4  Reset        — clean fade-out before restart            (1.0 s)
  *
  * Total loop: ~9.5 s (including transition time)
+ *
+ * Entrance: Dramatic spin-in with scroll-based parallax after entry.
+ * Floating: Continuous vertical bob with ground shadow platform.
  */
 
 const PHASE_DURATIONS = [2000, 1500, 1000, 4000, 1000]
 
 function PhoneMockup({ isVisible }) {
   const [hasEntryCompleted, setHasEntryCompleted] = useState(false)
-  const [phase, setPhase] = useState(0)
-  const phaseRef = useRef(0)
-  const timerRef = useRef(null)
 
+  // Scroll-based parallax effects
   const { scrollY } = useScroll()
   const smoothScrollY = useSpring(scrollY, { stiffness: 100, damping: 30 })
   const parallaxY = useTransform(smoothScrollY, [0, 500], [0, -60])
   const rotateX = useTransform(smoothScrollY, [0, 400], [0, 12])
   const rotateY = useTransform(smoothScrollY, [0, 400], [0, -8])
-  const scaleVal = useTransform(smoothScrollY, [0, 300], [1, 0.92])
+  const scale = useTransform(smoothScrollY, [0, 300], [1, 0.92])
+
+  const [phase, setPhase] = useState(0)
+  const phaseRef = useRef(0)
+  const timerRef = useRef(null)
 
   // Strict sequential phase advancement — single timer, no overlap
   const advancePhase = useCallback(() => {
@@ -46,26 +51,42 @@ function PhoneMockup({ isVisible }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 150, scale: 0.3, rotateY: 180, rotateX: 45 }}
-      animate={isVisible ? { opacity: 1, y: 0, scale: 1, rotateY: 0, rotateX: 0 } : {}}
+      initial={{
+        opacity: 0,
+        y: 150,
+        scale: 0.3,
+        rotateY: 180,
+        rotateX: 45,
+      }}
+      animate={isVisible ? {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        rotateY: 0,
+        rotateX: 0,
+      } : {}}
       transition={{
-        duration: 1.4, delay: 0.3,
+        duration: 1.4,
+        delay: 0.3,
         ease: [0.25, 0.46, 0.45, 0.94],
         rotateY: { duration: 1.2, ease: [0.34, 1.56, 0.64, 1] },
         rotateX: { duration: 1, ease: 'easeOut' },
       }}
       onAnimationComplete={() => setHasEntryCompleted(true)}
-      style={{ y: hasEntryCompleted ? parallaxY : 0, perspective: 1200 }}
+      style={{
+        y: hasEntryCompleted ? parallaxY : 0,
+        perspective: 1200,
+      }}
       className="relative flex justify-center"
     >
       {/* Floating bob */}
       <motion.div
-        animate={{ y: [0, -20, 0] }}
+        animate={{ y: [0, -18, 0] }}
         transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
         style={{
           rotateX: hasEntryCompleted ? rotateX : 0,
           rotateY: hasEntryCompleted ? rotateY : 0,
-          scale: hasEntryCompleted ? scaleVal : 1,
+          scale: hasEntryCompleted ? scale : 1,
           transformStyle: 'preserve-3d',
         }}
         className="relative"
@@ -481,11 +502,36 @@ function PhoneMockup({ isVisible }) {
         </motion.div>
       </motion.div>
 
-      {/* Ground Shadow */}
+      {/* ── Ground Shadow / Floating Platform ── */}
+      {/* Outer soft ambient shadow */}
       <motion.div
-        animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.15, 0.3] }}
+        animate={{
+          scaleX: [1, 1.06, 1],
+          scaleY: [1, 0.85, 1],
+          opacity: [0.45, 0.25, 0.45],
+        }}
         transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute -bottom-8 w-48 h-8 bg-black/20 rounded-full blur-xl"
+        className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-72 h-20 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 70% 55% at center, rgba(40,90,83,0.40) 0%, rgba(0,0,0,0.18) 40%, transparent 70%)',
+          borderRadius: '50%',
+          filter: 'blur(10px)',
+        }}
+      />
+      {/* Inner concentrated shadow */}
+      <motion.div
+        animate={{
+          scaleX: [1, 1.1, 1],
+          scaleY: [1, 0.7, 1],
+          opacity: [0.6, 0.35, 0.6],
+        }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-52 h-10 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.20) 45%, transparent 70%)',
+          borderRadius: '50%',
+          filter: 'blur(5px)',
+        }}
       />
     </motion.div>
   )

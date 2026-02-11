@@ -20,7 +20,7 @@ function Technology() {
   ]
 
   return (
-    <section id="technology" className="bg-primary py-20 lg:py-28 min-h-screen flex items-center relative overflow-hidden">
+    <section id="technology" className="bg-surface py-20 lg:py-28 min-h-screen flex items-center relative overflow-hidden">
       {/* Floating particles */}
       {[...Array(6)].map((_, i) => (
         <motion.div
@@ -28,7 +28,7 @@ function Technology() {
           animate={{
             y: [0, -30, 0],
             x: [0, i % 2 === 0 ? 15 : -15, 0],
-            opacity: [0.1, 0.25, 0.1],
+            opacity: [0.06, 0.15, 0.06],
           }}
           transition={{
             duration: 4 + i * 0.8,
@@ -36,7 +36,7 @@ function Technology() {
             delay: i * 0.7,
             ease: 'easeInOut',
           }}
-          className="absolute w-2 h-2 bg-white/10 rounded-full"
+          className="absolute w-2 h-2 bg-primary/20 rounded-full"
           style={{
             top: `${15 + i * 14}%`,
             left: `${8 + i * 16}%`,
@@ -51,10 +51,10 @@ function Technology() {
           viewport={{ once: false, margin: '-80px' }}
           transition={{ duration: 0.6 }}
         >
-          <div className="bg-white/5 rounded-3xl p-10 lg:p-16 relative overflow-hidden border border-white/5">
+          <div className="bg-white rounded-3xl p-10 lg:p-16 relative overflow-hidden border border-gray-100 shadow-sm">
             {/* Subtle gradient overlays */}
-            <div className="absolute top-0 right-0 w-1/4 h-full bg-white/3 rounded-l-full" />
-            <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-white/3 rounded-tr-full" />
+            <div className="absolute top-0 right-0 w-1/4 h-full bg-primary/3 rounded-l-full" />
+            <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-primary/3 rounded-tr-full" />
 
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
               {/* Left - Text */}
@@ -64,7 +64,7 @@ function Technology() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
                   transition={{ duration: 0.5, delay: 0.1 }}
-                  className="text-3xl lg:text-4xl font-bold text-white mb-5"
+                  className="text-3xl lg:text-4xl font-bold text-accent mb-5"
                 >
                   Powered by Advanced AI
                 </motion.h2>
@@ -73,7 +73,7 @@ function Technology() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  className="text-white/70 text-lg leading-relaxed mb-8"
+                  className="text-gray-600 text-lg leading-relaxed mb-8"
                 >
                   FreshLens uses a fine-tuned YOLOv8 model with TensorFlow Lite, 
                   trained on thousands of vegetable images for real-time 
@@ -90,8 +90,8 @@ function Technology() {
                       transition={{ duration: 0.4, delay: 0.3 + i * 0.08 }}
                       className="flex items-start gap-3"
                     >
-                      <div className="w-1.5 h-1.5 bg-white/50 rounded-full mt-2.5 shrink-0" />
-                      <span className="text-white/60 leading-relaxed">{item}</span>
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2.5 shrink-0" />
+                      <span className="text-gray-500 leading-relaxed">{item}</span>
                     </motion.li>
                   ))}
                 </ul>
@@ -103,10 +103,10 @@ function Technology() {
                   transition={{ duration: 0.5, delay: 0.6 }}
                   className="flex flex-wrap gap-3"
                 >
-                  <Link to="/technology" className="bg-white text-primary font-semibold px-7 py-3.5 rounded-full text-sm hover:bg-white/90 hover:scale-105 transition-all">
+                  <Link to="/technology" className="bg-primary text-white font-semibold px-7 py-3.5 rounded-full text-sm hover:bg-primary/90 hover:scale-105 transition-all">
                     Learn More
                   </Link>
-                  <a href="https://github.com/dsadsaewq10/freshlens-website" target="_blank" rel="noopener noreferrer" className="border border-white/30 text-white font-semibold px-7 py-3.5 rounded-full text-sm hover:bg-white/10 hover:scale-105 transition-all">
+                  <a href="https://github.com/dsadsaewq10/freshlens-website" target="_blank" rel="noopener noreferrer" className="border border-primary/30 text-primary font-semibold px-7 py-3.5 rounded-full text-sm hover:bg-primary/5 hover:scale-105 transition-all">
                     View on GitHub
                   </a>
                 </motion.div>
@@ -121,11 +121,11 @@ function Technology() {
                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     viewport={{ once: false }}
                     transition={{ duration: 0.4, delay: 0.15 + i * 0.07 }}
-                    whileHover={{ scale: 1.05, borderColor: 'rgba(255,255,255,0.3)' }}
-                    className="bg-white/10 border border-white/15 rounded-xl p-6 transition-all cursor-default"
+                    whileHover={{ scale: 1.05, borderColor: 'rgba(40,90,83,0.3)' }}
+                    className="bg-primary/5 border border-primary/10 rounded-xl p-6 transition-all cursor-default"
                   >
-                    <p className="text-white/50 text-sm mb-2">{stat.label}</p>
-                    <p className="text-white font-bold text-xl">{stat.value}</p>
+                    <p className="text-gray-500 text-sm mb-2">{stat.label}</p>
+                    <p className="text-accent font-bold text-xl">{stat.value}</p>
                   </motion.div>
                 ))}
               </div>
