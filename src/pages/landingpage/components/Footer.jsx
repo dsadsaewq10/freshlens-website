@@ -90,9 +90,9 @@ function Footer() {
             transition={{ duration: 0.7, delay: 0.15 }}
             className="lg:col-span-6 flex justify-center lg:justify-end"
           >
-            <div className="relative w-56 lg:w-64">
+            <div className="relative w-80 lg:w-96">
               <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-56 h-56 bg-white/5 rounded-full blur-3xl" />
-              <div className="relative overflow-hidden rounded-t-[2rem]" style={{ height: '380px' }}>
+              <div className="relative overflow-hidden rounded-t-[2rem]" style={{ height: '310px' }}>
                 <div className="bg-gradient-to-b from-gray-700 to-gray-800 rounded-t-[2rem] p-2 h-full">
                   <div className="w-full h-full bg-white rounded-t-[1.5rem] overflow-hidden relative">
                     {/* Notch */}

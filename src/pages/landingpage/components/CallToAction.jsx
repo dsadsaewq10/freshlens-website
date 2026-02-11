@@ -75,25 +75,23 @@ function CallToAction() {
             </div>
           </AnimatedSection>
 
-          {/* Phone mockup — wider, shorter, aligned to buttons */}
+          {/* Phone mockup placeholder */}
           <AnimatedSection delay={0.2}>
             <div className="relative flex justify-center lg:justify-end">
-              <div className="relative w-full">
-                {/* Phone frame */}
-                <div
-                  style={{ width: '100%', maxWidth: '520px', height: '200px' }}
-                  className="mx-auto bg-linear-to-b from-gray-800 to-gray-900 rounded-[2rem] p-2.5 shadow-2xl"
-                >
+              {/* PLACEHOLDER: Add your Android phone mockup image here */}
+              <div className="relative">
+                {/* Phone frame - BIGGER WIDTH, LESS HEIGHT */}
+                <div className="w-85 h-150 bg-linear-to-b from-gray-800 to-gray-900 rounded-[3rem] p-3 shadow-2xl">
                   {/* Screen */}
-                  <div className="w-full h-full bg-black rounded-[1.5rem] overflow-hidden relative">
+                  <div className="w-full h-full bg-black rounded-[2.5rem] overflow-hidden relative">
                     {/* Notch */}
-                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-4 bg-gray-900 rounded-full z-10" />
+                    <div className="absolute top-6 left-1/2 -translate-x-1/2 w-24 h-6 bg-gray-900 rounded-full z-10" />
                     
                     {/* App Screenshot */}
                     <img 
                       src="/assets/images/playstoreapp.png" 
                       alt="FreshLens App Screenshot" 
-                      className="w-full h-full object-cover object-top" 
+                      className="w-full h-full object-cover object-center" 
                     />
                   </div>
                 </div>
