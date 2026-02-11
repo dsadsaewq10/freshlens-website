@@ -24,34 +24,24 @@ function Header({ isLoaded = true, currentPage }) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Anchor links only work on the landing page
-  const anchorLinks = [
-    { href: '#features', label: 'Features' },
-    { href: '#benefits', label: 'Benefits' },
-    { href: '#download', label: 'Download' },
+  // Navigation items
+  const navItems = [
+    { label: 'Home', key: 'home' },
+    { label: 'Technology', key: 'technology', path: '/technology' },
+    { label: 'Dataset', key: 'dataset', path: '/dataset' },
   ]
 
-  // Page navigation links with active state
-  const pageLinks = [
-    { path: '/technology', label: 'Technology', key: 'technology' },
-    { path: '/dataset', label: 'Dataset', key: 'dataset' },
-  ]
-
-  const handleAnchorClick = (href) => {
+  const handleNavClick = (item) => {
     setIsMobileMenuOpen(false)
-    if (!isHome) {
-      // Navigate home first, then scroll to section
-      navigate('/')
-      setTimeout(() => {
-        const el = document.querySelector(href)
-        if (el) el.scrollIntoView({ behavior: 'smooth' })
-      }, 300)
+    if (item.key === 'home') {
+      if (isHome) {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      } else {
+        navigate('/')
+      }
+    } else {
+      navigate(item.path)
     }
-  }
-
-  const handlePageClick = (path) => {
-    setIsMobileMenuOpen(false)
-    navigate(path)
   }
 
   // Active indicator styles
@@ -89,24 +79,14 @@ function Header({ isLoaded = true, currentPage }) {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            {anchorLinks.map((link) => (
-              <a
-                key={link.href}
-                href={isHome ? link.href : undefined}
-                onClick={!isHome ? () => handleAnchorClick(link.href) : undefined}
-                className="text-accent hover:text-primary transition-colors font-medium cursor-pointer"
-              >
-                {link.label}
-              </a>
-            ))}
-            {pageLinks.map((link) => (
+            {navItems.map((item) => (
               <button
-                key={link.path}
-                onClick={() => handlePageClick(link.path)}
-                className={getNavClass(link.key)}
+                key={item.key}
+                onClick={() => handleNavClick(item)}
+                className={`${getNavClass(item.key)} cursor-pointer`}
               >
-                {link.label}
-                {activePage === link.key && (
+                {item.label}
+                {activePage === item.key && (
                   <motion.div
                     layoutId="activeNavIndicator"
                     className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full"
@@ -170,26 +150,16 @@ function Header({ isLoaded = true, currentPage }) {
           }`}
         >
           <div className="flex flex-col gap-4 pt-4 border-t border-gray-200">
-            {anchorLinks.map((link) => (
-              <a
-                key={link.href}
-                href={isHome ? link.href : undefined}
-                onClick={() => { if (!isHome) handleAnchorClick(link.href); else setIsMobileMenuOpen(false); }}
-                className="text-accent hover:text-primary transition-colors font-medium cursor-pointer"
-              >
-                {link.label}
-              </a>
-            ))}
-            {pageLinks.map((link) => (
+            {navItems.map((item) => (
               <button
-                key={link.path}
-                onClick={() => handlePageClick(link.path)}
-                className={`text-left ${getNavClass(link.key)}`}
+                key={item.key}
+                onClick={() => handleNavClick(item)}
+                className={`text-left cursor-pointer ${getNavClass(item.key)}`}
               >
-                {activePage === link.key && (
+                {activePage === item.key && (
                   <span className="inline-block w-1.5 h-1.5 rounded-full mr-2 align-middle" style={{ background: '#285A53' }} />
                 )}
-                {link.label}
+                {item.label}
               </button>
             ))}
             <button

@@ -7,8 +7,6 @@ import Features from '../pages/landingpage/components/Features'
 import HowItWorks from '../pages/landingpage/components/HowItWorks'
 import Technology from '../pages/landingpage/components/Technology'
 import Dataset from '../pages/landingpage/components/Dataset'
-import Benefits from '../pages/landingpage/components/Benefits'
-import CallToAction from '../pages/landingpage/components/CallToAction'
 import Footer from '../pages/landingpage/components/Footer'
 
 function Landingpage() {
@@ -27,7 +25,6 @@ function Landingpage() {
   const handleSplashComplete = () => {
     setShowSplash(false)
     setIsLoaded(true)
-    // Mark splash as shown for this session
     sessionStorage.setItem('freshlens-splash-shown', 'true')
   }
 
@@ -47,23 +44,18 @@ function Landingpage() {
           <Hero isLoaded={isLoaded} />
         </div>
         <div className="snap-section">
-          <Benefits />
-        </div>
-        <div className="snap-section">
-          <Technology />
-        </div>
-        <div className="snap-section">
-          <Dataset />
-        </div>
-        <div className="snap-section">
           <Features />
         </div>
         <div className="snap-section">
           <HowItWorks />
         </div>
-      
         <div className="snap-section">
-          <CallToAction />
+          <Dataset />
+        </div>
+        <div className="snap-section">
+          <Technology />
+        </div>
+        <div className="snap-section">
           <Footer />
         </div>
       </main>

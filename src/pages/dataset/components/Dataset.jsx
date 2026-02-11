@@ -1,12 +1,14 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import Header from '../../landingpage/components/Header'
+import SectionScanLine from '../../../components/SectionScanLine'
 
 // Color palette
 const COLORS = {
   primary: '#285A53',
   medium: '#3E6963',
   light: '#F5F5F5',
+  darker: '#EDEDED',
   white: '#FFFFFF',
   dark: '#1B413B',
 }
@@ -243,6 +245,7 @@ function HeroSection() {
       className="min-h-screen flex items-center justify-center relative overflow-hidden snap-start"
       style={{ background: COLORS.light }}
     >
+      <SectionScanLine duration={7} />
       <div className="absolute inset-0 opacity-[0.03]">
         <div
           className="absolute inset-0"
@@ -253,7 +256,7 @@ function HeroSection() {
         />
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 pt-20 pb-12 w-full">
+      <div className="max-w-6xl mx-auto px-6 pt-20 pb-12 w-full relative z-10">
         <div className="text-center max-w-3xl mx-auto">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
@@ -338,11 +341,12 @@ function DatasetGridSection({ onSelectDataset }) {
     <section
       ref={ref}
       className="min-h-screen flex items-center snap-start relative overflow-hidden"
-      style={{ background: COLORS.primary }}
+      style={{ background: COLORS.darker }}
     >
+      <SectionScanLine duration={7} />
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-white/[0.03]" />
-        <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full bg-white/[0.03]" />
+        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full" style={{ background: `${COLORS.primary}08` }} />
+        <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full" style={{ background: `${COLORS.primary}08` }} />
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-16 w-full relative z-10">
@@ -352,13 +356,13 @@ function DatasetGridSection({ onSelectDataset }) {
           transition={{ duration: 0.6 }}
           className="text-center mb-10"
         >
-          <span className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4 bg-white/10 text-white/80">
+          <span className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4" style={{ background: `${COLORS.primary}15`, color: COLORS.primary }}>
             Available Datasets
           </span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3" style={{ color: COLORS.primary }}>
             Choose a Dataset
           </h2>
-          <p className="text-white/70 max-w-xl mx-auto text-lg">
+          <p className="text-gray-600 max-w-xl mx-auto text-lg">
             Click on any dataset card to preview sample images, view statistics,
             and download the full dataset.
           </p>
@@ -375,10 +379,10 @@ function DatasetGridSection({ onSelectDataset }) {
               whileHover={{ scale: 1.03, y: -4 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => onSelectDataset(dataset)}
-              className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/15 cursor-pointer hover:bg-white/15 transition-colors group"
+              className="bg-white rounded-2xl p-5 border border-gray-200 cursor-pointer hover:shadow-lg transition-all group"
             >
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-xl bg-white/10 flex items-center justify-center shrink-0 overflow-hidden group-hover:scale-105 transition-transform">
+                <div className="w-16 h-16 rounded-xl flex items-center justify-center shrink-0 overflow-hidden group-hover:scale-105 transition-transform" style={{ background: COLORS.light }}>
                   <img
                     src={dataset.thumbnail}
                     alt={dataset.name}
@@ -387,24 +391,24 @@ function DatasetGridSection({ onSelectDataset }) {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-bold text-white mb-1">{dataset.name}</h3>
-                  <p className="text-white/60 text-sm line-clamp-2 mb-2.5">
+                  <h3 className="text-lg font-bold mb-1" style={{ color: COLORS.primary }}>{dataset.name}</h3>
+                  <p className="text-gray-500 text-sm line-clamp-2 mb-2.5">
                     {dataset.description}
                   </p>
                   <div className="flex flex-wrap gap-3 text-xs">
-                    <span className="flex items-center gap-1 text-white/70">
+                    <span className="flex items-center gap-1 text-gray-500">
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                       {dataset.images.toLocaleString()} images
                     </span>
-                    <span className="flex items-center gap-1 text-white/70">
+                    <span className="flex items-center gap-1 text-gray-500">
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                       </svg>
                       {dataset.classes.length} classes
                     </span>
-                    <span className="flex items-center gap-1 text-white/70">
+                    <span className="flex items-center gap-1 text-gray-500">
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
                       </svg>
@@ -414,7 +418,7 @@ function DatasetGridSection({ onSelectDataset }) {
                 </div>
 
                 <div className="shrink-0 self-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <svg className="w-5 h-5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-5 h-5" style={{ color: `${COLORS.primary}60` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
@@ -437,10 +441,11 @@ function StatsSection() {
   return (
     <section
       ref={ref}
-      className="min-h-screen flex items-center snap-start"
-      style={{ background: COLORS.medium }}
+      className="min-h-screen flex items-center snap-start relative overflow-hidden"
+      style={{ background: COLORS.primary }}
     >
-      <div className="max-w-6xl mx-auto px-6 py-16 w-full">
+      <SectionScanLine duration={6} light={false} />
+      <div className="max-w-6xl mx-auto px-6 py-16 w-full relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
@@ -590,10 +595,11 @@ function FormatSection() {
   return (
     <section
       ref={ref}
-      className="min-h-screen flex items-center snap-start"
+      className="min-h-screen flex items-center snap-start relative overflow-hidden"
       style={{ background: COLORS.light }}
     >
-      <div className="max-w-6xl mx-auto px-6 py-16 w-full">
+      <SectionScanLine duration={7} />
+      <div className="max-w-6xl mx-auto px-6 py-16 w-full relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}

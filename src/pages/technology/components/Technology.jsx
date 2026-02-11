@@ -1,12 +1,14 @@
 import React, { useRef, useEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
 import Header from '../../landingpage/components/Header'
+import SectionScanLine from '../../../components/SectionScanLine'
 
 // Color palette
 const COLORS = {
   primary: '#285A53',
   medium: '#3E6963',
   light: '#F5F5F5',
+  darker: '#EDEDED',
   white: '#FFFFFF',
   dark: '#1B413B',
 }
@@ -54,7 +56,7 @@ const technologies = [
       'Recognizes multiple vegetables in a single frame simultaneously',
     ],
     logo: '/assets/icons/yolo-logo.svg',
-    bgColor: COLORS.light,
+    bgColor: COLORS.darker,
     textColor: COLORS.primary,
   },
   {
@@ -98,8 +100,8 @@ const technologies = [
       'Keeps all processing on your device for complete privacy',
     ],
     logo: '/assets/icons/tflite.png',
-    bgColor: COLORS.medium,
-    textColor: COLORS.white,
+    bgColor: COLORS.light,
+    textColor: COLORS.primary,
   },
   {
     id: 'python',
@@ -120,7 +122,7 @@ const technologies = [
       'Automates the process of splitting data into training and testing sets',
     ],
     logo: '/assets/icons/python.png',
-    bgColor: COLORS.light,
+    bgColor: COLORS.darker,
     textColor: COLORS.primary,
   },
   {
@@ -163,6 +165,8 @@ function HeroSection() {
       className="min-h-screen flex items-center justify-center relative overflow-hidden snap-start"
       style={{ background: COLORS.light }}
     >
+      <SectionScanLine duration={7} />
+
       <div className="absolute inset-0 opacity-[0.03]">
         <div
           className="absolute inset-0"
@@ -173,7 +177,7 @@ function HeroSection() {
         />
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 pt-20 pb-12 w-full">
+      <div className="max-w-6xl mx-auto px-6 pt-20 pb-12 w-full relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <motion.div
             initial={{ opacity: 0, x: -40 }}
@@ -297,6 +301,8 @@ function TechSection({ tech, index }) {
       className="min-h-screen flex items-center snap-start relative overflow-hidden"
       style={{ background: tech.bgColor }}
     >
+      <SectionScanLine duration={6} light={tech.textColor !== COLORS.white} />
+
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
           className="absolute -top-24 -right-24 w-80 h-80 rounded-full opacity-[0.04]"
@@ -455,10 +461,12 @@ function ArchitectureSection() {
   return (
     <section
       ref={ref}
-      className="min-h-screen flex items-center snap-start"
+      className="min-h-screen flex items-center snap-start relative overflow-hidden"
       style={{ background: COLORS.light }}
     >
-      <div className="max-w-6xl mx-auto px-6 py-16 w-full">
+      <SectionScanLine duration={7} />
+
+      <div className="max-w-6xl mx-auto px-6 py-16 w-full relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
