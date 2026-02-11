@@ -11,6 +11,28 @@ const COLORS = {
   dark: '#1B413B',
 }
 
+// Reusable icon component that renders SVG/PNG with exact color via CSS mask
+function ColorIcon({ src, alt, color, className = 'w-6 h-6' }) {
+  return (
+    <div
+      role="img"
+      aria-label={alt}
+      className={className}
+      style={{
+        backgroundColor: color,
+        WebkitMaskImage: `url(${src})`,
+        WebkitMaskSize: 'contain',
+        WebkitMaskRepeat: 'no-repeat',
+        WebkitMaskPosition: 'center',
+        maskImage: `url(${src})`,
+        maskSize: 'contain',
+        maskRepeat: 'no-repeat',
+        maskPosition: 'center',
+      }}
+    />
+  )
+}
+
 // Technology data — Flutter replaces React Native, approachable descriptions
 const technologies = [
   {
@@ -20,10 +42,10 @@ const technologies = [
     description:
       'YOLOv8 is the "eyes" of FreshLens. It scans your vegetable photo in a single pass — meaning it can identify what it sees almost instantly. Think of it as a trained expert that glances at your produce and immediately knows its condition.',
     highlights: [
-      { label: 'Speed', value: '<50ms', icon: '⚡' },
-      { label: 'Accuracy', value: '89%+', icon: '🎯' },
-      { label: 'Parameters', value: '3.2M', icon: '🧠' },
-      { label: 'Input Size', value: '640px', icon: '📐' },
+      { label: 'Speed', value: '<50ms', icon: '/assets/icons/icon_speed.svg' },
+      { label: 'Accuracy', value: '89%+', icon: '/assets/icons/accuracy.svg' },
+      { label: 'Parameters', value: '3.2M', icon: '/assets/icons/icon_brain.svg' },
+      { label: 'Input Size', value: '640px', icon: '/assets/icons/icon_input.svg' },
     ],
     details: [
       'Processes the entire image at once — no need to scan piece by piece',
@@ -42,10 +64,10 @@ const technologies = [
     description:
       'TensorFlow is like the classroom where our AI learns. It provides the tools to show thousands of vegetable images to the model so it can gradually learn what "fresh" and "spoiled" look like — similar to how you learn to tell if fruit is ripe.',
     highlights: [
-      { label: 'Training Set', value: '9,355+', icon: '📊' },
-      { label: 'Iterations', value: '100+', icon: '🔄' },
-      { label: 'Acceleration', value: 'GPU', icon: '🚀' },
-      { label: 'Version', value: '2.x', icon: '📦' },
+      { label: 'Training Set', value: '9,355+', icon: '/assets/icons/icon_graph.svg' },
+      { label: 'Iterations', value: '100+', icon: '/assets/icons/icon_cycle.svg' },
+      { label: 'Acceleration', value: 'GPU', icon: '/assets/icons/icon_rocket.svg' },
+      { label: 'Version', value: '2.x', icon: '/assets/icons/icon_version.svg' },
     ],
     details: [
       'Feeds thousands of labeled images to teach the model patterns',
@@ -64,10 +86,10 @@ const technologies = [
     description:
       'Once the AI model is trained, TensorFlow Lite shrinks it down so it fits on your phone. This means FreshLens works offline — no internet needed. Your photos never leave your device, keeping your data private.',
     highlights: [
-      { label: 'Model Size', value: '<10MB', icon: '📱' },
-      { label: 'Response', value: '<100ms', icon: '⏱️' },
-      { label: 'Offline', value: '100%', icon: '📡' },
-      { label: 'Optimized', value: 'INT8', icon: '🔢' },
+      { label: 'Model Size', value: '<10MB', icon: '/assets/icons/icon_phone.svg' },
+      { label: 'Response', value: '<100ms', icon: '/assets/icons/icon_response.svg' },
+      { label: 'Offline', value: '100%', icon: '/assets/icons/offline.svg' },
+      { label: 'Optimized', value: 'INT8', icon: '/assets/icons/icon_setttings.svg' },
     ],
     details: [
       'Compresses the model to under 10 MB without losing accuracy',
@@ -86,10 +108,10 @@ const technologies = [
     description:
       'Python is the programming language that ties everything together behind the scenes. It handles collecting and organizing images, running the training process, and converting the final model for mobile use — the essential backbone of FreshLens.',
     highlights: [
-      { label: 'Version', value: '3.10+', icon: '🐍' },
-      { label: 'Libraries', value: '15+', icon: '📚' },
-      { label: 'Scripts', value: '20+', icon: '📝' },
-      { label: 'Testing', value: 'PyTest', icon: '✅' },
+      { label: 'Version', value: '3.10+', icon: '/assets/icons/icon_version.svg' },
+      { label: 'Libraries', value: '15+', icon: '/assets/icons/icon_libraries.svg' },
+      { label: 'Scripts', value: '20+', icon: '/assets/icons/icon_script.svg' },
+      { label: 'Testing', value: 'PyTest', icon: '/assets/icons/icon_check.svg' },
     ],
     details: [
       'Prepares and cleans images using NumPy and OpenCV before training',
@@ -108,10 +130,10 @@ const technologies = [
     description:
       'Flutter is Google\'s toolkit for building beautiful mobile apps. It lets us create one codebase that runs smoothly on both Android and iOS devices. Combined with the on-device AI model, it delivers a fast, responsive scanning experience.',
     highlights: [
-      { label: 'Platforms', value: 'Android & iOS', icon: '📱' },
-      { label: 'Camera', value: 'Real-time', icon: '📸' },
-      { label: 'Rendering', value: '60 FPS', icon: '🎬' },
-      { label: 'Language', value: 'Dart', icon: '🎨' },
+      { label: 'Platforms', value: 'Android & iOS', icon: '/assets/icons/mobile.svg' },
+      { label: 'Camera', value: 'Real-time', icon: '/assets/icons/icon_camera.svg' },
+      { label: 'Rendering', value: '60 FPS', icon: '/assets/icons/icons_fps.png' },
+      { label: 'Language', value: 'Dart', icon: '/assets/icons/icon_libraries.svg' },
     ],
     details: [
       'Single codebase produces native apps for both Android and iOS',
@@ -119,7 +141,7 @@ const technologies = [
       'Works offline with the AI model running right on your phone',
       'Smooth, native-feeling animations at 60 frames per second',
     ],
-    logo: null, // PLACEHOLDER: Add Flutter logo to /assets/icons/flutter.png
+    logo: '/assets/icons/icon_flutter.svg',
     bgColor: COLORS.primary,
     textColor: COLORS.white,
   },
@@ -127,11 +149,11 @@ const technologies = [
 
 // Pipeline steps
 const pipelineSteps = [
-  { label: 'Capture', desc: 'Phone camera captures the image', icon: '📷' },
-  { label: 'Preprocess', desc: 'Resize and prepare for analysis', icon: '🔧' },
-  { label: 'Detect', desc: 'YOLOv8 identifies the vegetable', icon: '🧠' },
-  { label: 'Classify', desc: 'Determine freshness level', icon: '🏷️' },
-  { label: 'Display', desc: 'Show results to the user', icon: '📊' },
+  { label: 'Capture', desc: 'Phone camera captures the image', icon: '/assets/icons/icon_camera.svg' },
+  { label: 'Preprocess', desc: 'Resize and prepare for analysis', icon: '/assets/icons/icon_wrench.svg' },
+  { label: 'Detect', desc: 'YOLOv8 identifies the vegetable', icon: '/assets/icons/icon_brain.svg' },
+  { label: 'Classify', desc: 'Determine freshness level', icon: '/assets/icons/icon_tag.svg' },
+  { label: 'Display', desc: 'Show results to the user', icon: '/assets/icons/icon_result.svg' },
 ]
 
 // Hero section (only plays on mount)
@@ -222,7 +244,7 @@ function HeroSection() {
                           className="w-11 h-11 rounded-xl flex items-center justify-center text-lg shrink-0"
                           style={{ background: `${COLORS.primary}10` }}
                         >
-                          {step.icon}
+                          <ColorIcon src={step.icon} alt={step.label} color={COLORS.primary} className="w-6 h-6" />
                         </div>
                         <div className="flex-1">
                           <p className="font-semibold text-sm" style={{ color: COLORS.primary }}>
@@ -379,10 +401,7 @@ function TechSection({ tech, index }) {
                     }}
                     whileHover={{ scale: 1.1 }}
                   >
-                    {/* PLACEHOLDER: Add Flutter logo at /assets/icons/flutter.png */}
-                    <span className="text-3xl font-bold" style={{ color: tech.textColor === COLORS.white ? COLORS.white : COLORS.primary }}>
-                      Fl
-                    </span>
+                    <img src="/assets/icons/icon_flutter.svg" alt="Flutter" className="w-12 h-12" />
                   </motion.div>
                 )}
               </div>
@@ -400,7 +419,7 @@ function TechSection({ tech, index }) {
                       border: tech.textColor === COLORS.white ? '1px solid rgba(255,255,255,0.08)' : '1px solid #f0f0f0',
                     }}
                   >
-                    <span className="text-lg mb-0.5 block">{stat.icon}</span>
+                    <ColorIcon src={stat.icon} alt={stat.label} color={tech.textColor === COLORS.white ? COLORS.white : COLORS.primary} className="w-6 h-6 mx-auto mb-0.5" />
                     <p className="text-xl font-bold" style={{ color: tech.textColor }}>
                       {stat.value}
                     </p>
