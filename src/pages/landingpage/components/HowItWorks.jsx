@@ -9,10 +9,7 @@ function HowItWorks() {
       title: 'Capture',
       description: 'Point your camera at any vegetable or upload an image from your gallery.',
       icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
+        <img src="/assets/icons/icon_outline_camera.svg" alt="" className="w-6 h-6 brightness-0 invert" />
       ),
       details: [
         'Use your phone camera for real-time detection',
@@ -24,9 +21,7 @@ function HowItWorks() {
       title: 'Analyze',
       description: 'YOLOv8 processes the image and analyzes visual features for freshness indicators.',
       icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
+        <img src="/assets/icons/icon_imageprocessing.png" alt="" className="w-6 h-6 brightness-0 invert" />
       ),
       details: [
         'YOLOv8 scans for color, texture, and decay patterns',
@@ -38,9 +33,7 @@ function HowItWorks() {
       title: 'Classify',
       description: 'The system classifies the vegetable into freshness categories with confidence scores.',
       icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
+        <img src="/assets/icons/icon_classification.png" alt="" className="w-6 h-6 brightness-0 invert" />
       ),
       details: [
         'Multi-class classification from Fresh to Spoiled',
@@ -52,9 +45,7 @@ function HowItWorks() {
       title: 'Results',
       description: 'Get instant results with detailed freshness assessment.',
       icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <img src="/assets/icons/icon_outline_check.svg" alt="" className="w-6 h-6 brightness-0 invert" />
       ),
       details: [
         'Clear visual indicators show freshness level at a glance',

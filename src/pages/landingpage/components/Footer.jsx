@@ -72,7 +72,7 @@ function Footer() {
                   href="#"
                   className="bg-white/10 hover:bg-white/15 hover:scale-105 border border-white/20 text-white px-7 py-3.5 rounded-xl font-semibold transition-all flex items-center justify-center gap-3"
                 >
-                  <img src="/assets/icons/download.png" alt="Download" className="w-5 h-5" />
+                  <img src="/assets/icons/download.png" alt="Download" className="w-5 h-5 brightness-0 invert" />
                   <div className="text-left">
                     <span className="text-[10px] text-white/70 block leading-none">Direct</span>
                     <span className="text-base leading-tight">Download APK</span>

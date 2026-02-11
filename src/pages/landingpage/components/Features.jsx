@@ -16,7 +16,7 @@ function PulseRadar() {
         />
       ))}
       {/* Center icon */}
-      <div className="relative z-10 w-14 h-14 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20">
+      <div className="relative z-10 w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
         <img src="/assets/icons/realtime.svg" alt="" className="w-7 h-7 brightness-0 invert" />
       </div>
       {/* Speed dashes */}
@@ -101,8 +101,8 @@ function FreshnessSpectrum() {
         </div>
       </div>
       {/* Classification icon */}
-      <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-        <img src="/assets/icons/fresh.svg" alt="" className="w-5 h-5" style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(17%) saturate(1400%) hue-rotate(120deg)' }} />
+      <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+        <img src="/assets/icons/icon_vegetables.svg" alt="" className="w-5 h-5 brightness-0 invert" />
       </div>
     </div>
   )
@@ -151,9 +151,9 @@ function OfflineVisual() {
 
 function StepFlow() {
   const steps = [
-    { icon: '📷', label: 'Point' },
-    { icon: '🧠', label: 'Scan' },
-    { icon: '✅', label: 'Result' },
+    { icon: '/assets/icons/icon_camera.svg', label: 'Point' },
+    { icon: '/assets/icons/icon_brain.svg', label: 'Scan' },
+    { icon: '/assets/icons/icon_check.svg', label: 'Result' },
   ]
   return (
     <div className="relative h-36 flex items-center justify-center">
@@ -167,10 +167,10 @@ function StepFlow() {
               transition={{ delay: 0.2 * i, type: 'spring', stiffness: 300 }}
               className="flex flex-col items-center gap-1.5"
             >
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl ${
-                i === 1 ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-primary/10'
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
+                i === 1 ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-primary/10'
               }`}>
-                {step.icon}
+                <img src={step.icon} alt="" className={`w-7 h-7 ${i === 1 ? 'brightness-0 invert' : ''}`} />
               </div>
               <span className="text-[10px] font-medium text-gray-400">{step.label}</span>
             </motion.div>
