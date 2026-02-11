@@ -4,8 +4,8 @@ import AnimatedSection from '../../../components/AnimatedSection'
 function CallToAction() {
   return (
     <section id="download" className="bg-accent py-20 lg:py-28">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end">
           {/* Content */}
           <AnimatedSection>
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
@@ -75,23 +75,25 @@ function CallToAction() {
             </div>
           </AnimatedSection>
 
-          {/* Phone mockup placeholder */}
+          {/* Phone mockup — wider, shorter, aligned to buttons */}
           <AnimatedSection delay={0.2}>
             <div className="relative flex justify-center lg:justify-end">
-              {/* PLACEHOLDER: Add your Android phone mockup image here */}
-              <div className="relative">
+              <div className="relative w-full">
                 {/* Phone frame */}
-                <div className="w-72 h-145 bg-linear-to-b from-gray-800 to-gray-900 rounded-[3rem] p-3 shadow-2xl">
+                <div
+                  style={{ width: '100%', maxWidth: '520px', height: '200px' }}
+                  className="mx-auto bg-linear-to-b from-gray-800 to-gray-900 rounded-[2rem] p-2.5 shadow-2xl"
+                >
                   {/* Screen */}
-                  <div className="w-full h-full bg-black rounded-[2.5rem] overflow-hidden relative">
+                  <div className="w-full h-full bg-black rounded-[1.5rem] overflow-hidden relative">
                     {/* Notch */}
-                    <div className="absolute top-6 left-1/2 -translate-x-1/2 w-24 h-6 bg-gray-900 rounded-full z-10" />
+                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-4 bg-gray-900 rounded-full z-10" />
                     
                     {/* App Screenshot */}
                     <img 
                       src="/assets/images/playstoreapp.png" 
                       alt="FreshLens App Screenshot" 
-                      className="w-full h-full object-contain object-center" 
+                      className="w-full h-full object-cover object-top" 
                     />
                   </div>
                 </div>

@@ -17,7 +17,7 @@ function Hero({ isLoaded }) {
   }
 
   return (
-    <section className="bg-background w-full flex items-center pt-20 overflow-hidden relative">
+    <section className="bg-background w-full min-h-screen flex items-center pt-20 pb-16 relative" style={{ overflow: 'clip', overflowClipMargin: '120px' }}>
       {/* Background floating particles */}
       {[...Array(4)].map((_, i) => (
         <motion.div
@@ -42,8 +42,8 @@ function Hero({ isLoaded }) {
           }}
         />
       ))}
-      <div className="max-w-6xl mx-auto px-6 w-full relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <div className="max-w-7xl mx-auto px-6 w-full relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
           {/* Text Content */}
           <motion.div
             variants={containerVariants}
@@ -97,7 +97,7 @@ function Hero({ isLoaded }) {
           </motion.div>
 
           {/* Phone Mockup */}
-          <div className="order-1 lg:order-2">
+          <div className="order-1 lg:order-2 lg:translate-x-16 lg:mr-[-2rem]">
             <PhoneMockup isVisible={isLoaded} />
           </div>
         </div>

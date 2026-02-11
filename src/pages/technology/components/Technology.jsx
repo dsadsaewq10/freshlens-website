@@ -174,7 +174,7 @@ function HeroSection() {
         />
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 pt-20 pb-12 w-full relative z-10">
+      <div className="max-w-7xl mx-auto px-6 pt-20 pb-12 w-full relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <motion.div
             initial={{ opacity: 0, x: -40 }}
@@ -309,7 +309,7 @@ function TechSection({ tech, index }) {
         />
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-16 w-full relative z-10">
+      <div className="max-w-7xl mx-auto px-6 py-16 w-full relative z-10">
         <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${!isEven ? 'lg:[direction:rtl]' : ''}`}>
           {/* Content */}
           <motion.div
@@ -459,7 +459,7 @@ function ArchitectureSection() {
       className="min-h-screen flex items-center snap-start relative overflow-hidden"
       style={{ background: COLORS.light }}
     >
-      <div className="max-w-6xl mx-auto px-6 py-16 w-full relative z-10">
+      <div className="max-w-7xl mx-auto px-6 py-16 w-full relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}

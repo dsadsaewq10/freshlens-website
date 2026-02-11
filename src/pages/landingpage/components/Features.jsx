@@ -234,13 +234,13 @@ const itemVariants = {
 
 function Features() {
   return (
-    <section id="features" className="bg-surface py-20 lg:py-28 relative overflow-hidden">
+    <section id="features" className="bg-surface py-20 lg:py-28 min-h-screen flex items-center relative overflow-hidden">
       {/* Background organic shapes */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute -top-24 -left-24 w-72 h-72 bg-primary/[0.03] rounded-full blur-2xl" />
         <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-primary/[0.03] rounded-full blur-3xl" />
       </div>
-      <div className="max-w-6xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -249,9 +249,6 @@ function Features() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <span className="inline-block bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            Core Capabilities
-          </span>
           <h2 className="text-3xl lg:text-4xl font-bold text-accent mb-4">
             Key Features
           </h2>

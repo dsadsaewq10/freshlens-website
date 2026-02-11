@@ -12,7 +12,7 @@ function Dataset() {
   ]
 
   return (
-    <section id="dataset" className="bg-background py-20 lg:py-28 relative overflow-hidden">
+    <section id="dataset" className="bg-background py-20 lg:py-28 min-h-screen flex items-center relative overflow-hidden">
       {/* Floating particles */}
       {[...Array(5)].map((_, i) => (
         <motion.div
@@ -35,7 +35,7 @@ function Dataset() {
         />
       ))}
 
-      <div className="max-w-6xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

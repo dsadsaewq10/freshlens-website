@@ -109,7 +109,7 @@ function PhoneMockup({ isVisible }) {
             <div className="absolute -left-1 top-32 w-1 h-12 bg-accent rounded-r-sm" />
 
             {/* Screen */}
-            <div className="w-full h-full bg-gradient-to-b from-[#1a1a2e] to-[#16213e] rounded-[2rem] overflow-hidden relative">
+            <div className="w-full h-full bg-gradient-to-b from-phonescreen/20 to-phonescreen/40 rounded-[2rem] overflow-hidden relative">
               {/* Notch */}
               <div className="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full flex items-center justify-center gap-2 z-30">
                 <div className="w-2 h-2 bg-gray-800 rounded-full" />
@@ -375,7 +375,7 @@ function PhoneMockup({ isVisible }) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4, ease: 'easeOut' }}
-                    className="absolute inset-0 z-10 bg-[#1a1a2e]"
+                    className="absolute inset-0 z-10 bg-gradient-to-b from-phonescreen/20 to-phonescreen/40"
                   >
                     <div className="absolute top-11 left-0 right-0 bottom-0 px-3 flex flex-col">
                       {/* Back arrow + title */}
@@ -477,7 +477,7 @@ function PhoneMockup({ isVisible }) {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="absolute inset-0 z-10 bg-[#1a1a2e] flex items-center justify-center"
+                    className="absolute inset-0 z-10 bg-gradient-to-b from-phonescreen/20 to-phonescreen/40 flex items-center justify-center"
                   >
                     <motion.div
                       initial={{ scale: 1, opacity: 1 }}
@@ -503,17 +503,17 @@ function PhoneMockup({ isVisible }) {
       </motion.div>
 
       {/* ── Ground Shadow / Floating Platform ── */}
-      {/* Outer soft ambient shadow */}
+      {/* Outer soft ambient shadow - positioned clearly below phone */}
       <motion.div
         animate={{
-          scaleX: [1, 1.06, 1],
-          scaleY: [1, 0.85, 1],
-          opacity: [0.45, 0.25, 0.45],
+          scaleX: [1, 1.08, 1],
+          scaleY: [1, 0.8, 1],
+          opacity: [0.75, 0.5, 0.75],
         }}
         transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-72 h-20 pointer-events-none"
+        className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-80 h-20 pointer-events-none z-0"
         style={{
-          background: 'radial-gradient(ellipse 70% 55% at center, rgba(40,90,83,0.40) 0%, rgba(0,0,0,0.18) 40%, transparent 70%)',
+          background: 'radial-gradient(ellipse 80% 65% at center, rgba(40,90,83,0.6) 0%, rgba(0,0,0,0.35) 35%, transparent 60%)',
           borderRadius: '50%',
           filter: 'blur(10px)',
         }}
@@ -521,14 +521,14 @@ function PhoneMockup({ isVisible }) {
       {/* Inner concentrated shadow */}
       <motion.div
         animate={{
-          scaleX: [1, 1.1, 1],
-          scaleY: [1, 0.7, 1],
-          opacity: [0.6, 0.35, 0.6],
+          scaleX: [1, 1.12, 1],
+          scaleY: [1, 0.65, 1],
+          opacity: [0.9, 0.6, 0.9],
         }}
         transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-52 h-10 pointer-events-none"
+        className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-56 h-10 pointer-events-none z-0"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.20) 45%, transparent 70%)',
+          background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 40%, transparent 60%)',
           borderRadius: '50%',
           filter: 'blur(5px)',
         }}

@@ -65,7 +65,7 @@ function Header({ isLoaded = true, currentPage }) {
           : 'bg-transparent border-gray-200/30'
       }`}
     >
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <button onClick={() => navigate('/')} className="flex items-center gap-3">

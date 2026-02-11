@@ -254,7 +254,7 @@ function HeroSection() {
         />
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 pt-20 pb-12 w-full relative z-10">
+      <div className="max-w-7xl mx-auto px-6 pt-20 pb-12 w-full relative z-10">
         <div className="text-center max-w-3xl mx-auto">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
@@ -346,7 +346,7 @@ function DatasetGridSection({ onSelectDataset }) {
         <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full" style={{ background: `${COLORS.primary}08` }} />
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-16 w-full relative z-10">
+      <div className="max-w-7xl mx-auto px-6 py-16 w-full relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
@@ -441,7 +441,7 @@ function StatsSection() {
       className="min-h-screen flex items-center snap-start relative overflow-hidden"
       style={{ background: COLORS.primary }}
     >
-      <div className="max-w-6xl mx-auto px-6 py-16 w-full relative z-10">
+      <div className="max-w-7xl mx-auto px-6 py-16 w-full relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
@@ -594,7 +594,7 @@ function FormatSection() {
       className="min-h-screen flex items-center snap-start relative overflow-hidden"
       style={{ background: COLORS.light }}
     >
-      <div className="max-w-6xl mx-auto px-6 py-16 w-full relative z-10">
+      <div className="max-w-7xl mx-auto px-6 py-16 w-full relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
