@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
 import Header from '../../landingpage/components/Header'
-import SectionScanLine from '../../../components/SectionScanLine'
 
 // Color palette
 const COLORS = {
@@ -165,8 +164,6 @@ function HeroSection() {
       className="min-h-screen flex items-center justify-center relative overflow-hidden snap-start"
       style={{ background: COLORS.light }}
     >
-      <SectionScanLine duration={7} />
-
       <div className="absolute inset-0 opacity-[0.03]">
         <div
           className="absolute inset-0"
@@ -301,8 +298,6 @@ function TechSection({ tech, index }) {
       className="min-h-screen flex items-center snap-start relative overflow-hidden"
       style={{ background: tech.bgColor }}
     >
-      <SectionScanLine duration={6} light={tech.textColor !== COLORS.white} />
-
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
           className="absolute -top-24 -right-24 w-80 h-80 rounded-full opacity-[0.04]"
@@ -464,8 +459,6 @@ function ArchitectureSection() {
       className="min-h-screen flex items-center snap-start relative overflow-hidden"
       style={{ background: COLORS.light }}
     >
-      <SectionScanLine duration={7} />
-
       <div className="max-w-6xl mx-auto px-6 py-16 w-full relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

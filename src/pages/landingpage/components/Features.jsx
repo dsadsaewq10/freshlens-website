@@ -1,6 +1,5 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import SectionScanLine from '../../../components/SectionScanLine'
 
 /* ─── Inline Infographic Illustrations ─── */
 
@@ -241,7 +240,6 @@ function Features() {
         <div className="absolute -top-24 -left-24 w-72 h-72 bg-primary/[0.03] rounded-full blur-2xl" />
         <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-primary/[0.03] rounded-full blur-3xl" />
       </div>
-      <SectionScanLine duration={8} />
       <div className="max-w-6xl mx-auto px-6 relative z-10">
         {/* Section Header */}
         <motion.div

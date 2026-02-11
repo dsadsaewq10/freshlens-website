@@ -1,15 +1,11 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import SectionScanLine from '../../../components/SectionScanLine'
 
 function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
     <footer className="bg-primary text-white relative overflow-hidden">
-      {/* Per-section scan line (light=false for dark bg) */}
-      <SectionScanLine duration={8} light={false} />
-
       {/* Download / CTA Section with Phone Mockup */}
       <div id="download" className="py-20 lg:py-28 relative">
         {/* Background decorative circles */}

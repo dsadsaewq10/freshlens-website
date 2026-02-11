@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import SectionScanLine from '../../../components/SectionScanLine'
 
 function HowItWorks() {
   const [activeStep, setActiveStep] = useState(0)
@@ -70,9 +69,6 @@ function HowItWorks() {
 
   return (
     <section id="how-it-works" className="bg-surface py-20 lg:py-28 relative overflow-hidden">
-      {/* Per-section scan line */}
-      <SectionScanLine duration={7} />
-
       {/* Background patterns */}
       <div className="absolute inset-0 opacity-[0.07]">
         <div className="absolute top-20 right-20 w-64 h-64 border border-primary rounded-full" />

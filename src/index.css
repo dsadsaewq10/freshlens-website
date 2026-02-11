@@ -56,34 +56,6 @@ html {
 
 /* ─── Aesthetic Enhancements ─── */
 
-/* ── Per-Section Scan Line ──
-   A single bright sweep line that travels top → bottom within its parent
-   section, then loops. Parent must be position: relative; overflow: hidden. */
-@keyframes sectionScanSweep {
-  0%   { top: -4px; opacity: 0; }
-  3%   { opacity: 1; }
-  97%  { opacity: 1; }
-  100% { top: 100%; opacity: 0; }
-}
-
-.section-scan-line {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 3px;
-  pointer-events: none;
-  z-index: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 5%,
-    var(--scan-color, rgba(40, 90, 83, 0.13)) 30%,
-    var(--scan-color, rgba(40, 90, 83, 0.13)) 70%,
-    transparent 95%
-  );
-  box-shadow: 0 0 10px 1px var(--scan-color, rgba(40, 90, 83, 0.06));
-  animation: sectionScanSweep var(--scan-duration, 6s) linear infinite;
-}
-
 /* Ensure main content sits above any global layers */
 #root {
   position: relative;

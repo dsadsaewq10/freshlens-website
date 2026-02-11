@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import Header from '../../landingpage/components/Header'
-import SectionScanLine from '../../../components/SectionScanLine'
 
 // Color palette
 const COLORS = {
@@ -245,7 +244,6 @@ function HeroSection() {
       className="min-h-screen flex items-center justify-center relative overflow-hidden snap-start"
       style={{ background: COLORS.light }}
     >
-      <SectionScanLine duration={7} />
       <div className="absolute inset-0 opacity-[0.03]">
         <div
           className="absolute inset-0"
@@ -343,7 +341,6 @@ function DatasetGridSection({ onSelectDataset }) {
       className="min-h-screen flex items-center snap-start relative overflow-hidden"
       style={{ background: COLORS.darker }}
     >
-      <SectionScanLine duration={7} />
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full" style={{ background: `${COLORS.primary}08` }} />
         <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full" style={{ background: `${COLORS.primary}08` }} />
@@ -444,7 +441,6 @@ function StatsSection() {
       className="min-h-screen flex items-center snap-start relative overflow-hidden"
       style={{ background: COLORS.primary }}
     >
-      <SectionScanLine duration={6} light={false} />
       <div className="max-w-6xl mx-auto px-6 py-16 w-full relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -598,7 +594,6 @@ function FormatSection() {
       className="min-h-screen flex items-center snap-start relative overflow-hidden"
       style={{ background: COLORS.light }}
     >
-      <SectionScanLine duration={7} />
       <div className="max-w-6xl mx-auto px-6 py-16 w-full relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

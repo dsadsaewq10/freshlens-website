@@ -1,7 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import PhoneMockup from './PhoneMockup'
-import SectionScanLine from '../../../components/SectionScanLine'
 
 function Hero({ isLoaded }) {
   const containerVariants = {
@@ -19,9 +18,6 @@ function Hero({ isLoaded }) {
 
   return (
     <section className="bg-background w-full flex items-center pt-20 overflow-hidden relative">
-      {/* Per-section scan line */}
-      <SectionScanLine duration={7} />
-
       {/* Background floating particles */}
       {[...Array(4)].map((_, i) => (
         <motion.div

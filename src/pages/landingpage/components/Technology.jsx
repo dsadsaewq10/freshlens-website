@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import SectionScanLine from '../../../components/SectionScanLine'
 
 function Technology() {
   const stats = [
@@ -22,9 +21,6 @@ function Technology() {
 
   return (
     <section id="technology" className="bg-primary py-20 lg:py-28 min-h-screen flex items-center relative overflow-hidden">
-      {/* Per-section scan line (light=false for dark bg) */}
-      <SectionScanLine duration={7} light={false} />
-
       {/* Floating particles */}
       {[...Array(6)].map((_, i) => (
         <motion.div

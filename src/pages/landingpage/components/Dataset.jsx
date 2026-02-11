@@ -1,7 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import SectionScanLine from '../../../components/SectionScanLine'
 
 function Dataset() {
   // Dataset statistics - update these with actual values
@@ -14,9 +13,6 @@ function Dataset() {
 
   return (
     <section id="dataset" className="bg-background py-20 lg:py-28 relative overflow-hidden">
-      {/* Per-section scan line */}
-      <SectionScanLine duration={8} />
-
       {/* Floating particles */}
       {[...Array(5)].map((_, i) => (
         <motion.div
