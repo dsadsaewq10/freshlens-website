@@ -20,7 +20,9 @@ const datasets = [
     description:
       'Annotated images of cabbages at various freshness stages, captured under controlled and natural lighting conditions. Each image is labeled with bounding boxes in YOLO format.',
     images: 2450,
-    classes: ['Fresh', 'Mild Decay', 'Moderate Decay', 'Severe Decay', 'Spoiled'],
+    freshCount: 1280,
+    rottenCount: 1170,
+    classes: ['Fresh Cabbage', 'Rotten Cabbage'],
     format: 'YOLO Format (.txt)',
     resolution: '640 x 640',
     size: '~320 MB',
@@ -35,12 +37,14 @@ const datasets = [
     description:
       'A curated collection of tomato images classified into three freshness levels. Captured across different environments to ensure the model works well in real-world conditions.',
     images: 2800,
-    classes: ['Fresh', 'Half Fresh', 'Spoiled'],
+    freshCount: 1500,
+    rottenCount: 1300,
+    classes: ['Fresh Tomato', 'Rotten Tomato'],
     format: 'YOLO Format (.txt)',
     resolution: '640 x 640',
     size: '~380 MB',
-    thumbnail: '/assets/icons/tomato.png',
-    sampleImages: ['/assets/icons/tomato.png'],
+    thumbnail: '/assets/icons_vegetables/tomato.png',
+    sampleImages: ['/assets/icons_vegetables/tomato.png'],
     downloadUrl: '#', // PLACEHOLDER: Add actual download URL
     lastUpdated: 'January 2026',
   },
@@ -50,12 +54,14 @@ const datasets = [
     description:
       'Comprehensive carrot image dataset featuring four freshness categories. Images include whole carrots and cross-sections for thorough classification training.',
     images: 2100,
-    classes: ['Fresh', 'Mild Decay', 'Moderate Decay', 'Spoiled'],
+    freshCount: 1120,
+    rottenCount: 980,
+    classes: ['Fresh Carrot', 'Rotten Carrot'],
     format: 'YOLO Format (.txt)',
     resolution: '640 x 640',
     size: '~290 MB',
-    thumbnail: '/assets/icons/carrot.png',
-    sampleImages: ['/assets/icons/carrot.png'],
+    thumbnail: '/assets/icons_vegetables/carrot.png',
+    sampleImages: ['/assets/icons_vegetables/carrot.png'],
     downloadUrl: '#', // PLACEHOLDER: Add actual download URL
     lastUpdated: 'January 2026',
   },
@@ -65,12 +71,14 @@ const datasets = [
     description:
       'Bell pepper images annotated with five distinct freshness levels. The dataset covers green, red, and yellow pepper varieties for comprehensive detection.',
     images: 2005,
-    classes: ['Fresh', 'Mild Decay', 'Moderate Decay', 'Severe Decay', 'Spoiled'],
+    freshCount: 1050,
+    rottenCount: 955,
+    classes: ['Fresh Pepper', 'Rotten Pepper'],
     format: 'YOLO Format (.txt)',
     resolution: '640 x 640',
     size: '~270 MB',
-    thumbnail: '/assets/icons/pepper.png',
-    sampleImages: ['/assets/icons/pepper.png'],
+    thumbnail: '/assets/icons_vegetables/pepper.png',
+    sampleImages: ['/assets/icons_vegetables/pepper.png'],
     downloadUrl: '#', // PLACEHOLDER: Add actual download URL
     lastUpdated: 'January 2026',
   },
@@ -309,12 +317,12 @@ function HeroSection() {
             ))}
           </motion.div>
         </div>
-
-        <motion.div
+      </div>
+      <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5"
+          className="absolute bottom-13 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5"
         >
           <span className="text-xs font-medium" style={{ color: COLORS.medium }}>
             Scroll to explore
@@ -325,7 +333,6 @@ function HeroSection() {
             </svg>
           </motion.div>
         </motion.div>
-      </div>
     </section>
   )
 }
@@ -497,8 +504,18 @@ function StatsSection() {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="bg-white/10 backdrop-blur-sm rounded-2xl p-7 border border-white/10"
           >
-            <h3 className="text-lg font-bold text-white mb-5">Classes per Vegetable</h3>
-            <div className="space-y-5">
+            <h3 className="text-lg font-bold text-white mb-2">Classes per Vegetables</h3>
+            <div className="flex items-center gap-4 mb-5">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-sm" style={{ background: '#86efac' }} />
+                <span className="text-xs text-white/70">Fresh</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-sm" style={{ background: '#fca5a5' }} />
+                <span className="text-xs text-white/70">Rotten</span>
+              </div>
+            </div>
+            <div className="space-y-4">
               {datasets.map((dataset, i) => (
                 <motion.div
                   key={dataset.id}
@@ -506,29 +523,37 @@ function StatsSection() {
                   animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
                   transition={{ delay: 0.3 + i * 0.08, duration: 0.5 }}
                 >
-                  <div className="flex items-center gap-3 mb-1.5">
-                    <img
-                      src={dataset.thumbnail}
-                      alt={dataset.name}
-                      className="w-7 h-7 object-contain"
-                    />
-                    <span className="text-sm font-semibold text-white">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-sm font-medium text-white/80">
                       {dataset.name.replace(' Dataset', '')}
                     </span>
+                    <span className="text-sm font-bold text-white">
+                      {dataset.images.toLocaleString()}
+                    </span>
                   </div>
-                  <div className="flex flex-wrap gap-1.5 ml-10">
-                    {dataset.classes.map((cls, ci) => (
-                      <span
-                        key={cls}
-                        className="px-2.5 py-1 rounded text-xs font-medium"
-                        style={{
-                          background: `rgba(255,255,255,${0.08 + ci * 0.04})`,
-                          color: ci === 0 ? '#86efac' : ci === dataset.classes.length - 1 ? '#fca5a5' : 'rgba(255,255,255,0.75)',
-                        }}
-                      >
-                        {cls}
-                      </span>
-                    ))}
+                  <div className="h-3 rounded-full bg-white/10 overflow-hidden flex">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={isInView ? { width: `${(dataset.freshCount / dataset.images) * 100}%` } : { width: 0 }}
+                      transition={{ delay: 0.4 + i * 0.12, duration: 0.8, ease: 'easeOut' }}
+                      className="h-full"
+                      style={{ background: '#86efac' }}
+                    />
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={isInView ? { width: `${(dataset.rottenCount / dataset.images) * 100}%` } : { width: 0 }}
+                      transition={{ delay: 0.5 + i * 0.12, duration: 0.8, ease: 'easeOut' }}
+                      className="h-full"
+                      style={{ background: '#fca5a5' }}
+                    />
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <span className="text-xs" style={{ color: '#86efac' }}>
+                      Fresh: {dataset.freshCount.toLocaleString()}
+                    </span>
+                    <span className="text-xs" style={{ color: '#fca5a5' }}>
+                      Rotten: {dataset.rottenCount.toLocaleString()}
+                    </span>
                   </div>
                 </motion.div>
               ))}

@@ -43,8 +43,8 @@ const technologies = [
     description:
       'YOLOv8 is the "eyes" of FreshLens. It scans your vegetable photo in a single pass — meaning it can identify what it sees almost instantly. Think of it as a trained expert that glances at your produce and immediately knows its condition.',
     highlights: [
-      { label: 'Speed', value: '<50ms', icon: '/assets/icons/icon_speed.svg' },
-      { label: 'Accuracy', value: '89%+', icon: '/assets/icons/accuracy.svg' },
+      { label: 'Speed', value: '<50ms', icon: '/assets/icons/icon_speed.png' },
+      { label: 'Accuracy', value: '89%+', icon: '/assets/icons/icon_accuracy.png' },
       { label: 'Parameters', value: '3.2M', icon: '/assets/icons/icon_brain.svg' },
       { label: 'Input Size', value: '640px', icon: '/assets/icons/icon_input.svg' },
     ],
@@ -65,7 +65,7 @@ const technologies = [
     description:
       'TensorFlow is like the classroom where our AI learns. It provides the tools to show thousands of vegetable images to the model so it can gradually learn what "fresh" and "spoiled" look like — similar to how you learn to tell if fruit is ripe.',
     highlights: [
-      { label: 'Training Set', value: '9,355+', icon: '/assets/icons/icon_graph.svg' },
+      { label: 'Training Set', value: '9,355+', icon: '/assets/icons/icon_dataset.png' },
       { label: 'Iterations', value: '100+', icon: '/assets/icons/icon_cycle.svg' },
       { label: 'Acceleration', value: 'GPU', icon: '/assets/icons/icon_rocket.svg' },
       { label: 'Version', value: '2.x', icon: '/assets/icons/icon_version.svg' },
@@ -124,37 +124,15 @@ const technologies = [
     bgColor: COLORS.darker,
     textColor: COLORS.primary,
   },
-  {
-    id: 'flutter',
-    name: 'Flutter',
-    tagline: 'Cross-Platform Mobile App',
-    description:
-      'Flutter is Google\'s toolkit for building beautiful mobile apps. It lets us create one codebase that runs smoothly on both Android and iOS devices. Combined with the on-device AI model, it delivers a fast, responsive scanning experience.',
-    highlights: [
-      { label: 'Platforms', value: 'Android & iOS', icon: '/assets/icons/mobile.svg' },
-      { label: 'Camera', value: 'Real-time', icon: '/assets/icons/icon_camera.svg' },
-      { label: 'Rendering', value: '60 FPS', icon: '/assets/icons/icons_fps.png' },
-      { label: 'Language', value: 'Dart', icon: '/assets/icons/icon_libraries.svg' },
-    ],
-    details: [
-      'Single codebase produces native apps for both Android and iOS',
-      'Direct camera integration for instant capture and scanning',
-      'Works offline with the AI model running right on your phone',
-      'Smooth, native-feeling animations at 60 frames per second',
-    ],
-    logo: '/assets/icons/icon_flutter.svg',
-    bgColor: COLORS.primary,
-    textColor: COLORS.white,
-  },
 ]
 
 // Pipeline steps
 const pipelineSteps = [
   { label: 'Capture', desc: 'Phone camera captures the image', icon: '/assets/icons/icon_camera.svg' },
   { label: 'Preprocess', desc: 'Resize and prepare for analysis', icon: '/assets/icons/icon_wrench.svg' },
-  { label: 'Detect', desc: 'YOLOv8 identifies the vegetable', icon: '/assets/icons/icon_brain.svg' },
+  { label: 'Detect', desc: 'YOLOv8 identifies the vegetable', icon: '/assets/icons/icon_detect.png' },
   { label: 'Classify', desc: 'Determine freshness level', icon: '/assets/icons/icon_tag.svg' },
-  { label: 'Display', desc: 'Show results to the user', icon: '/assets/icons/icon_result.svg' },
+  { label: 'Display', desc: 'Show results to the user', icon: '/assets/icons/icon_dataset.png' },
 ]
 
 // Hero section (only plays on mount)
@@ -185,7 +163,7 @@ function HeroSection() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-5"
+              className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-1"
               style={{ background: `${COLORS.primary}15`, color: COLORS.primary }}
             >
               Technology Stack
@@ -200,7 +178,7 @@ function HeroSection() {
               to how it works on your phone.
             </p>
             <div className="flex flex-wrap gap-2.5">
-              {['YOLOv8', 'TensorFlow', 'TF Lite', 'Python', 'Flutter'].map(
+              {['YOLOv8', 'TensorFlow', 'TF Lite', 'Python'].map(
                 (tag, i) => (
                   <motion.span
                     key={tag}
@@ -268,20 +246,21 @@ function HeroSection() {
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5"
-        >
-          <span className="text-xs font-medium" style={{ color: COLORS.medium }}>Scroll to explore</span>
-          <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
-            <svg className="w-5 h-5" style={{ color: COLORS.primary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
-          </motion.div>
-        </motion.div>
       </div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+        className="absolute bottom-13 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5"
+      >
+        <span className="text-xs font-medium" style={{ color: COLORS.medium }}>Scroll to explore</span>
+        <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
+          <svg className="w-5 h-5" style={{ color: COLORS.primary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </motion.div>
+      </motion.div>
     </section>
   )
 }
