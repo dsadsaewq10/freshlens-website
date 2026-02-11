@@ -88,7 +88,7 @@ function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, margin: '-40px' }}
             transition={{ duration: 0.7, delay: 0.15 }}
-            className="lg:col-span-6 flex justify-center lg:justify-end"
+            className="lg:col-span-6 flex justify-center lg:mr-[-2rem]"
           >
             <div className="relative w-80 lg:w-96">
               <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-56 h-56 bg-white/5 rounded-full blur-3xl" />
@@ -161,10 +161,10 @@ function Footer() {
         </div>
 
         {/* ── Separator Line ── */}
-        <div className="border-t border-white/10 my-8" />
+        <div className="border-t border-white/10 my-4" />
 
         {/* ── Footer Info Section (Above Copyright) ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-2">
