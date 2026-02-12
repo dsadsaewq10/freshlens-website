@@ -68,6 +68,8 @@ function Landingpage() {
         </div>
         <div className="snap-section" style={{ justifyContent: 'flex-start' }}>
           <Technology />
+        </div>
+        <div className="snap-section-footer">
           <Footer />
         </div>
       </main>

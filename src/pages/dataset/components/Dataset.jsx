@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import Header from '../../landingpage/components/Header'
+import Footer from '../../landingpage/components/Footer'
 
 // Color palette
 const COLORS = {
@@ -760,6 +761,9 @@ export default function DatasetPage() {
         isOpen={modalOpen}
         onClose={handleCloseModal}
       />
+      <div className="snap-section-footer">
+        <Footer />
+      </div>
     </div>
   )
 }

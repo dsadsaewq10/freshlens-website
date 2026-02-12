@@ -33,7 +33,22 @@ html {
   width: 100%;
 }
 
+/* Footer snap section — anchors content to bottom */
+.snap-section-footer {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+}
+
 .snap-section > section {
+  width: 100%;
+}
+
+.snap-section-footer > footer {
   width: 100%;
 }
 
