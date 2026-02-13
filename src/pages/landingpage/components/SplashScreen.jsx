@@ -34,7 +34,7 @@ function SplashScreen({ onComplete }) {
       initial={{ opacity: 1 }}
       animate={phase === 'exit' ? { opacity: 0 } : { opacity: 1 }}
       transition={{ duration: 0.5, ease: 'easeInOut' }}
-      className="fixed inset-0 z-[100] bg-primary flex items-center justify-center overflow-hidden"
+      className="fixed inset-0 z-100 bg-primary flex items-center justify-center overflow-hidden"
     >
       {/* Subtle grid background */}
       <div className="absolute inset-0 opacity-10">
@@ -129,7 +129,7 @@ function SplashScreen({ onComplete }) {
           </AnimatePresence>
 
           {/* Logo box */}
-          <div className="w-full h-full bg-white rounded-2xl border border-white/30 flex items-center justify-center overflow-hidden relative shadow-lg">
+          <div className="w-full h-full rounded-2xl flex items-center justify-center overflow-hidden relative">
             <motion.img
               src="/assets/logo/freshlens_logo.png"
               alt="FreshLens"
@@ -146,7 +146,7 @@ function SplashScreen({ onComplete }) {
                   animate={{ y: '100%' }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.6, ease: 'linear' }}
-                  className="absolute inset-x-0 h-1 bg-gradient-to-b from-transparent via-white to-transparent"
+                  className="absolute inset-x-0 h-1 bg-linear-to-b from-transparent via-white to-transparent"
                   style={{ boxShadow: '0 0 20px 5px rgba(255,255,255,0.5)' }}
                 />
               )}

@@ -88,13 +88,13 @@ function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, margin: '-40px' }}
             transition={{ duration: 0.7, delay: 0.15 }}
-            className="lg:col-span-6 flex justify-center lg:mr-[-2rem]"
+            className="lg:col-span-6 flex justify-center lg:-mr-8"
           >
             <div className="relative w-80 lg:w-96">
               <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-56 h-56 bg-white/5 rounded-full blur-3xl" />
-              <div className="relative overflow-hidden rounded-t-[2rem]" style={{ height: '310px' }}>
-                <div className="bg-gradient-to-b from-gray-700 to-gray-800 rounded-t-[2rem] p-2 h-full">
-                  <div className="w-full h-full bg-white rounded-t-[1.5rem] overflow-hidden relative">
+              <div className="relative overflow-hidden rounded-t-4xl" style={{ height: '310px' }}>
+                <div className="bg-linear-to-b from-gray-700 to-gray-800 rounded-t-4xl p-2 h-full">
+                  <div className="w-full h-full bg-white rounded-t-3xl overflow-hidden relative">
                     {/* Notch */}
                     <div className="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-5 bg-gray-800 rounded-full z-10" />
                     <div className="pt-10 px-4 h-full flex flex-col">
@@ -110,7 +110,7 @@ function Footer() {
 
                       {/* App icon + title */}
                       <div className="flex gap-3 mb-3">
-                        <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center shrink-0 shadow-lg">
+                        <div className="w-16 h-16 rounded-xl flex items-center justify-center shrink-0">
                           <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="w-13 h-13 object-contain" />
                         </div>
                         <div className="flex-1 min-w-0 pt-1">
@@ -155,7 +155,7 @@ function Footer() {
                 </div>
               </div>
               {/* Fade-out gradient at bottom */}
-              <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-accent to-transparent pointer-events-none" />
+              <div className="absolute bottom-0 left-0 right-0 h-12 bg-linear-to-t from-accent to-transparent pointer-events-none" />
             </div>
           </motion.div>
         </div>
@@ -168,7 +168,7 @@ function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center shadow-sm">
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center">
                 <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="w-7 h-7 object-contain" />
               </div>
               <span className="text-base font-bold">FreshLens</span>

@@ -25,9 +25,9 @@ function PulseRadar() {
         transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute right-6 flex flex-col gap-1.5"
       >
-        <div className="w-10 h-[3px] bg-primary/30 rounded-full" />
-        <div className="w-7 h-[3px] bg-primary/20 rounded-full" />
-        <div className="w-4 h-[3px] bg-primary/10 rounded-full" />
+        <div className="w-10 h-0.75 bg-primary/30 rounded-full" />
+        <div className="w-7 h-0.75 bg-primary/20 rounded-full" />
+        <div className="w-4 h-0.75 bg-primary/10 rounded-full" />
       </motion.div>
     </div>
   )
@@ -79,7 +79,7 @@ function FreshnessSpectrum() {
   return (
     <div className="relative h-36 flex flex-col items-center justify-center gap-3 px-4">
       {/* Gradient bar */}
-      <div className="w-full max-w-[220px] relative">
+      <div className="w-full max-w-55 relative">
         <div className="h-4 rounded-full overflow-hidden" style={{
           background: 'linear-gradient(to right, #10b981, #84cc16, #eab308, #f97316, #ef4444)',
         }} />
@@ -237,8 +237,8 @@ function Features() {
     <section id="features" className="bg-surface py-20 lg:py-28 min-h-screen flex items-center relative overflow-hidden">
       {/* Background organic shapes */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-24 -left-24 w-72 h-72 bg-primary/[0.03] rounded-full blur-2xl" />
-        <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-primary/[0.03] rounded-full blur-3xl" />
+        <div className="absolute -top-24 -left-24 w-72 h-72 bg-primary/3 rounded-full blur-2xl" />
+        <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-primary/3 rounded-full blur-3xl" />
       </div>
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Section Header */}
@@ -276,7 +276,7 @@ function Features() {
               >
                 <div className="bg-white rounded-2xl p-6 h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-transparent hover:border-primary/10 relative overflow-hidden micro-hover glow-pulse">
                   {/* Decorative corner */}
-                  <div className="absolute top-0 right-0 w-28 h-28 bg-primary/[0.03] rounded-bl-full" />
+                  <div className="absolute top-0 right-0 w-28 h-28 bg-primary/3 rounded-bl-full" />
 
                   <div className="relative z-10">
                     {/* Infographic Visual */}

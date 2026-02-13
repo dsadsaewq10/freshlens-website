@@ -12,14 +12,14 @@ function PhoneFrame({ children }) {
       <div className="absolute inset-0 bg-primary/20 rounded-[2.5rem] blur-2xl -z-10" />
 
       {/* Outer device shell */}
-      <div className="bg-gradient-to-b from-accent to-gray-900 rounded-[2.2rem] p-[6px] shadow-2xl">
+      <div className="bg-linear-to-b from-accent to-gray-900 rounded-[2.2rem] p-1.5 shadow-2xl">
         {/* Side buttons */}
-        <div className="absolute -right-[3px] top-20 w-[3px] h-10 bg-accent rounded-l-sm" />
-        <div className="absolute -left-[3px] top-16 w-[3px] h-5 bg-accent rounded-r-sm" />
-        <div className="absolute -left-[3px] top-24 w-[3px] h-8 bg-accent rounded-r-sm" />
+        <div className="absolute -right-0.75 top-20 w-0.75 h-10 bg-accent rounded-l-sm" />
+        <div className="absolute -left-0.75 top-16 w-0.75 h-5 bg-accent rounded-r-sm" />
+        <div className="absolute -left-0.75 top-24 w-0.75 h-8 bg-accent rounded-r-sm" />
 
         {/* Screen area */}
-        <div className="w-full aspect-[9/19.5] bg-gradient-to-b from-phonescreen/20 to-phonescreen/40 rounded-[1.9rem] overflow-hidden relative">
+        <div className="w-full aspect-[9/19.5] bg-white rounded-[1.9rem] overflow-hidden relative">
           {/* Notch */}
           <div className="absolute top-2 left-1/2 -translate-x-1/2 w-16 h-4 bg-black rounded-full flex items-center justify-center gap-1.5 z-30">
             <div className="w-1.5 h-1.5 bg-gray-800 rounded-full" />
@@ -27,12 +27,12 @@ function PhoneFrame({ children }) {
           </div>
 
           {/* Status bar */}
-          <div className="absolute top-2 left-3 right-3 flex justify-between items-center text-white/50 text-[8px] z-20 px-1">
+          <div className="absolute top-2 left-3 right-3 flex justify-between items-center text-gray-400 text-[8px] z-20 px-1">
             <span>9:41</span>
             <div className="flex gap-0.5">
-              <div className="w-2.5 h-1 bg-white/30 rounded-sm" />
-              <div className="w-2.5 h-1 bg-white/30 rounded-sm" />
-              <div className="w-3.5 h-1.5 bg-white/40 rounded-sm" />
+              <div className="w-2.5 h-1 bg-gray-300 rounded-sm" />
+              <div className="w-2.5 h-1 bg-gray-300 rounded-sm" />
+              <div className="w-3.5 h-1.5 bg-gray-400 rounded-sm" />
             </div>
           </div>
 
@@ -40,7 +40,7 @@ function PhoneFrame({ children }) {
           {children}
 
           {/* Reflection glare */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent skew-x-12 pointer-events-none z-30" />
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-gray-200/10 to-transparent skew-x-12 pointer-events-none z-30" />
         </div>
       </div>
     </div>
@@ -56,10 +56,10 @@ function CaptureScreen() {
     <div className="absolute inset-0 z-10">
       {/* Mini header */}
       <div className="absolute top-8 left-0 right-0 text-center z-10">
-        <div className="w-8 h-8 bg-white rounded-md mx-auto flex items-center justify-center shadow-md">
+        <div className="w-8 h-8 rounded-md mx-auto flex items-center justify-center">
           <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="w-7 h-7 object-contain" />
         </div>
-        <span className="text-white/80 font-medium text-[9px]">FreshLens</span>
+        <span className="text-gray-700 font-medium text-[9px]">FreshLens</span>
       </div>
 
       {/* Viewfinder */}
@@ -84,7 +84,7 @@ function CaptureScreen() {
           initial={{ y: '-10%' }}
           animate={{ y: '900%' }}
           transition={{ duration: 1.2, ease: 'easeInOut', repeat: Infinity, repeatDelay: 2 }}
-          className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"
+          className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-transparent via-primary to-transparent"
         />
 
         {/* Corner brackets */}
@@ -127,13 +127,13 @@ function CaptureScreen() {
 
       {/* Bottom capture bar */}
       <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-4 pb-1.5">
-        <div className="w-6 h-6 bg-white/5 rounded-full" />
+        <div className="w-6 h-6 bg-gray-200 rounded-full" />
         <motion.div
           animate={{ scale: [1, 1.1, 1] }}
           transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-          className="w-9 h-9 bg-primary rounded-full border-2 border-white/20"
+          className="w-9 h-9 bg-primary rounded-full border-2 border-gray-300"
         />
-        <div className="w-6 h-6 bg-white/5 rounded-full" />
+        <div className="w-6 h-6 bg-gray-200 rounded-full" />
       </div>
     </div>
   )
@@ -193,16 +193,16 @@ function AnalyzeScreen() {
    ═══════════════════════════════════════════════ */
 function ClassifyScreen() {
   return (
-    <div className="absolute inset-0 z-10 bg-gradient-to-b from-phonescreen/20 to-phonescreen/40">
+    <div className="absolute inset-0 z-10 bg-white">
       <div className="absolute top-8 left-0 right-0 bottom-0 px-3 flex flex-col">
         {/* Header */}
         <div className="flex items-center gap-1.5 mb-3 pt-1">
-          <div className="w-5 h-5 bg-white/10 rounded-md flex items-center justify-center">
-            <svg className="w-2.5 h-2.5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <div className="w-5 h-5 bg-gray-100 rounded-md flex items-center justify-center">
+            <svg className="w-2.5 h-2.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </div>
-          <p className="text-white font-semibold text-[10px]">Classification</p>
+          <p className="text-gray-800 font-semibold text-[10px]">Classification</p>
         </div>
 
         {/* Vegetable image */}
@@ -210,7 +210,7 @@ function ClassifyScreen() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4 }}
-          className="bg-white/5 rounded-lg p-3 flex justify-center mb-3 border border-white/5"
+          className="bg-gray-50 rounded-lg p-3 flex justify-center mb-3 border border-gray-200"
         >
           <img src="/assets/icons/tomato.png" alt="Scanned tomato" className="w-16 h-16 object-contain" />
         </motion.div>
@@ -222,8 +222,8 @@ function ClassifyScreen() {
           transition={{ delay: 0.2 }}
           className="text-center mb-3"
         >
-          <p className="text-white/40 text-[8px] uppercase tracking-wider mb-0.5">Detected Vegetable</p>
-          <p className="text-white font-bold text-lg">Tomato</p>
+          <p className="text-gray-400 text-[8px] uppercase tracking-wider mb-0.5">Detected Vegetable</p>
+          <p className="text-gray-800 font-bold text-lg">Tomato</p>
         </motion.div>
 
         {/* Freshness classification */}
@@ -231,10 +231,10 @@ function ClassifyScreen() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white/5 rounded-lg p-2.5 mb-3 border border-white/5"
+          className="bg-gray-50 rounded-lg p-2.5 mb-3 border border-gray-200"
         >
           <div className="flex items-center justify-between mb-2">
-            <p className="text-white/50 text-[8px]">Freshness Category</p>
+            <p className="text-gray-500 text-[8px]">Freshness Category</p>
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -254,10 +254,10 @@ function ClassifyScreen() {
             ].map((item, i) => (
               <div key={item.label}>
                 <div className="flex justify-between text-[7px] mb-0.5">
-                  <span className="text-white/50">{item.label}</span>
-                  <span className="text-white/70 font-medium">{item.pct}%</span>
+                  <span className="text-gray-500">{item.label}</span>
+                  <span className="text-gray-600 font-medium">{item.pct}%</span>
                 </div>
-                <div className="w-full bg-white/10 rounded-full h-1 overflow-hidden">
+                <div className="w-full bg-gray-200 rounded-full h-1 overflow-hidden">
                   <motion.div
                     initial={{ width: '0%' }}
                     animate={{ width: `${item.pct}%` }}
@@ -277,7 +277,7 @@ function ClassifyScreen() {
           transition={{ delay: 0.8 }}
           className="text-center"
         >
-          <p className="text-white/30 text-[7px]">YOLOv8 · TFLite · 94.2% confidence</p>
+          <p className="text-gray-400 text-[7px]">YOLOv8 · TFLite · 94.2% confidence</p>
         </motion.div>
       </div>
     </div>
@@ -290,16 +290,16 @@ function ClassifyScreen() {
    ═══════════════════════════════════════════════ */
 function ResultsScreen() {
   return (
-    <div className="absolute inset-0 z-10 bg-gradient-to-b from-phonescreen/20 to-phonescreen/40">
+    <div className="absolute inset-0 z-10 bg-white">
       <div className="absolute top-8 left-0 right-0 bottom-0 px-2.5 flex flex-col">
         {/* Back arrow + title */}
         <div className="flex items-center gap-1.5 mb-2 pt-1">
-          <div className="w-5 h-5 bg-white/10 rounded-md flex items-center justify-center">
-            <svg className="w-2.5 h-2.5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <div className="w-5 h-5 bg-gray-100 rounded-md flex items-center justify-center">
+            <svg className="w-2.5 h-2.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </div>
-          <p className="text-white font-semibold text-[10px]">Scan Result</p>
+          <p className="text-gray-800 font-semibold text-[10px]">Scan Result</p>
         </div>
 
         {/* Tomato image */}
@@ -307,7 +307,7 @@ function ResultsScreen() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4 }}
-          className="bg-white/5 rounded-lg p-3 flex justify-center mb-2 border border-white/5"
+          className="bg-gray-50 rounded-lg p-3 flex justify-center mb-2 border border-gray-200"
         >
           <img src="/assets/icons/tomato.png" alt="Scanned tomato" className="w-14 h-14 object-contain" />
         </motion.div>
@@ -315,7 +315,7 @@ function ResultsScreen() {
         {/* Classification */}
         <div className="flex items-center justify-between mb-2">
           <div>
-            <p className="text-white/50 text-[7px]">Classification</p>
+            <p className="text-gray-500 text-[7px]">Classification</p>
             <p className="text-emerald-400 font-bold text-sm">Fresh Tomato</p>
           </div>
           <motion.div
@@ -331,22 +331,22 @@ function ResultsScreen() {
         {/* Confidence bar */}
         <div className="mb-3">
           <div className="flex justify-between text-[7px] mb-0.5">
-            <span className="text-white/50">Confidence</span>
+            <span className="text-gray-500">Confidence</span>
             <span className="text-emerald-400 font-bold">94.2%</span>
           </div>
-          <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+          <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
             <motion.div
               initial={{ width: '0%' }}
               animate={{ width: '94.2%' }}
               transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
-              className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400"
+              className="h-full rounded-full bg-linear-to-r from-emerald-500 to-emerald-400"
             />
           </div>
         </div>
 
         {/* Recommendations */}
         <div className="mb-3 flex-1">
-          <p className="text-white/50 text-[7px] font-semibold uppercase tracking-wider mb-1.5">Recommendations</p>
+          <p className="text-gray-500 text-[7px] font-semibold uppercase tracking-wider mb-1.5">Recommendations</p>
           <div className="space-y-1.5">
             {[
               'Safe to consume — this vegetable is fresh',
@@ -363,7 +363,7 @@ function ResultsScreen() {
                 <div className="w-3 h-3 bg-emerald-500/20 rounded-full flex items-center justify-center mt-0.5 shrink-0">
                   <span className="text-emerald-400 text-[6px]">✓</span>
                 </div>
-                <p className="text-white/50 text-[7px] leading-relaxed">{rec}</p>
+                <p className="text-gray-500 text-[7px] leading-relaxed">{rec}</p>
               </motion.div>
             ))}
           </div>
@@ -377,11 +377,11 @@ function ResultsScreen() {
             </svg>
             <span className="text-white text-[8px] font-semibold">Scan Again</span>
           </div>
-          <div className="flex-1 bg-white/10 rounded-lg py-2 flex items-center justify-center gap-1 border border-white/10">
-            <svg className="w-2.5 h-2.5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <div className="flex-1 bg-gray-100 rounded-lg py-2 flex items-center justify-center gap-1 border border-gray-200">
+            <svg className="w-2.5 h-2.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4" />
             </svg>
-            <span className="text-white/60 text-[8px] font-semibold">Home</span>
+            <span className="text-gray-500 text-[8px] font-semibold">Home</span>
           </div>
         </div>
       </div>
@@ -421,7 +421,7 @@ function StepPhoneMockup({ step = 0 }) {
           initial={{ opacity: 0, scale: 0.6 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="absolute w-44 h-44 lg:w-52 lg:h-52 rounded-full border border-white/[0.04]"
+          className="absolute w-44 h-44 lg:w-52 lg:h-52 rounded-full border border-white/4"
         />
         {/* Subtle center glow */}
         <div className="absolute w-40 h-40 bg-primary/10 rounded-full blur-3xl" />

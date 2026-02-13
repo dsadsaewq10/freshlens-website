@@ -102,7 +102,7 @@ function DatasetModal({ dataset, isOpen, onClose }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          className="fixed inset-0 z-100 flex items-center justify-center p-4"
           onClick={onClose}
         >
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
@@ -134,7 +134,7 @@ function DatasetModal({ dataset, isOpen, onClose }) {
                   className="w-28 h-28 object-contain drop-shadow-2xl"
                 />
               </div>
-              <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/40 to-transparent">
+              <div className="absolute bottom-0 left-0 right-0 p-5 bg-linear-to-t from-black/40 to-transparent">
                 <h2 className="text-2xl md:text-3xl font-bold text-white">{dataset.name}</h2>
               </div>
             </div>
@@ -188,7 +188,7 @@ function DatasetModal({ dataset, isOpen, onClose }) {
                   {[0, 1, 2].map((i) => (
                     <div
                       key={i}
-                      className="aspect-[4/3] rounded-xl overflow-hidden border border-gray-200"
+                      className="aspect-4/3 rounded-xl overflow-hidden border border-gray-200"
                       style={{ background: COLORS.light }}
                     >
                       {dataset.sampleImages[i] ? (
@@ -351,7 +351,7 @@ function DatasetGridSection({ onSelectDataset }) {
       style={{ background: COLORS.darker }}
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full" style={{ background: `${COLORS.primary}08` }} />
+        <div className="absolute -top-40 -right-40 w-125 h-125 rounded-full" style={{ background: `${COLORS.primary}08` }} />
         <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full" style={{ background: `${COLORS.primary}08` }} />
       </div>
 

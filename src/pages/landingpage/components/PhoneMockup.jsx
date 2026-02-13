@@ -92,7 +92,7 @@ function PhoneMockup({ isVisible }) {
         className="relative"
       >
         <motion.div
-          className="relative w-64 lg:w-72 h-[500px] lg:h-[560px]"
+          className="relative w-64 lg:w-72 h-125 lg:h-140"
           style={{ transformStyle: 'preserve-3d' }}
         >
           {/* Glow */}
@@ -103,13 +103,13 @@ function PhoneMockup({ isVisible }) {
           />
 
           {/* Phone Frame */}
-          <div className="absolute inset-0 bg-gradient-to-b from-accent to-gray-900 rounded-[2.5rem] p-2 shadow-2xl">
+          <div className="absolute inset-0 bg-linear-to-b from-accent to-gray-900 rounded-[2.5rem] p-2 shadow-2xl">
             <div className="absolute -right-1 top-24 w-1 h-16 bg-accent rounded-l-sm" />
             <div className="absolute -left-1 top-20 w-1 h-8 bg-accent rounded-r-sm" />
             <div className="absolute -left-1 top-32 w-1 h-12 bg-accent rounded-r-sm" />
 
             {/* Screen */}
-            <div className="w-full h-full bg-gradient-to-b from-phonescreen/20 to-phonescreen/40 rounded-[2rem] overflow-hidden relative">
+            <div className="w-full h-full bg-white rounded-4xl overflow-hidden relative">
               {/* Notch */}
               <div className="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full flex items-center justify-center gap-2 z-30">
                 <div className="w-2 h-2 bg-gray-800 rounded-full" />
@@ -117,12 +117,12 @@ function PhoneMockup({ isVisible }) {
               </div>
 
               {/* Status Bar */}
-              <div className="absolute top-3 left-4 right-4 flex justify-between items-center text-white/50 text-[10px] z-20 px-2">
+              <div className="absolute top-3 left-4 right-4 flex justify-between items-center text-gray-400 text-[10px] z-20 px-2">
                 <span>9:41</span>
                 <div className="flex gap-1">
-                  <div className="w-3.5 h-1.5 bg-white/30 rounded-sm" />
-                  <div className="w-3.5 h-1.5 bg-white/30 rounded-sm" />
-                  <div className="w-5 h-2.5 bg-white/40 rounded-sm" />
+                  <div className="w-3.5 h-1.5 bg-gray-300 rounded-sm" />
+                  <div className="w-3.5 h-1.5 bg-gray-300 rounded-sm" />
+                  <div className="w-5 h-2.5 bg-gray-400 rounded-sm" />
                 </div>
               </div>
 
@@ -141,7 +141,7 @@ function PhoneMockup({ isVisible }) {
                       initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
                       animate={{ scale: 1, opacity: 1, rotate: 0 }}
                       transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
-                      className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center shadow-lg mb-3 relative"
+                      className="w-24 h-24 rounded-2xl flex items-center justify-center mb-3 relative"
                     >
                       <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="w-20 h-20 object-contain" />
                       {/* Subtle glow ring */}
@@ -155,7 +155,7 @@ function PhoneMockup({ isVisible }) {
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="text-white/90 font-semibold text-base"
+                      className="text-gray-800 font-semibold text-base"
                     >
                       FreshLens
                     </motion.p>
@@ -163,7 +163,7 @@ function PhoneMockup({ isVisible }) {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.5 }}
-                      className="text-white/40 text-[10px] mt-1"
+                      className="text-gray-400 text-[10px] mt-1"
                     >
                       AI Freshness Scanner
                     </motion.p>
@@ -189,10 +189,10 @@ function PhoneMockup({ isVisible }) {
                   >
                     {/* Mini header */}
                     <div className="absolute top-12 left-0 right-0 text-center z-10">
-                      <div className="w-9 h-9 bg-white rounded-lg mx-auto mb-1 flex items-center justify-center shadow-md">
+                      <div className="w-9 h-9 rounded-lg mx-auto mb-1 flex items-center justify-center">
                         <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="w-9 h-9 object-contain" />
                       </div>
-                      <span className="text-white/80 font-medium text-[11px]">FreshLens</span>
+                      <span className="text-gray-700 font-medium text-[11px]">FreshLens</span>
                     </div>
 
                     {/* Viewfinder */}
@@ -228,7 +228,7 @@ function PhoneMockup({ isVisible }) {
                         initial={{ y: '-10%' }}
                         animate={{ y: '900%' }}
                         transition={{ duration: 0.8, ease: 'easeInOut' }}
-                        className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-transparent via-primary to-transparent"
+                        className="absolute inset-x-0 top-0 h-1.5 bg-linear-to-r from-transparent via-primary to-transparent"
                       />
 
                       {/* Corner brackets */}
@@ -291,25 +291,25 @@ function PhoneMockup({ isVisible }) {
 
                     {/* Bottom capture bar */}
                     <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-6 pb-2">
-                      <div className="w-8 h-8 bg-white/5 rounded-full" />
+                      <div className="w-8 h-8 bg-gray-200 rounded-full" />
                       {/* Shutter button — pulses then locks */}
                       <motion.div
                         animate={{
                           scale: [1, 1.15, 0.9, 1],
-                          borderColor: ['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.5)', 'rgba(40,90,83,0.8)', 'rgba(40,90,83,0.6)'],
+                          borderColor: ['rgba(209,213,219,0.5)', 'rgba(156,163,175,0.5)', 'rgba(40,90,83,0.8)', 'rgba(40,90,83,0.6)'],
                         }}
                         transition={{ duration: 1, delay: 0.3, times: [0, 0.3, 0.5, 1] }}
-                        className="w-12 h-12 bg-primary rounded-full border-3 border-white/20 relative"
+                        className="w-12 h-12 bg-primary rounded-full border-3 border-gray-300 relative"
                       >
                         {/* Inner ring */}
                         <motion.div
                           initial={{ scale: 1 }}
                           animate={{ scale: [1, 0.6, 1] }}
                           transition={{ duration: 0.5, delay: 0.6 }}
-                          className="absolute inset-1 rounded-full border-2 border-white/30"
+                          className="absolute inset-1 rounded-full border-2 border-gray-300"
                         />
                       </motion.div>
-                      <div className="w-8 h-8 bg-white/5 rounded-full" />
+                      <div className="w-8 h-8 bg-gray-200 rounded-full" />
                     </div>
                   </motion.div>
                 )}
@@ -374,28 +374,28 @@ function PhoneMockup({ isVisible }) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4, ease: 'easeOut' }}
-                    className="absolute inset-0 z-10 bg-gradient-to-b from-phonescreen/20 to-phonescreen/40"
+                    className="absolute inset-0 z-10 bg-white"
                   >
                     <div className="absolute top-11 left-0 right-0 bottom-0 px-3 flex flex-col">
                       {/* Back arrow + title */}
                       <div className="flex items-center gap-2 mb-3 pt-2">
-                        <div className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center">
-                          <svg className="w-3.5 h-3.5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <div className="w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <svg className="w-3.5 h-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                           </svg>
                         </div>
-                        <p className="text-white font-semibold text-sm">Scan Result</p>
+                        <p className="text-gray-800 font-semibold text-sm">Scan Result</p>
                       </div>
 
                       {/* Tomato image */}
-                      <div className="bg-white/5 rounded-xl p-4 flex justify-center mb-3 border border-white/5">
+                      <div className="bg-gray-50 rounded-xl p-4 flex justify-center mb-3 border border-gray-200">
                         <img src="/assets/icons/tomato.png" alt="Scanned tomato" className="w-20 h-20 object-contain" />
                       </div>
 
                       {/* Classification Label */}
                       <div className="flex items-center justify-between mb-3">
                         <div>
-                          <p className="text-white/50 text-[10px]">Classification</p>
+                          <p className="text-gray-500 text-[10px]">Classification</p>
                           <p className="text-emerald-400 font-bold text-base">Fresh Tomato</p>
                         </div>
                         <motion.div
@@ -411,22 +411,22 @@ function PhoneMockup({ isVisible }) {
                       {/* Confidence bar */}
                       <div className="mb-4">
                         <div className="flex justify-between text-[10px] mb-1">
-                          <span className="text-white/50">Confidence</span>
+                          <span className="text-gray-500">Confidence</span>
                           <span className="text-emerald-400 font-bold">94.2%</span>
                         </div>
-                        <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                           <motion.div
                             initial={{ width: '0%' }}
                             animate={{ width: '94.2%' }}
                             transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
-                            className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400"
+                            className="h-full rounded-full bg-linear-to-r from-emerald-500 to-emerald-400"
                           />
                         </div>
                       </div>
 
                       {/* Recommendations */}
                       <div className="mb-4 flex-1">
-                        <p className="text-white/50 text-[10px] font-semibold uppercase tracking-wider mb-2">Recommendations</p>
+                        <p className="text-gray-500 text-[10px] font-semibold uppercase tracking-wider mb-2">Recommendations</p>
                         <div className="space-y-2">
                           {[
                             'Safe to consume — this vegetable is fresh',
@@ -443,7 +443,7 @@ function PhoneMockup({ isVisible }) {
                               <div className="w-3.5 h-3.5 bg-emerald-500/20 rounded-full flex items-center justify-center mt-0.5 shrink-0">
                                 <span className="text-emerald-400 text-[7px]">✓</span>
                               </div>
-                              <p className="text-white/50 text-[9px] leading-relaxed">{rec}</p>
+                              <p className="text-gray-500 text-[9px] leading-relaxed">{rec}</p>
                             </motion.div>
                           ))}
                         </div>
@@ -457,11 +457,11 @@ function PhoneMockup({ isVisible }) {
                           </svg>
                           <span className="text-white text-[10px] font-semibold">Scan Again</span>
                         </div>
-                        <div className="flex-1 bg-white/10 rounded-xl py-2.5 flex items-center justify-center gap-1.5 border border-white/10">
-                          <svg className="w-3 h-3 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <div className="flex-1 bg-gray-100 rounded-xl py-2.5 flex items-center justify-center gap-1.5 border border-gray-200">
+                          <svg className="w-3 h-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4" />
                           </svg>
-                          <span className="text-white/60 text-[10px] font-semibold">Home</span>
+                          <span className="text-gray-500 text-[10px] font-semibold">Home</span>
                         </div>
                       </div>
                     </div>
@@ -476,13 +476,13 @@ function PhoneMockup({ isVisible }) {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="absolute inset-0 z-10 bg-gradient-to-b from-phonescreen/20 to-phonescreen/40 flex items-center justify-center"
+                    className="absolute inset-0 z-10 bg-white flex items-center justify-center"
                   >
                     <motion.div
                       initial={{ scale: 1, opacity: 1 }}
                       animate={{ scale: 0.8, opacity: 0.3 }}
                       transition={{ duration: 0.8, ease: 'easeInOut' }}
-                      className="w-18 h-18 bg-white rounded-2xl flex items-center justify-center shadow-md"
+                      className="w-18 h-18 rounded-2xl flex items-center justify-center"
                     >
                       <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="w-14 h-14 object-contain" />
                     </motion.div>
@@ -494,7 +494,7 @@ function PhoneMockup({ isVisible }) {
               <motion.div
                 animate={{ x: ['-100%', '200%'] }}
                 transition={{ duration: 4, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12 pointer-events-none z-30"
+                className="absolute inset-0 bg-linear-to-r from-transparent via-gray-200/20 to-transparent skew-x-12 pointer-events-none z-30"
               />
             </div>
           </div>

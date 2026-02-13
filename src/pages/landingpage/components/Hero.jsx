@@ -97,7 +97,7 @@ function Hero({ isLoaded }) {
           </motion.div>
 
           {/* Phone Mockup */}
-          <div className="order-1 lg:order-2 lg:translate-x-16 lg:mr-[-2rem]">
+          <div className="order-1 lg:order-2 lg:translate-x-16 lg:-mr-8">
             <PhoneMockup isVisible={isLoaded} />
           </div>
         </div>
