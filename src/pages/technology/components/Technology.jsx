@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
 import Header from '../../landingpage/components/Header'
 import Footer from '../../landingpage/components/Footer'
+import BackToTop from '../../../components/BackToTop'
 
 // Color palette
 const COLORS = {
@@ -533,6 +534,7 @@ export default function TechnologyPage() {
       <div className="snap-section-footer">
         <Footer />
       </div>
+      <BackToTop />
     </div>
   )
 }

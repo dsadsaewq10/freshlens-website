@@ -110,12 +110,12 @@ function Footer() {
 
                       {/* App icon + title */}
                       <div className="flex gap-3 mb-3">
-                        <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center shrink-0 shadow-lg">
-                          <span className="text-white font-bold text-xl">F</span>
+                        <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center shrink-0 shadow-lg">
+                          <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="w-13 h-13 object-contain" />
                         </div>
                         <div className="flex-1 min-w-0 pt-1">
                           <p className="font-bold text-gray-900 text-base">FreshLens</p>
-                          <p className="text-primary text-xs font-medium">FreshLens Team</p>
+                          <p className="text-primary text-xs font-medium">Bern Payot and Friends</p>
                         </div>
                       </div>
 
@@ -168,8 +168,8 @@ function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 bg-white/15 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">F</span>
+              <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="w-7 h-7 object-contain" />
               </div>
               <span className="text-base font-bold">FreshLens</span>
             </div>

@@ -141,9 +141,9 @@ function PhoneMockup({ isVisible }) {
                       initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
                       animate={{ scale: 1, opacity: 1, rotate: 0 }}
                       transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
-                      className="w-20 h-20 bg-primary/30 rounded-2xl flex items-center justify-center border border-primary/40 mb-3 relative"
+                      className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center shadow-lg mb-3 relative"
                     >
-                      <span className="text-white font-bold text-3xl">F</span>
+                      <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="w-20 h-20 object-contain" />
                       {/* Subtle glow ring */}
                       <motion.div
                         animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0, 0.3] }}
@@ -189,8 +189,8 @@ function PhoneMockup({ isVisible }) {
                   >
                     {/* Mini header */}
                     <div className="absolute top-12 left-0 right-0 text-center z-10">
-                      <div className="w-8 h-8 bg-primary/30 rounded-lg mx-auto mb-1 flex items-center justify-center border border-primary/40">
-                        <span className="text-white font-bold text-xs">F</span>
+                      <div className="w-9 h-9 bg-white rounded-lg mx-auto mb-1 flex items-center justify-center shadow-md">
+                        <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="w-9 h-9 object-contain" />
                       </div>
                       <span className="text-white/80 font-medium text-[11px]">FreshLens</span>
                     </div>
@@ -482,9 +482,9 @@ function PhoneMockup({ isVisible }) {
                       initial={{ scale: 1, opacity: 1 }}
                       animate={{ scale: 0.8, opacity: 0.3 }}
                       transition={{ duration: 0.8, ease: 'easeInOut' }}
-                      className="w-14 h-14 bg-primary/30 rounded-2xl flex items-center justify-center border border-primary/40"
+                      className="w-18 h-18 bg-white rounded-2xl flex items-center justify-center shadow-md"
                     >
-                      <span className="text-white font-bold text-xl">F</span>
+                      <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="w-14 h-14 object-contain" />
                     </motion.div>
                   </motion.div>
                 )}

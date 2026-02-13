@@ -69,9 +69,11 @@ function Header({ isLoaded = true, currentPage }) {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <button onClick={() => navigate('/')} className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">F</span>
-            </div>
+            <img
+              src="/assets/logo/freshlens_logo.png"
+              alt="FreshLens"
+              className="w-10 h-10 object-contain"
+            />
             <span className="text-xl lg:text-2xl font-bold text-accent">
               FreshLens
             </span>

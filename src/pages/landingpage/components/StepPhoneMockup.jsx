@@ -56,14 +56,14 @@ function CaptureScreen() {
     <div className="absolute inset-0 z-10">
       {/* Mini header */}
       <div className="absolute top-8 left-0 right-0 text-center z-10">
-        <div className="w-6 h-6 bg-primary/30 rounded-md mx-auto mb-0.5 flex items-center justify-center border border-primary/40">
-          <span className="text-white font-bold text-[8px]">F</span>
+        <div className="w-8 h-8 bg-white rounded-md mx-auto flex items-center justify-center shadow-md">
+          <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="w-7 h-7 object-contain" />
         </div>
-        <span className="text-white/80 font-medium text-[8px]">FreshLens</span>
+        <span className="text-white/80 font-medium text-[9px]">FreshLens</span>
       </div>
 
       {/* Viewfinder */}
-      <div className="absolute top-20 left-2.5 right-2.5 bottom-20 rounded-xl overflow-hidden bg-black/40 border border-white/5">
+      <div className="absolute top-21 left-2.5 right-2.5 bottom-20 rounded-xl overflow-hidden bg-black/40 border border-white/5">
         {/* Tomato subject */}
         <div className="absolute inset-0 flex items-center justify-center">
           <img src="/assets/icons/tomato.png" alt="Tomato" className="w-20 h-20 object-contain drop-shadow-lg" />

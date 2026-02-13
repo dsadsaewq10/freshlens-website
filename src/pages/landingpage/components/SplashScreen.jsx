@@ -129,14 +129,14 @@ function SplashScreen({ onComplete }) {
           </AnimatePresence>
 
           {/* Logo box */}
-          <div className="w-full h-full bg-white/15 rounded-2xl backdrop-blur-sm border border-white/30 flex items-center justify-center overflow-hidden relative">
-            <motion.span
+          <div className="w-full h-full bg-white rounded-2xl border border-white/30 flex items-center justify-center overflow-hidden relative shadow-lg">
+            <motion.img
+              src="/assets/logo/freshlens_logo.png"
+              alt="FreshLens"
               animate={phase === 'ready' ? { scale: [1, 1.15, 1] } : {}}
               transition={{ duration: 0.25 }}
-              className="text-white text-5xl font-bold relative z-10"
-            >
-              F
-            </motion.span>
+              className="w-32 h-32 object-contain relative z-10"
+            />
 
             {/* Scan line sweep */}
             <AnimatePresence>
