@@ -246,36 +246,35 @@ function PhoneMockup({ isVisible }) {
                       >
                         AF ●
                       </motion.div>
+
+                      {/* ── CAMERA SHUTTER FLASH — inside viewfinder only ── */}
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: [0, 0, 0.95, 0] }}
+                        transition={{ duration: 0.5, delay: 0.7, times: [0, 0, 0.3, 1] }}
+                        className="absolute inset-0 bg-white rounded-2xl z-40 pointer-events-none"
+                      />
+
+                      {/* Shutter iris closing effect — inside viewfinder only */}
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: [0, 0, 1, 1, 0] }}
+                        transition={{ duration: 0.8, delay: 0.65, times: [0, 0, 0.15, 0.7, 1] }}
+                        className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center overflow-hidden rounded-2xl"
+                      >
+                        {/* Shutter blades */}
+                        {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
+                          <motion.div
+                            key={deg}
+                            initial={{ scaleY: 0 }}
+                            animate={{ scaleY: [0, 0, 1, 1, 0] }}
+                            transition={{ duration: 0.8, delay: 0.65, times: [0, 0, 0.2, 0.6, 1] }}
+                            className="absolute w-[120%] h-3 bg-gray-900/90 origin-center"
+                            style={{ transform: `rotate(${deg}deg)` }}
+                          />
+                        ))}
+                      </motion.div>
                     </div>
-
-                    {/* ── CAMERA SHUTTER FLASH ── */}
-                    {/* Full-screen white flash — simulates capture */}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0, 0, 0.95, 0] }}
-                      transition={{ duration: 0.5, delay: 0.7, times: [0, 0, 0.3, 1] }}
-                      className="absolute inset-0 bg-white z-40 pointer-events-none"
-                    />
-
-                    {/* Shutter iris closing effect */}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0, 0, 1, 1, 0] }}
-                      transition={{ duration: 0.8, delay: 0.65, times: [0, 0, 0.15, 0.7, 1] }}
-                      className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center"
-                    >
-                      {/* Shutter blades */}
-                      {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
-                        <motion.div
-                          key={deg}
-                          initial={{ scaleY: 0 }}
-                          animate={{ scaleY: [0, 0, 1, 1, 0] }}
-                          transition={{ duration: 0.8, delay: 0.65, times: [0, 0, 0.2, 0.6, 1] }}
-                          className="absolute w-[120%] h-3 bg-gray-900/90 origin-center"
-                          style={{ transform: `rotate(${deg}deg)` }}
-                        />
-                      ))}
-                    </motion.div>
 
                     {/* Capture indicator — "Photo captured" */}
                     <motion.div

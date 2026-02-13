@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import StepPhoneMockup from './StepPhoneMockup'
 
 function HowItWorks() {
   const [activeStep, setActiveStep] = useState(0)
@@ -99,7 +100,6 @@ function HowItWorks() {
       <div className="absolute inset-0 opacity-[0.07]">
         <div className="absolute top-20 right-20 w-64 h-64 border border-white rounded-full" />
         <div className="absolute bottom-20 left-10 w-48 h-48 border border-white rounded-full" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-white rounded-full" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -212,23 +212,13 @@ function HowItWorks() {
                   ))}
                 </div>
 
-                {/* Screenshot Placeholder - Replace src with actual app screenshots */}
+                {/* Phone Mockup for current step */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="bg-white/10 rounded-2xl border border-white/20 p-4 max-w-md"
                 >
-                  <div className="aspect-[9/16] max-h-72 bg-white/5 rounded-xl flex items-center justify-center border border-dashed border-white/30">
-                    {/* TODO: Replace with actual screenshot for each step */}
-                    <div className="text-center text-white/40">
-                      <div className="w-12 h-12 mx-auto mb-3 bg-white/10 rounded-lg flex items-center justify-center">
-                        <img src={steps[activeStep].visual} alt="" className="w-6 h-6 opacity-50" />
-                      </div>
-                      <p className="text-sm">App Screenshot</p>
-                      <p className="text-xs mt-1">Step {activeStep + 1}: {steps[activeStep].title}</p>
-                    </div>
-                  </div>
+                  <StepPhoneMockup step={activeStep} />
                 </motion.div>
               </motion.div>
             </AnimatePresence>
