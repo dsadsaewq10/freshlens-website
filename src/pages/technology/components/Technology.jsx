@@ -99,7 +99,7 @@ const technologies = [
       'Works entirely without an internet connection after initial setup',
       'Keeps all processing on your device for complete privacy',
     ],
-    logo: '/assets/icons/tflite.png',
+    logo: '/assets/icons/tensorflow.png',
     bgColor: COLORS.light,
     textColor: COLORS.primary,
   },

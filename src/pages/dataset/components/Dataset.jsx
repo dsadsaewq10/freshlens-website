@@ -17,18 +17,18 @@ const COLORS = {
 const datasets = [
   {
     id: 'cabbage',
-    name: 'Cabbage Dataset',
+    name: 'Cucumber Dataset',
     description:
-      'Annotated images of cabbages at various freshness stages, captured under controlled and natural lighting conditions. Each image is labeled with bounding boxes in YOLO format.',
+      'Annotated images of cucumbers at various freshness stages, captured under controlled and natural lighting conditions. Each image is labeled with bounding boxes in YOLO format.',
     images: 2450,
     freshCount: 1280,
     rottenCount: 1170,
-    classes: ['Fresh Cabbage', 'Rotten Cabbage'],
+    classes: ['Fresh Cucumber', 'Rotten Cucumber'],
     format: 'YOLO Format (.txt)',
     resolution: '640 x 640',
     size: '~320 MB',
-    thumbnail: '/assets/icons/cabbage.webp',
-    sampleImages: ['/assets/icons/cabbage.webp'],
+    thumbnail: '/assets/icons_vegetables/cucumber_transparent.png',
+    sampleImages: ['/assets/sample_data/cucumber1.webp', '/assets/sample_data/cucumber2.jpg', '/assets/sample_data/cucumber3.jpg'],
     downloadUrl: '#', // PLACEHOLDER: Add actual download URL
     lastUpdated: 'January 2026',
   },
@@ -45,7 +45,7 @@ const datasets = [
     resolution: '640 x 640',
     size: '~380 MB',
     thumbnail: '/assets/icons_vegetables/tomato.png',
-    sampleImages: ['/assets/icons_vegetables/tomato.png'],
+    sampleImages: ['/assets/sample_data/tomato1.jpg', '/assets/sample_data/tomato2.avif', '/assets/sample_data/tomato3.webp'],
     downloadUrl: '#', // PLACEHOLDER: Add actual download URL
     lastUpdated: 'January 2026',
   },
@@ -62,7 +62,7 @@ const datasets = [
     resolution: '640 x 640',
     size: '~290 MB',
     thumbnail: '/assets/icons_vegetables/carrot.png',
-    sampleImages: ['/assets/icons_vegetables/carrot.png'],
+    sampleImages: ['/assets/sample_data/carrot1.webp', '/assets/sample_data/carrot2.webp', '/assets/sample_data/carrot3.webp'],
     downloadUrl: '#', // PLACEHOLDER: Add actual download URL
     lastUpdated: 'January 2026',
   },
@@ -79,7 +79,7 @@ const datasets = [
     resolution: '640 x 640',
     size: '~270 MB',
     thumbnail: '/assets/icons_vegetables/pepper.png',
-    sampleImages: ['/assets/icons_vegetables/pepper.png'],
+    sampleImages: ['/assets/sample_data/pepper1.webp', '/assets/sample_data/pepper2.jpg', '/assets/sample_data/pepper3.jpg'],
     downloadUrl: '#', // PLACEHOLDER: Add actual download URL
     lastUpdated: 'January 2026',
   },
@@ -187,14 +187,14 @@ function DatasetModal({ dataset, isOpen, onClose }) {
                   {[0, 1, 2].map((i) => (
                     <div
                       key={i}
-                      className="aspect-square rounded-xl overflow-hidden border border-gray-200 flex items-center justify-center"
+                      className="aspect-[4/3] rounded-xl overflow-hidden border border-gray-200"
                       style={{ background: COLORS.light }}
                     >
                       {dataset.sampleImages[i] ? (
                         <img
                           src={dataset.sampleImages[i]}
                           alt={`Sample ${i + 1}`}
-                          className="w-full h-full object-contain p-4"
+                          className="w-full h-full object-cover"
                         />
                       ) : (
                         <div className="text-center p-4">

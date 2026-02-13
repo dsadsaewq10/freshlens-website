@@ -25,7 +25,7 @@ function HowItWorks() {
       title: 'Analyze',
       description: 'YOLOv8 processes the image and analyzes visual features for freshness indicators.',
       icon: (
-        <img src="/assets/icons/icon_imageprocessing.png" alt="" className="w-6 h-6 brightness-0 invert" />
+        <img src="/assets/icons/icon_analyze.png" alt="" className="w-6 h-6 brightness-0 invert" />
       ),
       details: [
         'YOLOv8 scans for color, texture, and decay patterns',
