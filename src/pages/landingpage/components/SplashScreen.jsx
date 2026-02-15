@@ -131,7 +131,7 @@ function SplashScreen({ onComplete }) {
           {/* Logo box */}
           <div className="w-full h-full rounded-2xl flex items-center justify-center overflow-hidden relative">
             <motion.img
-              src="/assets/logo/freshlens_logo.png"
+              src="/assets/logo/white logo.png"
               alt="FreshLens"
               animate={phase === 'ready' ? { scale: [1, 1.15, 1] } : {}}
               transition={{ duration: 0.25 }}
