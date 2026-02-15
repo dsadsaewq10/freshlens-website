@@ -72,19 +72,19 @@ function CaptureScreen() {
         {/* Focus ring */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <motion.div
-            initial={{ scale: 1.6, opacity: 0 }}
-            animate={{ scale: 1, opacity: 0.6 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
+            initial={{ scale: 1.3, opacity: 0 }}
+            animate={{ scale: 1, opacity: 0.7 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
             className="w-24 h-24 border-2 border-primary rounded-lg"
           />
         </div>
 
         {/* Scan line sweep */}
         <motion.div
-          initial={{ y: '-10%' }}
-          animate={{ y: '900%' }}
-          transition={{ duration: 1.2, ease: 'easeInOut', repeat: Infinity, repeatDelay: 2 }}
-          className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-transparent via-primary to-transparent"
+          initial={{ y: '0%' }}
+          animate={{ y: '100%' }}
+          transition={{ duration: 1.5, ease: 'linear', repeat: Infinity, repeatDelay: 1.5 }}
+          className="absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-transparent via-primary to-transparent opacity-70"
         />
 
         {/* Corner brackets */}
@@ -106,8 +106,8 @@ function CaptureScreen() {
         {/* Shutter flash — contained within viewfinder only */}
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 0, 0.9, 0] }}
-          transition={{ duration: 0.6, delay: 1.5, times: [0, 0, 0.3, 1], repeat: Infinity, repeatDelay: 4 }}
+          animate={{ opacity: [0, 0.9, 0] }}
+          transition={{ duration: 0.5, delay: 1.5, times: [0, 0.4, 1], repeat: Infinity, repeatDelay: 3.5 }}
           className="absolute inset-0 bg-white rounded-xl z-40 pointer-events-none"
         />
       </div>
@@ -115,8 +115,8 @@ function CaptureScreen() {
       {/* "Image Captured" badge */}
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: [0, 0, 1, 1, 0] }}
-        transition={{ duration: 2, delay: 1.8, times: [0, 0, 0.1, 0.7, 1], repeat: Infinity, repeatDelay: 3.2 }}
+        animate={{ opacity: [0, 1, 1, 0] }}
+        transition={{ duration: 1.5, delay: 1.9, times: [0, 0.15, 0.75, 1], repeat: Infinity, repeatDelay: 2.6 }}
         className="absolute bottom-24 left-0 right-0 flex justify-center z-40 pointer-events-none"
       >
         <div className="bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5">
@@ -129,8 +129,8 @@ function CaptureScreen() {
       <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-4 pb-1.5">
         <div className="w-6 h-6 bg-gray-200 rounded-full" />
         <motion.div
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 2, repeat: Infinity, repeatDelay: 2 }}
           className="w-9 h-9 bg-primary rounded-full border-2 border-gray-300"
         />
         <div className="w-6 h-6 bg-gray-200 rounded-full" />

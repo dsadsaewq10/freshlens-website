@@ -206,29 +206,22 @@ function PhoneMockup({ isVisible }) {
                         />
                       </div>
 
-                      {/* Focus pulse ring around tomato */}
+                      {/* Focus ring around tomato */}
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <motion.div
-                          initial={{ scale: 1.8, opacity: 0 }}
-                          animate={{ scale: 1, opacity: [0, 0.6, 0.6] }}
-                          transition={{ duration: 0.4, ease: 'easeOut' }}
+                          initial={{ scale: 1.4, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 0.7 }}
+                          transition={{ duration: 0.5, ease: 'easeOut' }}
                           className="w-32 h-32 border-2 border-primary rounded-xl"
-                        />
-                        {/* Secondary focus ring */}
-                        <motion.div
-                          initial={{ scale: 2, opacity: 0 }}
-                          animate={{ scale: 1.15, opacity: [0, 0.3, 0] }}
-                          transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
-                          className="absolute w-36 h-36 border border-primary/50 rounded-xl"
                         />
                       </div>
 
-                      {/* Scan line — fast sweep */}
+                      {/* Scan line — smooth single sweep */}
                       <motion.div
-                        initial={{ y: '-10%' }}
-                        animate={{ y: '900%' }}
-                        transition={{ duration: 0.8, ease: 'easeInOut' }}
-                        className="absolute inset-x-0 top-0 h-1.5 bg-linear-to-r from-transparent via-primary to-transparent"
+                        initial={{ y: '0%' }}
+                        animate={{ y: '100%' }}
+                        transition={{ duration: 1, ease: 'linear' }}
+                        className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-transparent via-primary to-transparent opacity-80"
                       />
 
                       {/* Corner brackets */}
@@ -250,37 +243,17 @@ function PhoneMockup({ isVisible }) {
                       {/* ── CAMERA SHUTTER FLASH — inside viewfinder only ── */}
                       <motion.div
                         initial={{ opacity: 0 }}
-                        animate={{ opacity: [0, 0, 0.95, 0] }}
-                        transition={{ duration: 0.5, delay: 0.7, times: [0, 0, 0.3, 1] }}
+                        animate={{ opacity: [0, 0.95, 0] }}
+                        transition={{ duration: 0.4, delay: 0.9, times: [0, 0.4, 1] }}
                         className="absolute inset-0 bg-white rounded-2xl z-40 pointer-events-none"
                       />
-
-                      {/* Shutter iris closing effect — inside viewfinder only */}
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: [0, 0, 1, 1, 0] }}
-                        transition={{ duration: 0.8, delay: 0.65, times: [0, 0, 0.15, 0.7, 1] }}
-                        className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center overflow-hidden rounded-2xl"
-                      >
-                        {/* Shutter blades */}
-                        {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
-                          <motion.div
-                            key={deg}
-                            initial={{ scaleY: 0 }}
-                            animate={{ scaleY: [0, 0, 1, 1, 0] }}
-                            transition={{ duration: 0.8, delay: 0.65, times: [0, 0, 0.2, 0.6, 1] }}
-                            className="absolute w-[120%] h-3 bg-gray-900/90 origin-center"
-                            style={{ transform: `rotate(${deg}deg)` }}
-                          />
-                        ))}
-                      </motion.div>
                     </div>
 
                     {/* Capture indicator — "Photo captured" */}
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: [0, 0, 1, 1, 0], y: [10, 10, 0, 0, -5] }}
-                      transition={{ duration: 1.2, delay: 0.8, times: [0, 0, 0.2, 0.7, 1] }}
+                      animate={{ opacity: [0, 1, 1, 0], y: [10, 0, 0, -5] }}
+                      transition={{ duration: 0.8, delay: 1.1, times: [0, 0.2, 0.7, 1] }}
                       className="absolute bottom-32 left-0 right-0 flex justify-center z-40 pointer-events-none"
                     >
                       <div className="bg-black/70 backdrop-blur-sm px-4 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
