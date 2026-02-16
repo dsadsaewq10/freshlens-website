@@ -113,7 +113,7 @@ function DatasetModal({ dataset, isOpen, onClose }) {
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl"
           >
             {/* Close button */}
             <button
@@ -126,48 +126,48 @@ function DatasetModal({ dataset, isOpen, onClose }) {
             </button>
 
             {/* Header with thumbnail */}
-            <div className="relative h-48 md:h-56 overflow-hidden rounded-t-2xl" style={{ background: COLORS.primary }}>
+            <div className="relative h-36 md:h-40 overflow-hidden rounded-t-2xl" style={{ background: COLORS.primary }}>
               <div className="absolute inset-0 flex items-center justify-center">
                 <img
                   src={dataset.thumbnail}
                   alt={dataset.name}
-                  className="w-28 h-28 object-contain drop-shadow-2xl"
+                  className="w-20 h-20 md:w-24 md:h-24 object-contain drop-shadow-2xl"
                 />
               </div>
-              <div className="absolute bottom-0 left-0 right-0 p-5 bg-linear-to-t from-black/40 to-transparent">
-                <h2 className="text-2xl md:text-3xl font-bold text-white">{dataset.name}</h2>
+              <div className="absolute bottom-0 left-0 right-0 p-4 bg-linear-to-t from-black/40 to-transparent">
+                <h2 className="text-xl md:text-2xl font-bold text-white">{dataset.name}</h2>
               </div>
             </div>
 
             {/* Body */}
-            <div className="p-6 md:p-8">
-              <p className="text-gray-600 leading-relaxed mb-5">{dataset.description}</p>
+            <div className="p-5 md:p-6">
+              <p className="text-gray-600 text-sm leading-relaxed mb-4">{dataset.description}</p>
 
               {/* Stats grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-4">
                 {[
                   { value: dataset.images.toLocaleString(), label: 'Total Images' },
                   { value: dataset.classes.length, label: 'Classes' },
                   { value: dataset.resolution, label: 'Resolution' },
                   { value: dataset.size, label: 'Dataset Size' },
                 ].map((stat) => (
-                  <div key={stat.label} className="rounded-xl p-3 text-center" style={{ background: COLORS.light }}>
-                    <p className="text-xl font-bold" style={{ color: COLORS.primary }}>{stat.value}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{stat.label}</p>
+                  <div key={stat.label} className="rounded-xl p-2.5 text-center" style={{ background: COLORS.light }}>
+                    <p className="text-lg md:text-xl font-bold" style={{ color: COLORS.primary }}>{stat.value}</p>
+                    <p className="text-[10px] md:text-xs text-gray-500 mt-0.5">{stat.label}</p>
                   </div>
                 ))}
               </div>
 
               {/* Classes */}
-              <div className="mb-6">
-                <h3 className="text-sm font-semibold uppercase tracking-wider mb-2.5" style={{ color: COLORS.medium }}>
+              <div className="mb-4">
+                <h3 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: COLORS.medium }}>
                   Freshness Classes
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {dataset.classes.map((cls, i) => (
                     <span
                       key={cls}
-                      className="px-3 py-1.5 rounded-lg text-sm font-medium"
+                      className="px-2.5 py-1 rounded-lg text-xs font-medium"
                       style={{
                         background: i === 0 ? `${COLORS.primary}15` : i === dataset.classes.length - 1 ? '#fee2e2' : '#f3f4f6',
                         color: i === 0 ? COLORS.primary : i === dataset.classes.length - 1 ? '#dc2626' : '#374151',
@@ -180,11 +180,11 @@ function DatasetModal({ dataset, isOpen, onClose }) {
               </div>
 
               {/* Sample images */}
-              <div className="mb-6">
-                <h3 className="text-sm font-semibold uppercase tracking-wider mb-2.5" style={{ color: COLORS.medium }}>
+              <div className="mb-4">
+                <h3 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: COLORS.medium }}>
                   Sample Images
                 </h3>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-2.5">
                   {[0, 1, 2].map((i) => (
                     <div
                       key={i}
@@ -198,11 +198,11 @@ function DatasetModal({ dataset, isOpen, onClose }) {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="text-center p-4">
-                          <svg className="w-8 h-8 mx-auto mb-2 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <div className="text-center p-3">
+                          <svg className="w-6 h-6 mx-auto mb-1 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                           </svg>
-                          <p className="text-xs text-gray-400">Sample {i + 1}</p>
+                          <p className="text-[10px] text-gray-400">Sample {i + 1}</p>
                         </div>
                       )}
                     </div>
@@ -211,15 +211,15 @@ function DatasetModal({ dataset, isOpen, onClose }) {
               </div>
 
               {/* Meta info */}
-              <div className="flex flex-col sm:flex-row gap-3 mb-6 text-sm text-gray-500">
-                <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <div className="flex flex-col sm:flex-row gap-2.5 mb-4 text-xs text-gray-500">
+                <div className="flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   Format: {dataset.format}
                 </div>
-                <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <div className="flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   Updated: {dataset.lastUpdated}
@@ -231,7 +231,7 @@ function DatasetModal({ dataset, isOpen, onClose }) {
                 href={dataset.downloadUrl}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl text-white font-bold text-lg shadow-lg hover:shadow-xl transition-shadow"
+                className="flex items-center justify-center gap-2.5 w-full py-3 rounded-xl text-white font-bold text-base shadow-lg hover:shadow-xl transition-shadow"
                 style={{ background: COLORS.primary }}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

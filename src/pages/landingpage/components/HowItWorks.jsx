@@ -116,8 +116,8 @@ function HowItWorks() {
           </h2>
         </motion.div>
 
-        {/* Two-column layout: Left (step tabs only), Right (content) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
+        {/* Three-column layout: Left (step tabs), Center (content), Right (phone mockup) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-start">
           {/* ── LEFT: Step tabs only ── */}
           <div className="lg:col-span-3 flex flex-col">
             <div className="space-y-1.5">
@@ -164,38 +164,38 @@ function HowItWorks() {
             </div>
           </div>
 
-          {/* ── RIGHT: Step content ── */}
+          {/* ── CENTER: Step content (text only) ── */}
           <div
             ref={rightRef}
-            className="lg:col-span-9 lg:pl-12"
+            className="lg:col-span-5 lg:pl-6 lg:pr-4"
             onMouseEnter={handleRightEnter}
             onMouseLeave={handleRightLeave}
           >
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeStep}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.4 }}
               >
                 {/* Step header */}
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center text-white">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-14 h-14 bg-white/15 rounded-xl flex items-center justify-center text-white">
                     {steps[activeStep].icon}
                   </div>
                   <div>
-                    <h3 className="text-2xl lg:text-3xl font-bold text-white">{steps[activeStep].title}</h3>
+                    <h3 className="text-3xl lg:text-4xl font-bold text-white">{steps[activeStep].title}</h3>
                   </div>
                 </div>
 
                 {/* Description */}
-                <p className="text-white/80 text-lg leading-relaxed mb-8 max-w-xl">
+                <p className="text-white/80 text-lg leading-relaxed mb-8">
                   {steps[activeStep].description}
                 </p>
 
                 {/* Details */}
-                <div className="space-y-4 mb-10">
+                <div className="space-y-5">
                   {steps[activeStep].details.map((detail, i) => (
                     <motion.div
                       key={i}
@@ -207,19 +207,25 @@ function HowItWorks() {
                       <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center mt-0.5 shrink-0">
                         <div className="w-2 h-2 bg-white rounded-full" />
                       </div>
-                      <p className="text-white/60 text-base leading-relaxed">{detail}</p>
+                      <p className="text-white/70 text-base leading-relaxed">{detail}</p>
                     </motion.div>
                   ))}
                 </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
-                {/* Phone Mockup for current step */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <StepPhoneMockup step={activeStep} />
-                </motion.div>
+          {/* ── RIGHT: Phone Mockup ── */}
+          <div className="lg:col-span-4 flex justify-center lg:justify-end items-center lg:sticky lg:top-24 pt-8 lg:pt-0">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeStep}
+                initial={{ opacity: 0, scale: 0.9, x: 30 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.95, x: -20 }}
+                transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+              >
+                <StepPhoneMockup step={activeStep} />
               </motion.div>
             </AnimatePresence>
           </div>
