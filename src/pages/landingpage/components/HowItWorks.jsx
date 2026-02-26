@@ -19,7 +19,7 @@ function HowItWorks() {
         'Use your phone camera for real-time detection',
         'Or upload a saved image from your gallery',
       ],
-      visual: '/assets/icons/scan.svg',
+      visual: '/assets/icons/icon_scan.svg',
     },
     {
       title: 'Analyze',
@@ -31,7 +31,7 @@ function HowItWorks() {
         'YOLOv8 scans for color, texture, and decay patterns',
         'TFLite model runs directly on your device',
       ],
-      visual: '/assets/icons/accuracy.svg',
+      visual: '/assets/icons/icon_accuracy.svg',
     },
     {
       title: 'Classify',
@@ -43,7 +43,7 @@ function HowItWorks() {
         'Multi-class classification from Fresh to Spoiled',
         'Confidence scores show reliability of each result',
       ],
-      visual: '/assets/icons/fresh.svg',
+      visual: '/assets/icons/icon_fresh.svg',
     },
     {
       title: 'Results',
@@ -55,7 +55,7 @@ function HowItWorks() {
         'Clear visual indicators show freshness level at a glance',
         'Actionable recommendations help you decide what to do next',
       ],
-      visual: '/assets/icons/realtime.svg',
+      visual: '/assets/icons/icon_realtime.svg',
     },
   ]
 

@@ -66,7 +66,7 @@ function CaptureScreen() {
       <div className="absolute top-21 left-2.5 right-2.5 bottom-20 rounded-xl overflow-hidden bg-black/40 border border-white/5">
         {/* Tomato subject */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <img src="/assets/icons/tomato.png" alt="Tomato" className="w-20 h-20 object-contain drop-shadow-lg" />
+          <img src="/assets/icons/icon_tomato.png" alt="Tomato" className="w-20 h-20 object-contain drop-shadow-lg" />
         </div>
 
         {/* Focus ring */}
@@ -149,7 +149,7 @@ function AnalyzeScreen() {
       {/* Background: dimmed viewfinder with tomato + bounding box */}
       <div className="absolute top-20 left-2.5 right-2.5 bottom-20 rounded-xl overflow-hidden bg-black/40 border border-white/5">
         <div className="absolute inset-0 flex items-center justify-center">
-          <img src="/assets/icons/tomato.png" alt="Tomato" className="w-20 h-20 object-contain drop-shadow-lg opacity-50" />
+          <img src="/assets/icons/icon_tomato.png" alt="Tomato" className="w-20 h-20 object-contain drop-shadow-lg opacity-50" />
           {/* Bounding box */}
           <motion.div
             initial={{ opacity: 0, scale: 1.2 }}
@@ -212,7 +212,7 @@ function ClassifyScreen() {
           transition={{ duration: 0.4 }}
           className="bg-gray-50 rounded-lg p-3 flex justify-center mb-3 border border-gray-200"
         >
-          <img src="/assets/icons/tomato.png" alt="Scanned tomato" className="w-16 h-16 object-contain" />
+          <img src="/assets/icons/icon_tomato.png" alt="Scanned tomato" className="w-16 h-16 object-contain" />
         </motion.div>
 
         {/* Classification label */}
@@ -309,7 +309,7 @@ function ResultsScreen() {
           transition={{ duration: 0.4 }}
           className="bg-gray-50 rounded-lg p-3 flex justify-center mb-2 border border-gray-200"
         >
-          <img src="/assets/icons/tomato.png" alt="Scanned tomato" className="w-14 h-14 object-contain" />
+          <img src="/assets/icons/icon_tomato.png" alt="Scanned tomato" className="w-14 h-14 object-contain" />
         </motion.div>
 
         {/* Classification */}

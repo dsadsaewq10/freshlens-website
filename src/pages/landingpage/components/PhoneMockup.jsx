@@ -200,7 +200,7 @@ function PhoneMockup({ isVisible }) {
                       {/* Tomato */}
                       <div className="absolute inset-0 flex items-center justify-center">
                         <img
-                          src="/assets/icons/tomato.png"
+                          src="/assets/icons/icon_tomato.png"
                           alt="Tomato"
                           className="w-28 h-28 object-contain drop-shadow-lg"
                         />
@@ -301,7 +301,7 @@ function PhoneMockup({ isVisible }) {
                     <div className="absolute top-28 left-3 right-3 bottom-28 rounded-2xl overflow-hidden bg-black/40 border border-white/5">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <img
-                          src="/assets/icons/tomato.png"
+                          src="/assets/icons/icon_tomato.png"
                           alt="Tomato"
                           className="w-28 h-28 object-contain drop-shadow-lg opacity-60"
                         />
@@ -362,7 +362,7 @@ function PhoneMockup({ isVisible }) {
 
                       {/* Tomato image */}
                       <div className="bg-gray-50 rounded-xl p-4 flex justify-center mb-3 border border-gray-200">
-                        <img src="/assets/icons/tomato.png" alt="Scanned tomato" className="w-20 h-20 object-contain" />
+                        <img src="/assets/icons/icon_tomato.png" alt="Scanned tomato" className="w-20 h-20 object-contain" />
                       </div>
 
                       {/* Classification Label */}

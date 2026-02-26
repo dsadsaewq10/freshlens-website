@@ -62,7 +62,7 @@ function Footer() {
                   href="#"
                   className="bg-primary hover:bg-primary/90 hover:scale-105 text-white px-5 py-2.5 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm"
                 >
-                  <img src="/assets/icons/playstore.png" alt="Google Play" className="w-5 h-5" />
+                  <img src="/assets/icons/logo_playstore.png" alt="Google Play" className="w-5 h-5" />
                   <div className="text-left">
                     <span className="text-[8px] text-white/70 block leading-none">Get it on</span>
                     <span className="text-sm leading-tight">Google Play</span>
@@ -72,7 +72,7 @@ function Footer() {
                   href="#"
                   className="bg-white/10 hover:bg-white/15 hover:scale-105 border border-white/20 text-white px-5 py-2.5 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm"
                 >
-                  <img src="/assets/icons/download.png" alt="Download" className="w-5 h-5 brightness-0 invert" />
+                  <img src="/assets/icons/icon_download.png" alt="Download" className="w-5 h-5 brightness-0 invert" />
                   <div className="text-left">
                     <span className="text-[8px] text-white/70 block leading-none">Direct</span>
                     <span className="text-sm leading-tight">Download APK</span>
