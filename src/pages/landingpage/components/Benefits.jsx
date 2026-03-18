@@ -13,7 +13,7 @@ function Benefits() {
       category: 'Efficiency',
       title: 'Save Time',
       description: 'Instant classification results eliminate guesswork and speed up quality assessment processes.',
-      icon: '/assets/icons/realtime.svg'
+      icon: '/assets/icons/icon_realtime.svg'
     },
     {
       category: 'Economics',
@@ -25,19 +25,19 @@ function Benefits() {
       category: 'Accessibility',
       title: 'Easy to Use',
       description: 'Simple point-and-scan interface makes freshness detection accessible to everyone, no expertise required.',
-      icon: '/assets/icons/scan.svg'
+      icon: '/assets/icons/icon_scan.svg'
     },
     {
       category: 'Accuracy',
       title: 'Reliable Results',
       description: 'AI-powered analysis provides consistent and objective freshness assessments you can trust.',
-      icon: '/assets/icons/accuracy.svg'
+      icon: '/assets/icons/icon_accuracy.svg'
     },
     {
       category: 'Mobility',
       title: 'Mobile Ready',
       description: 'Use FreshLens anywhere with our Android app - at the grocery store, restaurant, or home.',
-      icon: '/assets/icons/mobile.svg'
+      icon: '/assets/icons/icon_mobile.svg'
     }
   ]
 
