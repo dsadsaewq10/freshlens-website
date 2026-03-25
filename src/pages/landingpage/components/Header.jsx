@@ -100,23 +100,20 @@ function Header({ isLoaded = true, currentPage }) {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
-            {isHome ? (
-              <a
-                href="#download"
-                className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-lg font-semibold transition-colors"
-              >
-                Get the App
-              </a>
-            ) : (
-              <button
-                onClick={() => navigate('/')}
-                className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-lg font-semibold transition-colors"
-              >
-                Get the App
-              </button>
-            )}
+          {/* Auth Actions */}
+          <div className="hidden md:flex items-center gap-3">
+            <button
+              onClick={() => navigate('/login')}
+              className="border border-primary text-primary hover:bg-primary/5 px-5 py-2.5 rounded-lg font-semibold transition-colors"
+            >
+              Login
+            </button>
+            <button
+              onClick={() => navigate('/signup')}
+              className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg font-semibold transition-colors"
+            >
+              Sign Up
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -164,12 +161,20 @@ function Header({ isLoaded = true, currentPage }) {
                 {item.label}
               </button>
             ))}
-            <button
-              onClick={() => { setIsMobileMenuOpen(false); if (!isHome) navigate('/'); }}
-              className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-lg font-semibold transition-colors text-center mt-2"
-            >
-              Get the App
-            </button>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              <button
+                onClick={() => { setIsMobileMenuOpen(false); navigate('/login'); }}
+                className="border border-primary text-primary hover:bg-primary/5 px-4 py-2.5 rounded-lg font-semibold transition-colors text-center"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => { setIsMobileMenuOpen(false); navigate('/signup'); }}
+                className="bg-primary hover:bg-primary/90 text-white px-4 py-2.5 rounded-lg font-semibold transition-colors text-center"
+              >
+                Sign Up
+              </button>
+            </div>
           </div>
         </div>
       </div>
