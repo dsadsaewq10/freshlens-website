@@ -1,10 +1,26 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
+import { z } from 'zod'
+import { supabase } from '../../lib/supabase'
+
+const loginSchema = z.object({
+  email: z.string().email('Please enter a valid email address.'),
+  password: z.string().min(6, 'Password must be at least 6 characters long.'),
+})
+
+const signupSchema = loginSchema.extend({
+  name: z.string().min(1, 'Username is required.'),
+})
 
 function AuthScreen({ mode }) {
   const [showPassword, setShowPassword] = useState(false)
+  const [formData, setFormData] = useState({ name: '', email: '', password: '' })
+  const [errorMsg, setErrorMsg] = useState('')
+  const [loading, setLoading] = useState(false)
+  
   const { authMode } = useParams()
+  const navigate = useNavigate()
 
   const resolvedMode = mode === 'login' || mode === 'signup'
     ? mode
@@ -69,6 +85,56 @@ function AuthScreen({ mode }) {
     ]
   }, [isLogin, showPassword])
 
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.id]: e.target.value,
+    }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setErrorMsg('')
+
+    try {
+      const schema = isLogin ? loginSchema : signupSchema
+      schema.parse(formData)
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        setErrorMsg(err.errors[0].message)
+        return
+      }
+    }
+
+    setLoading(true)
+
+    try {
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        })
+        if (error) throw error
+        navigate('/') // Go home or dashboard
+      } else {
+        const { error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: { username: formData.name },
+          },
+        })
+        if (error) throw error
+        alert('Check your email for the confirmation link!')
+        navigate('/login')
+      }
+    } catch (err) {
+      setErrorMsg(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="h-screen w-full overflow-hidden bg-[#f3f6f6]">
       <div className="grid h-full w-full overflow-hidden bg-white lg:grid-cols-2">
@@ -115,7 +181,12 @@ function AuthScreen({ mode }) {
               </Link>
             </div>
 
-            <form className="mx-auto mt-7 w-full max-w-md min-h-84 space-y-4" onSubmit={(event) => event.preventDefault()}>
+            <form className="mx-auto mt-7 w-full max-w-md min-h-84 space-y-4" onSubmit={handleSubmit}>
+              {errorMsg && (
+                <div className="rounded-xl bg-red-50 p-3 text-sm text-red-500">
+                  {errorMsg}
+                </div>
+              )}
               {fields.map((field) => (
                 <label
                   key={field.id}
@@ -124,9 +195,13 @@ function AuthScreen({ mode }) {
                   <span className="mb-2 block text-base font-medium text-[#1f4f52]">{field.label} <span className="text-primary">*</span></span>
                   <div className="relative">
                     <input
+                      id={field.id}
                       type={field.type}
+                      value={formData[field.id] || ''}
+                      onChange={handleChange}
                       placeholder={field.placeholder}
                       className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
+                      required
                     />
                     {field.id === 'password' && (
                       <button
@@ -143,9 +218,10 @@ function AuthScreen({ mode }) {
 
               <button
                 type="submit"
-                className="mt-2 w-full rounded-2xl bg-primary px-5 py-4 text-base font-semibold text-white transition hover:bg-primary/90"
+                disabled={loading}
+                className="mt-2 w-full rounded-2xl bg-primary px-5 py-4 text-base font-semibold text-white transition hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {submitLabel}
+                {loading ? 'Processing...' : submitLabel}
               </button>
             </form>
 
@@ -157,13 +233,14 @@ function AuthScreen({ mode }) {
 
             <div className="mt-5 flex items-center justify-center gap-4">
               {[
-                { name: 'Google', icon: '/assets/icons/logo_google.png' },
-                { name: 'Facebook', icon: '/assets/icons/logo_facebook.png' },
-                { name: 'Github', icon: '/assets/icons/logo_github.png' },
+                { id: 'google', name: 'Google', icon: '/assets/icons/logo_google.png' },
+                { id: 'facebook', name: 'Facebook', icon: '/assets/icons/logo_facebook.png' },
+                { id: 'github', name: 'Github', icon: '/assets/icons/logo_github.png' },
               ].map((provider) => (
                 <button
                   key={provider.name}
                   type="button"
+                  onClick={() => supabase.auth.signInWithOAuth({ provider: provider.id })}
                   className="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white transition hover:border-primary"
                   aria-label={`Continue with ${provider.name}`}
                 >

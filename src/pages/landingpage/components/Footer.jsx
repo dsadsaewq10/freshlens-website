@@ -57,10 +57,10 @@ function Footer() {
               </div>
 
               {/* Download buttons */}
-              <div className="flex flex-row gap-3 mb-6">
+              <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <a
                   href="#"
-                  className="bg-primary hover:bg-primary/90 hover:scale-105 text-white px-5 py-2.5 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm"
+                  className="bg-primary hover:bg-primary/90 hover:scale-[1.02] text-white px-5 py-2.5 rounded-xl font-semibold transition-all flex items-center justify-center sm:justify-start gap-2 text-sm"
                 >
                   <img src="/assets/icons/logo_playstore.png" alt="Google Play" className="w-5 h-5" />
                   <div className="text-left">
@@ -70,7 +70,7 @@ function Footer() {
                 </a>
                 <a
                   href="#"
-                  className="bg-white/10 hover:bg-white/15 hover:scale-105 border border-white/20 text-white px-5 py-2.5 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm"
+                  className="bg-white/10 hover:bg-white/15 hover:scale-[1.02] border border-white/20 text-white px-5 py-2.5 rounded-xl font-semibold transition-all flex items-center justify-center sm:justify-start gap-2 text-sm"
                 >
                   <img src="/assets/icons/icon_download.png" alt="Download" className="w-5 h-5 brightness-0 invert" />
                   <div className="text-left">
@@ -88,9 +88,9 @@ function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, margin: '-40px' }}
             transition={{ duration: 0.7, delay: 0.15 }}
-            className="lg:col-span-6 flex justify-center lg:-mr-8"
+            className="lg:col-span-6 flex justify-center lg:-mr-8 w-full"
           >
-            <div className="relative w-80 lg:w-96">
+            <div className="relative w-full max-w-[18rem] sm:max-w-[20rem] lg:max-w-none lg:w-96">
               <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-56 h-56 bg-white/5 rounded-full blur-3xl" />
               <div className="relative overflow-hidden rounded-t-4xl" style={{ height: '310px' }}>
                 <div className="bg-linear-to-b from-gray-700 to-gray-800 rounded-t-4xl p-2 h-full">

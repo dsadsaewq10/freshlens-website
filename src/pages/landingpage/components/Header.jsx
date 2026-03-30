@@ -60,7 +60,7 @@ function Header({ isLoaded = true, currentPage }) {
       animate={isLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
       transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
-        isScrolled
+        isScrolled || isMobileMenuOpen
           ? 'bg-white/95 backdrop-blur-md shadow-sm border-gray-200/60'
           : 'bg-transparent border-gray-200/30'
       }`}
