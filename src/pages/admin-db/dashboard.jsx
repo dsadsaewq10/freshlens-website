@@ -148,6 +148,7 @@ function InteractiveLineChart({ values, secondaryValues, areaValues, width = 420
 function DashboardPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('30D')
   const [isExportingPdf, setIsExportingPdf] = useState(false)
+  const [exportError, setExportError] = useState('')
   const dashboardPanelRef = useRef(null)
   const analytics = analyticsByPeriod[selectedPeriod]
 
@@ -156,16 +157,28 @@ function DashboardPage() {
       return
     }
 
+    setExportError('')
     setIsExportingPdf(true)
 
     try {
-      const canvas = await html2canvas(dashboardPanelRef.current, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-      })
+      const element = dashboardPanelRef.current
+      if (document.fonts?.ready) {
+        await document.fonts.ready
+      }
 
+      const canvas = await html2canvas(element, {
+        scale: Math.min(window.devicePixelRatio || 1, 2),
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: '#ffffff',
+        scrollX: 0,
+        scrollY: -window.scrollY,
+        windowWidth: document.documentElement.scrollWidth,
+        windowHeight: document.documentElement.scrollHeight,
+        logging: false,
+      })
       const imageData = canvas.toDataURL('image/png')
+
       const pdf = new jsPDF('p', 'mm', 'a4')
       const pageWidth = pdf.internal.pageSize.getWidth()
       const pageHeight = pdf.internal.pageSize.getHeight()
@@ -187,6 +200,9 @@ function DashboardPage() {
       }
 
       pdf.save(`dashboard-${selectedPeriod}.pdf`)
+    } catch (error) {
+      console.error('Failed to export dashboard PDF', error)
+      setExportError('Export failed. Please try again.')
     } finally {
       setIsExportingPdf(false)
     }
@@ -203,10 +219,10 @@ function DashboardPage() {
 
   return (
     <section ref={dashboardPanelRef} className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] sm:p-7">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-[rgba(226,232,240,0.8)] bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] sm:p-7">
         <div>
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Analytics dashboard</h2>
-          <p className="mt-1 text-sm text-slate-500">Interactive visual analytics mapped to the test cases you provided</p>
+          <p className="mt-1 text-sm text-[rgb(100,116,139)]">Interactive visual analytics mapped to the test cases you provided</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
@@ -224,7 +240,7 @@ function DashboardPage() {
                 type="button"
                 onClick={() => setSelectedPeriod(period)}
                 className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${
-                  selectedPeriod === period ? 'bg-primary text-white' : 'text-accent hover:bg-white/70'
+                  selectedPeriod === period ? 'bg-primary text-white' : 'text-accent hover:bg-[rgba(255,255,255,0.7)]'
                 }`}
               >
                 {period}
@@ -232,6 +248,7 @@ function DashboardPage() {
             ))}
           </div>
         </div>
+        {exportError && <p className="w-full text-xs font-medium text-[rgb(220,38,38)]">{exportError}</p>}
       </div>
 
       <div className="grid auto-rows-[minmax(220px,auto)] gap-4 sm:grid-cols-2 xl:grid-cols-12">
@@ -241,8 +258,8 @@ function DashboardPage() {
             <p className="mt-1 text-sm opacity-85">KPI cards show correct totals</p>
             <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {[68, 82, 74, 91].map((value, index) => (
-                <div key={index} className="rounded-xl bg-white/15 p-2">
-                  <div className="h-16 rounded-lg bg-white/20">
+                <div key={index} className="rounded-xl bg-[rgba(255,255,255,0.15)] p-2">
+                  <div className="h-16 rounded-lg bg-[rgba(255,255,255,0.2)]">
                     <div className="rounded-lg bg-white" style={{ height: `${value}%` }} />
                   </div>
                 </div>
@@ -251,23 +268,23 @@ function DashboardPage() {
           </article>
 
           <article className="rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-7">
-            <p className="text-xs font-semibold uppercase tracking-wide text-accent/70">DAU / MAU Metrics</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">DAU / MAU Metrics</p>
             <p className="mt-2 text-3xl font-semibold">{analytics.dau}k / {analytics.mau}k</p>
-            <p className="mt-1 text-sm text-accent/70">Daily and monthly active users</p>
+            <p className="mt-1 text-sm text-[rgba(50,52,62,0.7)]">Daily and monthly active users</p>
             <InteractiveLineChart values={analytics.dauSeries} secondaryValues={analytics.mauSeries} />
           </article>
 
           <article className="rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-accent/70">New User Trend</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">New User Trend</p>
             <p className="mt-2 text-3xl font-semibold">+{analytics.newUsers}%</p>
-            <p className="mt-1 text-sm text-accent/70">Registration trend accuracy</p>
+            <p className="mt-1 text-sm text-[rgba(50,52,62,0.7)]">Registration trend accuracy</p>
             <InteractiveLineChart values={analytics.newUserSeries} areaValues={analytics.newUserSeries} />
           </article>
 
           <article className="flex min-h-80 flex-col rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-accent/70">User Retention</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">User Retention</p>
             <p className="mt-2 text-3xl font-semibold">D1 {analytics.retention[0]}% · D7 {analytics.retention[1]}%</p>
-            <p className="mt-1 text-sm text-accent/70">Retention cohorts</p>
+            <p className="mt-1 text-sm text-[rgba(50,52,62,0.7)]">Retention cohorts</p>
             <div className="mt-4 flex flex-1 flex-col items-center justify-center gap-4 text-center sm:flex-row sm:justify-center sm:text-left">
               <svg viewBox="0 0 120 120" className="h-28 w-28 -rotate-90 sm:h-36 sm:w-36">
                 {analytics.retention.map((value, index) => {
@@ -292,7 +309,7 @@ function DashboardPage() {
                   )
                 })}
               </svg>
-              <div className="space-y-2 text-sm text-accent/75">
+              <div className="space-y-2 text-sm text-[rgba(50,52,62,0.75)]">
                 <p>D1: {analytics.retention[0]}%</p>
                 <p>D7: {analytics.retention[1]}%</p>
                 <p>D30: {analytics.retention[2]}%</p>
@@ -301,16 +318,16 @@ function DashboardPage() {
           </article>
 
           <article className="rounded-2xl bg-surface p-4 text-accent sm:col-span-2 xl:col-span-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-accent/70">Daily Graph</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">Daily Graph</p>
             <p className="mt-2 text-3xl font-semibold">{analytics.dailySeries.at(-1)} scans</p>
-            <p className="mt-1 text-sm text-accent/70">Adjusts with 1D / 7D / 30D</p>
+            <p className="mt-1 text-sm text-[rgba(50,52,62,0.7)]">Adjusts with 1D / 7D / 30D</p>
             <InteractiveLineChart values={analytics.dailySeries} areaValues={analytics.dailySeries} />
           </article>
 
           <article className="flex min-h-80 flex-col rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-4 xl:row-span-2">
-            <p className="text-sm font-semibold uppercase tracking-wide text-accent/70">Fresh vs Not Fresh</p>
+            <p className="text-sm font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">Fresh vs Not Fresh</p>
             <p className="mt-2 text-4xl font-semibold">{analytics.freshness.fresh}% / {analytics.freshness.notFresh}%</p>
-            <p className="mt-1 text-base text-accent/70">Classification distribution</p>
+            <p className="mt-1 text-base text-[rgba(50,52,62,0.7)]">Classification distribution</p>
             <div className="flex flex-1 items-center justify-center">
               <svg viewBox="0 0 180 180" className="h-44 w-44 text-primary sm:h-52 sm:w-52">
                 <circle cx="90" cy="90" r="62" fill="none" stroke="currentColor" strokeOpacity="0.18" strokeWidth="28" />
@@ -331,38 +348,38 @@ function DashboardPage() {
             <div className="mt-2 flex items-center justify-center gap-6 text-sm font-medium">
               <div className="flex items-center gap-2">
                 <span className="h-3 w-3 rounded-full bg-primary" />
-                <span className="text-accent/85">Fresh ({analytics.freshness.fresh}%)</span>
+                <span className="text-[rgba(50,52,62,0.85)]">Fresh ({analytics.freshness.fresh}%)</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full bg-primary/30" />
-                <span className="text-accent/85">Not Fresh ({analytics.freshness.notFresh}%)</span>
+                <span className="h-3 w-3 rounded-full bg-[rgba(40,90,83,0.3)]" />
+                <span className="text-[rgba(50,52,62,0.85)]">Not Fresh ({analytics.freshness.notFresh}%)</span>
               </div>
             </div>
           </article>
 
           <article className="rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-accent/70">Vegetable Popularity</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">Vegetable Popularity</p>
             <p className="mt-2 text-3xl font-semibold">Top scanned vegetables</p>
-            <p className="mt-1 text-sm text-accent/70">Tomato, Carrot, Cabbage</p>
+            <p className="mt-1 text-sm text-[rgba(50,52,62,0.7)]">Tomato, Carrot, Cabbage</p>
             <div className="mt-4 flex h-36 items-end gap-3">
               {popularityBars.map((item) => (
                 <div key={item.label} className="flex flex-1 flex-col items-center gap-2">
                   <div className="flex h-full w-full items-end rounded-xl bg-surface p-1">
                     <div className="w-full rounded-lg bg-primary" style={{ height: item.height }} />
                   </div>
-                  <p className="text-[11px] font-medium text-accent/70">{item.label}</p>
+                  <p className="text-[11px] font-medium text-[rgba(50,52,62,0.7)]">{item.label}</p>
                 </div>
               ))}
             </div>
           </article>
 
           <article className="rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-accent/70">Confidence Distribution</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">Confidence Distribution</p>
             <p className="mt-2 text-3xl font-semibold">0.82 avg</p>
-            <p className="mt-1 text-sm text-accent/70">Histogram / confidence bins</p>
+            <p className="mt-1 text-sm text-[rgba(50,52,62,0.7)]">Histogram / confidence bins</p>
             <div className="mt-4 flex h-36 items-end gap-2">
               {analytics.confidence.map((value, index) => (
-                <div key={index} className="flex-1 rounded-t-lg bg-primary/35" style={{ height: `${value}%` }} />
+                <div key={index} className="flex-1 rounded-t-lg bg-[rgba(40,90,83,0.35)]" style={{ height: `${value}%` }} />
               ))}
             </div>
           </article>
@@ -378,7 +395,7 @@ function DashboardPage() {
                     <span>{vegetableLabels[index]}</span>
                     <span>{item}%</span>
                   </div>
-                  <div className="h-2 rounded-full bg-white/15">
+                  <div className="h-2 rounded-full bg-[rgba(255,255,255,0.15)]">
                     <div className="h-2 rounded-full bg-white" style={{ width: `${item}%` }} />
                   </div>
                 </div>
@@ -387,16 +404,16 @@ function DashboardPage() {
           </article>
 
           <article className="rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-4 xl:col-start-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-accent/70">Data Consistency</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">Data Consistency</p>
             <p className="mt-2 text-3xl font-semibold">{analytics.consistency}</p>
-            <p className="mt-1 text-sm text-accent/70">Totals match database report</p>
+            <p className="mt-1 text-sm text-[rgba(50,52,62,0.7)]">Totals match database report</p>
             <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
               <div className="rounded-xl bg-surface p-3">
-                <p className="text-xs text-accent/70">Analytics</p>
+                <p className="text-xs text-[rgba(50,52,62,0.7)]">Analytics</p>
                 <p className="mt-1 font-semibold">{analytics.overviewTotal} total</p>
               </div>
               <div className="rounded-xl bg-surface p-3">
-                <p className="text-xs text-accent/70">Database</p>
+                <p className="text-xs text-[rgba(50,52,62,0.7)]">Database</p>
                 <p className="mt-1 font-semibold">{analytics.overviewTotal} total</p>
               </div>
             </div>
