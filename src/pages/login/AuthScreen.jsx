@@ -115,7 +115,7 @@ function AuthScreen({ mode }) {
           password: formData.password,
         })
         if (error) throw error
-        navigate('/') // Go home or dashboard
+        navigate('/admin')
       } else {
         const { error } = await supabase.auth.signUp({
           email: formData.email,

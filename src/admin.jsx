@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import DashboardPage from './admin-db/dashboard'
-import DatasetPage from './admin-db/dataset'
-import UserPage from './admin-db/user'
+import DashboardPage from './pages/admin-db/dashboard'
+import DatasetPage from './pages/admin-db/dataset'
+import UserPage from './pages/admin-db/user'
 
 const navItems = ['Dashboard', 'Dataset', 'User Management']
 

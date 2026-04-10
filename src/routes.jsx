@@ -4,6 +4,7 @@ import Landingpage from './auth/Landingpage'
 import TechnologyPage from './pages/technology/components/Technology'
 import DatasetPage from './pages/dataset/components/Dataset'
 import AuthScreen from './pages/login/AuthScreen'
+import AdminDashboard from './admin'
 
 export default function AppRoutes() {
   return (
@@ -12,6 +13,7 @@ export default function AppRoutes() {
         <Route path="/" element={<Landingpage />} />
         <Route path="/technology" element={<TechnologyPage />} />
         <Route path="/dataset" element={<DatasetPage />} />
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/:authMode" element={<AuthScreen />} />
       </Routes>
     </Router>
