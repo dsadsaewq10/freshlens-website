@@ -2,8 +2,18 @@ import { useState } from 'react'
 import DashboardPage from './pages/admin-db/dashboard'
 import DatasetPage from './pages/admin-db/dataset'
 import UserPage from './pages/admin-db/user'
+import AiResponsePage from './pages/admin-db/ai-response'
+import DatasetRetrievalPage from './pages/admin-db/dataset-retrieval'
+import DatasetReleasePage from './pages/admin-db/dataset-release'
 
-const navItems = ['Dashboard', 'Dataset', 'User Management']
+const navItems = [
+  'Dashboard',
+  'Dataset',
+  'User Management',
+  'AI Responses',
+  'Dataset Retrieval',
+  'Dataset Release',
+]
 
 function Sidebar({ activeNav, onNavChange }) {
   return (
@@ -127,6 +137,9 @@ function AdminDashboard() {
           {activeNav === 'Dashboard' && <DashboardPage />}
           {activeNav === 'Dataset' && <DatasetPage />}
           {activeNav === 'User Management' && <UserPage />}
+          {activeNav === 'AI Responses' && <AiResponsePage />}
+          {activeNav === 'Dataset Retrieval' && <DatasetRetrievalPage />}
+          {activeNav === 'Dataset Release' && <DatasetReleasePage />}
         </main>
       </div>
     </div>
