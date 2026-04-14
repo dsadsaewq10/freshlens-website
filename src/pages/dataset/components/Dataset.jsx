@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useInView } from 'framer-motion'
 import Header from '../../landingpage/components/Header'
 import Footer from '../../landingpage/components/Footer'
 import BackToTop from '../../../components/BackToTop'
+import { supabase } from '../../../lib/supabase'
 
 // Color palette
 const COLORS = {
@@ -340,7 +341,7 @@ function HeroSection() {
 }
 
 // Dataset grid section — animations replay
-function DatasetGridSection({ onSelectDataset }) {
+function DatasetGridSection({ publishedReleases = [], loadingReleases = false }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: false, amount: 0.15 })
 
@@ -374,64 +375,117 @@ function DatasetGridSection({ onSelectDataset }) {
           </p>
         </motion.div>
 
-        {/* Dataset cards grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto">
-          {datasets.map((dataset, i) => (
-            <motion.div
-              key={dataset.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ delay: 0.1 + i * 0.08, duration: 0.6 }}
-              whileHover={{ scale: 1.03, y: -4 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => onSelectDataset(dataset)}
-              className="bg-white rounded-2xl p-5 border border-gray-200 cursor-pointer hover:shadow-lg transition-all group"
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-xl flex items-center justify-center shrink-0 overflow-hidden group-hover:scale-105 transition-transform" style={{ background: COLORS.light }}>
-                  <img
-                    src={dataset.thumbnail}
-                    alt={dataset.name}
-                    className="w-12 h-12 object-contain"
-                  />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-bold mb-1" style={{ color: COLORS.primary }}>{dataset.name}</h3>
-                  <p className="text-gray-500 text-sm line-clamp-2 mb-2.5">
-                    {dataset.description}
-                  </p>
-                  <div className="flex flex-wrap gap-3 text-xs">
-                    <span className="flex items-center gap-1 text-gray-500">
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      {dataset.images.toLocaleString()} images
-                    </span>
-                    <span className="flex items-center gap-1 text-gray-500">
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                      </svg>
-                      {dataset.classes.length} classes
-                    </span>
-                    <span className="flex items-center gap-1 text-gray-500">
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
-                      </svg>
-                      {dataset.size}
+        {/* Published community releases */}
+        {!loadingReleases && publishedReleases.length > 0 && (
+          <div className="max-w-4xl mx-auto mb-8">
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: COLORS.medium }}>
+              Community Releases
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {publishedReleases.map((release, i) => (
+                <motion.div
+                  key={release.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                  transition={{ delay: 0.08 + i * 0.08, duration: 0.6 }}
+                  className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-lg transition-all group"
+                >
+                  <div className="flex items-start gap-4">
+                    <div
+                      className="w-16 h-16 rounded-xl flex items-center justify-center shrink-0 text-white font-bold text-lg"
+                      style={{ background: COLORS.primary }}
+                    >
+                      {(release.name || 'R').slice(0, 2).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <h3 className="text-base font-bold truncate" style={{ color: COLORS.primary }}>{release.name}</h3>
+                        <span className="shrink-0 text-[10px] font-mono px-1.5 py-0.5 rounded" style={{ background: `${COLORS.primary}15`, color: COLORS.medium }}>
+                          v{release.version}
+                        </span>
+                      </div>
+                      {release.changelog && (
+                        <p className="text-gray-500 text-sm line-clamp-2 mb-2.5">{release.changelog}</p>
+                      )}
+                      <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-3">
+                        {release.sample_count > 0 && (
+                          <span className="flex items-center gap-1">
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            {release.sample_count.toLocaleString()} images
+                          </span>
+                        )}
+                        <span className="flex items-center gap-1">
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          YOLO format
+                        </span>
+                        {release.vegetables?.length > 0 && (
+                          <span>{release.vegetables.join(', ')}</span>
+                        )}
+                      </div>
+                      {release.public_url ? (
+                        <motion.a
+                          href={release.public_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.97 }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white"
+                          style={{ background: COLORS.primary }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                          Download
+                        </motion.a>
+                      ) : (
+                        <span className="inline-block px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-400">
+                          Link unavailable
+                        </span>
+                      )}
+                    </div>
+                    <span className="shrink-0 self-start mt-1">
+                      <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700">
+                        Published
+                      </span>
                     </span>
                   </div>
-                </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
 
-                <div className="shrink-0 self-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <svg className="w-5 h-5" style={{ color: `${COLORS.primary}60` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {/* Loading spinner */}
+        {loadingReleases && (
+          <div className="flex justify-center py-16">
+            <div className="w-8 h-8 rounded-full border-2 border-current border-t-transparent animate-spin" style={{ color: COLORS.primary }} />
+          </div>
+        )}
+
+        {/* Empty state — no published releases yet */}
+        {!loadingReleases && publishedReleases.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="max-w-md mx-auto text-center py-16"
+          >
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: `${COLORS.primary}12` }}>
+              <svg className="w-8 h-8" style={{ color: COLORS.primary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+              </svg>
+            </div>
+            <p className="text-lg font-semibold mb-2" style={{ color: COLORS.primary }}>No datasets published yet</p>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Datasets approved by the FreshLens team will appear here once published. Check back soon.
+            </p>
+          </motion.div>
+        )}
       </div>
     </section>
   )
@@ -724,18 +778,20 @@ function FormatSection() {
 
 // Main Dataset Page
 export default function DatasetPage() {
-  const [selectedDataset, setSelectedDataset] = useState(null)
-  const [modalOpen, setModalOpen] = useState(false)
+  const [publishedReleases, setPublishedReleases] = useState([])
+  const [loadingReleases, setLoadingReleases] = useState(true)
 
-  const handleSelectDataset = (dataset) => {
-    setSelectedDataset(dataset)
-    setModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    setModalOpen(false)
-    setTimeout(() => setSelectedDataset(null), 300)
-  }
+  useEffect(() => {
+    supabase
+      .from('dataset_releases')
+      .select('id, name, version, vegetables, sample_count, fresh_ratio, changelog, public_url, updated_at')
+      .eq('status', 'Published')
+      .order('updated_at', { ascending: false })
+      .then(({ data }) => {
+        setPublishedReleases(data ?? [])
+        setLoadingReleases(false)
+      })
+  }, [])
 
   useEffect(() => {
     const html = document.documentElement
@@ -754,14 +810,11 @@ export default function DatasetPage() {
     <div className="bg-background">
       <Header currentPage="dataset" />
       <HeroSection />
-      <DatasetGridSection onSelectDataset={handleSelectDataset} />
-      <StatsSection />
-      <FormatSection />
-      <DatasetModal
-        dataset={selectedDataset}
-        isOpen={modalOpen}
-        onClose={handleCloseModal}
+      <DatasetGridSection
+        publishedReleases={publishedReleases}
+        loadingReleases={loadingReleases}
       />
+      <FormatSection />
       <div className="snap-section-footer">
         <Footer />
       </div>
