@@ -236,10 +236,20 @@ yolo detect train data=data.yaml model=yolov8n.pt epochs=100
 
     console.log("Upload successful")
 
-    // 8. Calculate metrics
+    // 8. Mark scans as published in this dataset
+    const { error: markError } = await supabase
+      .from("scan_history")
+      .update({ published_dataset_id: releaseId })
+      .in("id", captures.map(c => c.id))
+
+    if (markError) {
+      console.warn("Warning: failed to mark scans as published:", markError)
+    }
+
+    // 9. Calculate metrics
     const freshRatio = freshCount / captures.length
 
-    // 9. Update release record
+    // 10. Update release record
     const { error: updateError } = await supabase
       .from("dataset_releases")
       .update({

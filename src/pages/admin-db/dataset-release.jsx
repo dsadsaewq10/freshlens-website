@@ -490,9 +490,11 @@ export default function DatasetReleasePage() {
         'id, class_label, is_fresh, scanned_image_path, detections,' +
         'box_left, box_top, box_right, box_bottom,' +
         'reviewed_class_label, reviewed_detections,' +
-        'reviewed_box_left, reviewed_box_top, reviewed_box_right, reviewed_box_bottom, reviewed_at'
+        'reviewed_box_left, reviewed_box_top, reviewed_box_right, reviewed_box_bottom, reviewed_at,' +
+        'published_dataset_id'
       )
       .eq('review_status', 'approved')
+      .is('published_dataset_id', null)
       .order('reviewed_at', { ascending: false })
     setApproved((data ?? []).map(r => ({
       id:                  r.id,
@@ -564,20 +566,16 @@ export default function DatasetReleasePage() {
         ? (Math.max(...publishedVersions) + 1).toFixed(1)
         : '1.0'
 
-      const { data, error } = await supabase
-        .from('dataset_releases')
-        .insert({
-          name:         `FreshLens ${veg} v${nextVer}`,
-          version:      nextVer,
-          vegetables:   [veg],
-          changelog:    `Auto-created draft from ${groups[veg].total} approved ${veg} captures.`,
-          sample_count: groups[veg].total,
-          fresh_ratio:  groups[veg].total > 0 ? groups[veg].fresh / groups[veg].total : 0,
-          status:       'Draft',
-          public_url:   '',
-        })
-        .select()
-        .single()
+      const { data, error } = await restApi('POST', '/dataset_releases?select=*', {
+        name:         `FreshLens ${veg} v${nextVer}`,
+        version:      nextVer,
+        vegetables:   [veg],
+        changelog:    `Auto-created draft from ${groups[veg].total} approved ${veg} captures.`,
+        sample_count: groups[veg].total,
+        fresh_ratio:  groups[veg].total > 0 ? groups[veg].fresh / groups[veg].total : 0,
+        status:       'Draft',
+        public_url:   '',
+      })
       if (!error && data) {
         setReleases(prev => [data, ...prev])
         created++
@@ -597,6 +595,38 @@ export default function DatasetReleasePage() {
     setAutoCreating(false)
   }
 
+  // ── REST API call with JWT ──
+  async function restApi(method, path, body = null) {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.access_token) return { error: 'Not authenticated' }
+
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/rest/v1${path}`,
+      {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      }
+    )
+
+    // Handle responses with no body (e.g., DELETE returning 204)
+    const text = await response.text()
+    let data = null
+    if (text) {
+      try {
+        data = JSON.parse(text)
+      } catch (e) {
+        return { error: 'Invalid JSON response' }
+      }
+    }
+
+    return response.ok ? { data } : { error: data || 'Request failed' }
+  }
+
   // ── Run a lifecycle action on a release ──
   async function runAction(release, action) {
     // Special handling for publish: call Edge Function to build YOLO dataset
@@ -605,13 +635,21 @@ export default function DatasetReleasePage() {
       showToast(`Building dataset for ${release.name}...`)
 
       try {
+        const { data: { session } } = await supabase.auth.getSession()
+        const token = session?.access_token
+        if (!token) {
+          showToast('Not authenticated. Please log in again.')
+          setPublishingId(null)
+          return
+        }
+
         const response = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/build-release`,
           {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+              'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({ releaseId: release.id }),
           }
@@ -649,6 +687,16 @@ export default function DatasetReleasePage() {
       return
     }
 
+    // Handle unpublish: return scans to approved pool
+    if (action === 'unpublish') {
+      // Clear published_dataset_id for all scans in this dataset
+      await restApi('PATCH', `/scan_history?published_dataset_id=eq.${release.id}`, {
+        published_dataset_id: null,
+      })
+      // Reload approved pool to show returned scans
+      await loadPool()
+    }
+
     // Handle other actions
     const updates = { updated_at: new Date().toISOString() }
     if (action === 'review')    updates.status = 'Review'
@@ -657,18 +705,28 @@ export default function DatasetReleasePage() {
     if (action === 'archive')   updates.status = 'Archived'
 
     if (action === 'delete') {
-      const { error } = await supabase.from('dataset_releases').delete().eq('id', release.id)
+      const { error } = await restApi('DELETE', `/dataset_releases?id=eq.${release.id}`)
       if (error) { showToast('Delete failed: ' + error.message); return }
       setReleases(prev => prev.filter(r => r.id !== release.id))
       showToast(`Deleted ${release.name}.`)
       return
     }
 
-    const { data, error } = await supabase
-      .from('dataset_releases').update(updates).eq('id', release.id).select().single()
-    if (error) { showToast('Update failed: ' + error.message); return }
-    setReleases(prev => prev.map(r => r.id === release.id ? data : r))
-    showToast(`${release.name} → ${data.status}.`)
+    const { error } = await restApi(
+      'PATCH',
+      `/dataset_releases?id=eq.${release.id}`,
+      updates
+    )
+    if (error) { showToast('Update failed: ' + JSON.stringify(error)); return }
+
+    // Refresh the release from database
+    const { data: updated } = await restApi('GET', `/dataset_releases?id=eq.${release.id}`)
+    if (updated && Array.isArray(updated) && updated.length > 0) {
+      setReleases(prev => prev.map(r => r.id === release.id ? updated[0] : r))
+      showToast(`${release.name} → ${updated[0].status}.`)
+    } else {
+      showToast(`${release.name} updated.`)
+    }
   }
 
   // ── Stats ──
