@@ -53,7 +53,12 @@ function Header({ isLoaded = true, currentPage }) {
     ? role.charAt(0).toUpperCase() + role.slice(1)
     : 'User'
 
-  const userLabel = user?.user_metadata?.username || user?.email || 'Signed in user'
+  const displayName =
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.user_metadata?.username ||
+    user?.email?.split('@')[0] ||
+    'there'
 
   const handleLogout = async ({ closeMobile } = {}) => {
     setLogoutError('')
@@ -142,7 +147,7 @@ function Header({ isLoaded = true, currentPage }) {
                     {roleLabel}
                   </p>
                   <p className="max-w-48 truncate text-sm font-semibold text-primary">
-                    Signed in as {userLabel}
+                    Hi! {displayName}
                   </p>
                 </div>
                 <button
@@ -223,7 +228,7 @@ function Header({ isLoaded = true, currentPage }) {
                     {roleLabel}
                   </p>
                   <p className="text-sm font-semibold text-primary break-all">
-                    Signed in as {userLabel}
+                    Hi! {displayName}
                   </p>
                 </div>
                 <button

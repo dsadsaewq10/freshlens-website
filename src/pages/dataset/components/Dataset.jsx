@@ -465,6 +465,10 @@ function ReleasePreviewModal({ release, onClose }) {
   const [downloading, setDownloading] = useState(false)
   const [progress, setProgress] = useState(0)
 
+  // True once loading finishes and we got zero rows — means the user's account
+  // cannot read the scan_history rows (RLS restricts non-owners).
+  const previewUnavailable = !loading && captures.length === 0
+
   async function handleDownload() {
     if (!captures.length || downloading) return
     setDownloading(true); setProgress(0)
@@ -492,6 +496,8 @@ function ReleasePreviewModal({ release, onClose }) {
     return g
   }, [captures])
 
+  const imageCount = captures.length || release.sample_count || 0
+
   return (
     <div className="fixed inset-0 z-70 flex items-center justify-center bg-slate-900/60 p-4" onClick={onClose}>
       <div
@@ -502,7 +508,7 @@ function ReleasePreviewModal({ release, onClose }) {
           <div>
             <h3 className="text-lg font-bold" style={{ color: COLORS.primary }}>{release.name}</h3>
             <p className="text-xs text-slate-500">
-              v{release.version} · {captures.length} images · {release.vegetables?.join(', ')}
+              v{release.version} · {imageCount} images · {release.vegetables?.join(', ')}
             </p>
           </div>
           <button type="button" onClick={onClose} className="rounded-full p-1.5 text-slate-400 hover:bg-slate-100">
@@ -521,8 +527,11 @@ function ReleasePreviewModal({ release, onClose }) {
             <div className="flex justify-center py-12">
               <div className="w-8 h-8 rounded-full border-2 border-current border-t-transparent animate-spin" style={{ color: COLORS.primary }} />
             </div>
-          ) : captures.length === 0 ? (
-            <p className="py-8 text-center text-sm text-slate-400">No approved captures in this release yet.</p>
+          ) : previewUnavailable ? (
+            <div className="py-8 text-center space-y-1">
+              <p className="text-sm font-medium text-slate-600">Preview images are not available for this account.</p>
+              <p className="text-xs text-slate-400">You can still download the published dataset zip below.</p>
+            </div>
           ) : (
             <div className="space-y-4">
               {Object.entries(byVeg).map(([veg, caps]) => (
@@ -577,25 +586,44 @@ function ReleasePreviewModal({ release, onClose }) {
           )}
 
           <div className="flex items-center gap-3 border-t border-slate-100 pt-4">
-            <button
-              type="button"
-              disabled={!captures.length || downloading}
-              onClick={handleDownload}
-              className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
-              style={{ background: COLORS.primary }}
-            >
-              {downloading ? (
-                <>Building ZIP… {progress}%</>
-              ) : (
-                <>
+            {previewUnavailable && release.public_url ? (
+              <>
+                <a
+                  href={release.public_url}
+                  download
+                  className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white"
+                  style={{ background: COLORS.primary }}
+                >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  Download .zip ({captures.length} imgs)
-                </>
-              )}
-            </button>
-            <p className="text-xs text-slate-400">Bundled in YOLO format — data.yaml + images/ + labels/</p>
+                  Download published .zip ({imageCount} imgs)
+                </a>
+                <p className="text-xs text-slate-400">Downloads the published release from Supabase Storage.</p>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  disabled={!captures.length || downloading}
+                  onClick={handleDownload}
+                  className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+                  style={{ background: COLORS.primary }}
+                >
+                  {downloading ? (
+                    <>Building ZIP… {progress}%</>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      Download .zip ({captures.length} imgs)
+                    </>
+                  )}
+                </button>
+                <p className="text-xs text-slate-400">Bundled in YOLO format — data.yaml + images/ + labels/</p>
+              </>
+            )}
           </div>
         </div>
       </div>

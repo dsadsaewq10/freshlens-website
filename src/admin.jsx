@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useMemo } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import DashboardPage from './pages/admin-db/dashboard'
 import DatasetPage from './pages/admin-db/dataset'
 import UserPage from './pages/admin-db/user'
@@ -7,17 +7,33 @@ import AiResponsePage from './pages/admin-db/ai-response'
 import DatasetRetrievalPage from './pages/admin-db/dataset-retrieval'
 import DatasetReleasePage from './pages/admin-db/dataset-release'
 import { supabase } from './lib/supabase'
+import { useAuth } from './auth/useAuth'
 
-const navItems = [
-  'Dashboard',
-  'Dataset',
-  'User Management',
-  'AI Responses',
-  'Review Queue',
-  'Dataset Release',
-]
+// Maps display label → URL slug (and back)
+const TAB_SLUG = {
+  'Dashboard':       'dashboard',
+  'Dataset':         'dataset',
+  'User Management': 'users',
+  'AI Responses':    'ai-responses',
+  'Review Queue':    'review-queue',
+  'Dataset Release': 'dataset-release',
+}
 
-function Sidebar({ activeNav, onNavChange, onLogout, signingOut }) {
+const SLUG_TAB = Object.fromEntries(
+  Object.entries(TAB_SLUG).map(([label, slug]) => [slug, label])
+)
+
+const navItems = Object.keys(TAB_SLUG)
+
+function Sidebar({ activeNav, onNavChange, onLogout, signingOut, adminUser }) {
+  const displayName =
+    adminUser?.user_metadata?.full_name ||
+    adminUser?.user_metadata?.name ||
+    adminUser?.user_metadata?.username ||
+    adminUser?.email?.split('@')[0] ||
+    'Admin'
+  const displayEmail = adminUser?.email || ''
+
   return (
     <aside className="fixed left-0 top-0 hidden h-screen w-72 shrink-0 border-r border-surface bg-white/90 p-6 backdrop-blur-xl lg:flex lg:flex-col">
       <div className="flex items-center gap-3 pb-8">
@@ -43,8 +59,8 @@ function Sidebar({ activeNav, onNavChange, onLogout, signingOut }) {
         })}
       </nav>
       <div className="mt-auto rounded-2xl bg-surface p-4">
-        <p className="text-sm font-semibold text-accent">Emily Jonson</p>
-        <p className="text-xs text-accent/70">jonson@bress.com</p>
+        <p className="text-sm font-semibold text-accent">{displayName}</p>
+        <p className="text-xs text-accent/70">{displayEmail}</p>
         <button
           type="button"
           onClick={onLogout}
@@ -59,14 +75,26 @@ function Sidebar({ activeNav, onNavChange, onLogout, signingOut }) {
 }
 
 function AdminDashboard() {
-  const [activeNav, setActiveNav] = useState('Dashboard')
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
   const navigate = useNavigate()
+  const { tab } = useParams()
+  const { user } = useAuth()
+
+  // Derive active tab from URL param; fall back to Dashboard for unknown slugs
+  const activeNav = useMemo(() => SLUG_TAB[tab] ?? 'Dashboard', [tab])
+
+  const displayName =
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.user_metadata?.username ||
+    user?.email?.split('@')[0] ||
+    'Admin'
+  const displayEmail = user?.email || ''
 
   function handleNavChange(nextNav) {
-    setActiveNav(nextNav)
     setIsMobileSidebarOpen(false)
+    navigate(`/admin/${TAB_SLUG[nextNav]}`, { replace: false })
   }
 
   async function handleLogout() {
@@ -144,8 +172,8 @@ function AdminDashboard() {
                 })}
               </nav>
               <div className="mt-auto rounded-2xl bg-surface p-4">
-                <p className="text-sm font-semibold text-accent">Emily Jonson</p>
-                <p className="text-xs text-accent/70">jonson@bress.com</p>
+                <p className="text-sm font-semibold text-accent">{displayName}</p>
+                <p className="text-xs text-accent/70">{displayEmail}</p>
                 <button
                   type="button"
                   onClick={handleLogout}
@@ -166,6 +194,7 @@ function AdminDashboard() {
           onNavChange={handleNavChange}
           onLogout={handleLogout}
           signingOut={signingOut}
+          adminUser={user}
         />
 
         <main className="flex-1 space-y-5 p-4 pt-20 sm:p-6 sm:pt-24 lg:ml-72 lg:p-8 lg:pt-8">
@@ -176,11 +205,11 @@ function AdminDashboard() {
             </div>
           </header>
 
-          {activeNav === 'Dashboard' && <DashboardPage />}
-          {activeNav === 'Dataset' && <DatasetPage />}
+          {activeNav === 'Dashboard'       && <DashboardPage />}
+          {activeNav === 'Dataset'         && <DatasetPage />}
           {activeNav === 'User Management' && <UserPage />}
-          {activeNav === 'AI Responses' && <AiResponsePage />}
-          {activeNav === 'Review Queue' && <DatasetRetrievalPage />}
+          {activeNav === 'AI Responses'    && <AiResponsePage />}
+          {activeNav === 'Review Queue'    && <DatasetRetrievalPage />}
           {activeNav === 'Dataset Release' && <DatasetReleasePage />}
         </main>
       </div>
