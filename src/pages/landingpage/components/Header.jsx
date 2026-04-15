@@ -59,7 +59,7 @@ function Header({ isLoaded = true, currentPage }) {
     setLogoutError('')
     setIsLoggingOut(true)
 
-    const { error } = await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut({ scope: 'local' })
 
     if (closeMobile) {
       setIsMobileMenuOpen(false)

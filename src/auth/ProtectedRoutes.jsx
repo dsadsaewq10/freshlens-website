@@ -25,10 +25,10 @@ export function RequireAuth({ children }) {
 }
 
 export function RequireRole({ allowedRoles = [], children }) {
-  const { user, role, loading } = useAuth()
+  const { user, role, loading, roleLoading } = useAuth()
   const location = useLocation()
 
-  if (loading) {
+  if (loading || roleLoading) {
     return <AuthLoadingScreen />
   }
 
