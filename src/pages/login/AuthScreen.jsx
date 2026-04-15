@@ -13,6 +13,24 @@ const signupSchema = loginSchema.extend({
   name: z.string().min(1, 'Username is required.'),
 })
 
+function withTimeout(promise, timeoutMs, timeoutMessage) {
+  return new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      reject(new Error(timeoutMessage))
+    }, timeoutMs)
+
+    promise
+      .then((value) => {
+        clearTimeout(timeoutId)
+        resolve(value)
+      })
+      .catch((error) => {
+        clearTimeout(timeoutId)
+        reject(error)
+      })
+  })
+}
+
 function AuthScreen({ mode }) {
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', password: '' })
@@ -54,6 +72,30 @@ function AuthScreen({ mode }) {
       document.body.style.overflowY = previousBodyOverflowY
     }
   }, [])
+
+  useEffect(() => {
+    let mounted = true
+
+    async function redirectAuthenticatedUser() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!mounted || !session?.user) {
+        return
+      }
+
+      if (!mounted) return
+
+      navigate('/admin', { replace: true })
+    }
+
+    redirectAuthenticatedUser()
+
+    return () => {
+      mounted = false
+    }
+  }, [navigate])
 
   const fields = useMemo(() => {
     if (isLogin) {
@@ -110,10 +152,31 @@ function AuthScreen({ mode }) {
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: formData.email,
-          password: formData.password,
-        })
+        let loginResult
+        try {
+          loginResult = await withTimeout(
+            supabase.auth.signInWithPassword({
+              email: formData.email,
+              password: formData.password,
+            }),
+            12000,
+            'Sign-in is taking too long. Please try again.',
+          )
+        } catch (signInErr) {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession()
+
+          // Session can be created even when the sign-in promise stalls in some network conditions.
+          if (session?.user) {
+            navigate('/admin')
+            return
+          }
+
+          throw signInErr
+        }
+
+        const { error } = loginResult
         if (error) throw error
         navigate('/admin')
       } else {

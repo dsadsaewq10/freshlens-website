@@ -5,17 +5,35 @@ import TechnologyPage from './pages/technology/components/Technology'
 import DatasetPage from './pages/dataset/components/Dataset'
 import AuthScreen from './pages/login/AuthScreen'
 import AdminDashboard from './admin'
+import { AuthProvider } from './auth/AuthProvider'
+import { RequireAuth, RequireRole } from './auth/ProtectedRoutes'
 
 export default function AppRoutes() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Landingpage />} />
-        <Route path="/technology" element={<TechnologyPage />} />
-        <Route path="/dataset" element={<DatasetPage />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/:authMode" element={<AuthScreen />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Landingpage />} />
+          <Route path="/technology" element={<TechnologyPage />} />
+          <Route
+            path="/dataset"
+            element={(
+              <RequireAuth>
+                <DatasetPage />
+              </RequireAuth>
+            )}
+          />
+          <Route
+            path="/admin"
+            element={(
+              <RequireRole allowedRoles={['admin']}>
+                <AdminDashboard />
+              </RequireRole>
+            )}
+          />
+          <Route path="/:authMode" element={<AuthScreen />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   )
 }
