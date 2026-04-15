@@ -1,80 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { supabase } from '../../lib/supabase'
 
-// TODO: replace mock data with Supabase query (table: ai_responses)
-const initialResponses = [
-	{
-		id: 'r-001',
-		capturedAt: '2026-04-12 09:41',
-		user: 'acno',
-		vegetable: 'Tomato',
-		prompt: 'Is this tomato still usable for salsa?',
-		response:
-			'Yes. The surface shows minor wrinkling but no mold or soft rot. Safe for cooking within 1–2 days.',
-		modelVersion: 'freshlens-chat-0.4.2',
-		confidence: 0.86,
-		status: 'Pending',
-		tags: ['freshness', 'cooking-advice'],
-		includeInRetraining: false,
-	},
-	{
-		id: 'r-002',
-		capturedAt: '2026-04-12 10:12',
-		user: 'jv',
-		vegetable: 'Cabbage',
-		prompt: 'Why are the outer leaves turning yellow?',
-		response:
-			'Yellowing outer leaves typically indicate early spoilage from ethylene exposure. Remove the outer layer; inner head is usually fine.',
-		modelVersion: 'freshlens-chat-0.4.2',
-		confidence: 0.74,
-		status: 'Approved',
-		tags: ['spoilage', 'storage'],
-		includeInRetraining: true,
-	},
-	{
-		id: 'r-003',
-		capturedAt: '2026-04-13 08:05',
-		user: 'than',
-		vegetable: 'Pepper',
-		prompt: 'Are the soft spots dangerous?',
-		response:
-			'Soft spots suggest bruising or mold. Discard if there is visible fuzz or sour smell; otherwise trim the affected area.',
-		modelVersion: 'freshlens-chat-0.4.2',
-		confidence: 0.62,
-		status: 'Needs edit',
-		tags: ['mold', 'safety'],
-		includeInRetraining: false,
-	},
-	{
-		id: 'r-004',
-		capturedAt: '2026-04-13 14:28',
-		user: 'pin',
-		vegetable: 'Cucumber',
-		prompt: 'How long can I keep this in the fridge?',
-		response:
-			'Wrapped cucumbers last 5–7 days in the crisper drawer. Do not store below 10°C for prolonged periods.',
-		modelVersion: 'freshlens-chat-0.4.2',
-		confidence: 0.91,
-		status: 'Approved',
-		tags: ['storage'],
-		includeInRetraining: true,
-	},
-	{
-		id: 'r-005',
-		capturedAt: '2026-04-14 07:50',
-		user: 'acno',
-		vegetable: 'Carrot',
-		prompt: 'Is the rubbery texture a problem?',
-		response:
-			'Rubbery carrots have lost moisture. Still safe — rehydrate in ice water for 30 minutes before use.',
-		modelVersion: 'freshlens-chat-0.4.2',
-		confidence: 0.83,
-		status: 'Pending',
-		tags: ['texture', 'rescue'],
-		includeInRetraining: false,
-	},
-]
-
-const statusOptions = ['All', 'Pending', 'Approved', 'Needs edit', 'Rejected']
+const statusOptions = ['Pending', 'Approved', 'Needs edit', 'Rejected', 'All']
+const REVIEW_STORAGE_KEY = 'freshlens.aiResponseReviews.v1'
 
 function statusClass(status) {
 	if (status === 'Approved') return 'bg-emerald-100 text-emerald-700'
@@ -83,20 +11,98 @@ function statusClass(status) {
 	return 'bg-rose-100 text-rose-700'
 }
 
-function confidenceClass(value) {
-	if (value >= 0.85) return 'text-emerald-700'
-	if (value >= 0.7) return 'text-amber-700'
-	return 'text-rose-700'
+function formatTimestamp(iso) {
+	if (!iso) return '—'
+	try {
+		const d = new Date(iso)
+		return `${d.toISOString().slice(0, 10)} ${d.toTimeString().slice(0, 5)}`
+	} catch {
+		return iso
+	}
+}
+
+// Walk messages[] jsonb and build (user → assistant) pairs.
+function extractPairs(session) {
+	const msgs = Array.isArray(session.messages) ? session.messages : []
+	const pairs = []
+	for (let i = 0; i < msgs.length; i++) {
+		const m = msgs[i]
+		if (!m || !m.isUser) continue
+		// find next assistant reply
+		let j = i + 1
+		while (j < msgs.length && msgs[j]?.isUser) j++
+		const reply = msgs[j]
+		if (!reply || reply.isUser) continue
+		const id = `${session.local_id || session.id}::${m.id ?? i}`
+		pairs.push({
+			id,
+			sessionId: session.local_id || session.id,
+			sessionTitle: session.title || 'Chat',
+			capturedAt: m.timestamp || session.last_message_at,
+			user: (session.user_id ?? '').slice(0, 8) || 'user',
+			prompt: String(m.text ?? '').trim(),
+			response: String(reply.text ?? '').trim(),
+			provider: reply.provider ?? 'unknown',
+		})
+	}
+	return pairs
+}
+
+function loadReviews() {
+	try {
+		const raw = localStorage.getItem(REVIEW_STORAGE_KEY)
+		return raw ? JSON.parse(raw) : {}
+	} catch {
+		return {}
+	}
+}
+
+function saveReviews(reviews) {
+	try {
+		localStorage.setItem(REVIEW_STORAGE_KEY, JSON.stringify(reviews))
+	} catch { /* storage unavailable */ }
 }
 
 function AiResponsePage() {
-	const [responses, setResponses] = useState(initialResponses)
+	const [rawPairs, setRawPairs] = useState([])
+	const [loading, setLoading] = useState(true)
+	const [reviews, setReviews] = useState(() => loadReviews())
 	const [search, setSearch] = useState('')
-	const [statusFilter, setStatusFilter] = useState('All')
+	const [statusFilter, setStatusFilter] = useState('Pending')
 	const [selected, setSelected] = useState(null)
 	const [draft, setDraft] = useState(null)
 	const [isEditing, setIsEditing] = useState(false)
 	const [toast, setToast] = useState('')
+
+	useEffect(() => {
+		(async () => {
+			const { data, error } = await supabase
+				.from('chat_sessions')
+				.select('local_id, user_id, title, messages, last_message_at, created_at')
+				.order('last_message_at', { ascending: false })
+				.limit(500)
+			if (error) {
+				setToast(`Failed to load chat sessions: ${error.message}`)
+				setLoading(false)
+				return
+			}
+			const all = []
+			for (const s of data ?? []) all.push(...extractPairs(s))
+			setRawPairs(all)
+			setLoading(false)
+		})()
+	}, [])
+
+	// Merge raw pairs with per-id review metadata from localStorage
+	const responses = useMemo(() => rawPairs.map((p) => {
+		const r = reviews[p.id] || {}
+		return {
+			...p,
+			prompt: r.prompt ?? p.prompt,
+			response: r.response ?? p.response,
+			status: r.status ?? 'Pending',
+		}
+	}), [rawPairs, reviews])
 
 	const filtered = useMemo(() => {
 		const q = search.trim().toLowerCase()
@@ -105,8 +111,8 @@ function AiResponsePage() {
 				q.length === 0 ||
 				r.prompt.toLowerCase().includes(q) ||
 				r.response.toLowerCase().includes(q) ||
-				r.vegetable.toLowerCase().includes(q) ||
-				r.user.toLowerCase().includes(q)
+				r.user.toLowerCase().includes(q) ||
+				r.sessionTitle.toLowerCase().includes(q)
 			const byStatus = statusFilter === 'All' || r.status === statusFilter
 			return byText && byStatus
 		})
@@ -117,9 +123,16 @@ function AiResponsePage() {
 		const approved = responses.filter((r) => r.status === 'Approved').length
 		const pending = responses.filter((r) => r.status === 'Pending').length
 		const flagged = responses.filter((r) => r.status === 'Needs edit' || r.status === 'Rejected').length
-		const retraining = responses.filter((r) => r.includeInRetraining).length
-		return { total, approved, pending, flagged, retraining }
+		return { total, approved, pending, flagged }
 	}, [responses])
+
+	function patchReview(id, patch) {
+		setReviews((prev) => {
+			const next = { ...prev, [id]: { ...(prev[id] || {}), ...patch } }
+			saveReviews(next)
+			return next
+		})
+	}
 
 	function openResponse(entry) {
 		setSelected(entry)
@@ -134,33 +147,49 @@ function AiResponsePage() {
 	}
 
 	function updateStatus(id, nextStatus) {
-		setResponses((prev) => prev.map((r) => (r.id === id ? { ...r, status: nextStatus } : r)))
+		patchReview(id, { status: nextStatus })
 		if (selected?.id === id) {
 			setSelected((prev) => (prev ? { ...prev, status: nextStatus } : prev))
 			setDraft((prev) => (prev ? { ...prev, status: nextStatus } : prev))
 		}
-		setToast(`Marked ${id} as ${nextStatus}.`)
-	}
-
-	function toggleRetraining(id) {
-		setResponses((prev) =>
-			prev.map((r) => (r.id === id ? { ...r, includeInRetraining: !r.includeInRetraining } : r)),
-		)
+		setToast(`Marked response as ${nextStatus}.`)
 	}
 
 	function saveDraft() {
 		if (!draft) return
-		setResponses((prev) => prev.map((r) => (r.id === draft.id ? { ...draft, status: 'Needs edit' } : r)))
-		setSelected(draft)
+		patchReview(draft.id, {
+			prompt: draft.prompt,
+			response: draft.response,
+			status: 'Needs edit',
+		})
+		setSelected({ ...draft, status: 'Needs edit' })
 		setIsEditing(false)
-		setToast(`Response ${draft.id} edited and re-queued for review.`)
+		setToast('Response edited and re-queued for review.')
 	}
 
 	function exportRetrainingBatch() {
-		const batch = responses.filter((r) => r.includeInRetraining && r.status === 'Approved')
-		// TODO: POST batch to /retraining endpoint or upload JSONL to Supabase Storage
-		console.log('retraining batch (stub)', batch)
-		setToast(`Queued ${batch.length} approved response(s) for retraining export.`)
+		const batch = responses.filter((r) => r.status === 'Approved')
+		if (batch.length === 0) {
+			setToast('Nothing to export — approve responses first.')
+			return
+		}
+		const cleanResponse = (text) => String(text ?? '')
+			.replace(/\*\*/g, '')
+			.replace(/#{1,6}\s*/g, '')
+			.trim()
+		// JSONL: one row per pair, ready for supervised fine-tuning
+		const lines = batch.map((r) => JSON.stringify({
+			instruction: r.prompt,
+			response: cleanResponse(r.response),
+		}))
+		const blob = new Blob([lines.join('\n') + '\n'], { type: 'application/jsonl' })
+		const url = URL.createObjectURL(blob)
+		const a = document.createElement('a')
+		a.href = url
+		a.download = `freshlens_chat_retraining_${new Date().toISOString().slice(0, 10)}.jsonl`
+		document.body.appendChild(a); a.click(); document.body.removeChild(a)
+		URL.revokeObjectURL(url)
+		setToast(`Exported ${batch.length} approved response(s) as JSONL.`)
 	}
 
 	return (
@@ -171,8 +200,8 @@ function AiResponsePage() {
 						<div>
 							<h1 className="text-xl font-semibold tracking-tight sm:text-2xl">AI response review</h1>
 							<p className="mt-1 text-sm text-slate-500">
-								Review chatbot answers paired with user captures. Approve, edit, or flag — approved items can
-								be exported for retraining the on-device chat model.
+								Review chatbot answers paired with user captures. Approve, edit, or flag — all approved items
+								are exported as a JSONL for retraining the on-device chat model.
 							</p>
 						</div>
 						<button
@@ -184,13 +213,12 @@ function AiResponsePage() {
 						</button>
 					</div>
 
-					<div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+					<div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
 						{[
 							{ label: 'Total responses', value: stats.total },
 							{ label: 'Approved', value: stats.approved },
 							{ label: 'Pending', value: stats.pending },
 							{ label: 'Flagged', value: stats.flagged },
-							{ label: 'In retraining set', value: stats.retraining },
 						].map((card) => (
 							<div key={card.label} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
 								<p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{card.label}</p>
@@ -204,7 +232,7 @@ function AiResponsePage() {
 							type="search"
 							value={search}
 							onChange={(event) => setSearch(event.target.value)}
-							placeholder="Search prompt, response, user, or vegetable"
+							placeholder="Search prompt, response, user, or session"
 							className="w-full flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-cyan-400 sm:w-auto"
 						/>
 						<select
@@ -221,7 +249,10 @@ function AiResponsePage() {
 					</div>
 
 					<div className="space-y-3">
-						{filtered.map((entry) => (
+						{loading && (
+							<p className="pt-6 text-center text-sm text-slate-500">Loading chat sessions…</p>
+						)}
+						{!loading && filtered.map((entry) => (
 							<article
 								key={entry.id}
 								className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-primary/40"
@@ -229,32 +260,21 @@ function AiResponsePage() {
 								<div className="flex flex-wrap items-start justify-between gap-3">
 									<div className="min-w-0 flex-1">
 										<div className="flex flex-wrap items-center gap-2">
-											<span className="text-xs font-mono text-slate-500">{entry.id}</span>
+											<span className="text-xs font-mono text-slate-500 truncate max-w-[260px]">{entry.sessionTitle}</span>
 											<span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass(entry.status)}`}>
 												{entry.status}
 											</span>
 											<span className="rounded-full bg-slate-200/80 px-2.5 py-1 text-xs font-semibold text-slate-700">
-												{entry.vegetable}
-											</span>
-											<span className={`text-xs font-semibold ${confidenceClass(entry.confidence)}`}>
-												{(entry.confidence * 100).toFixed(0)}% conf
+												{entry.provider}
 											</span>
 										</div>
 										<p className="mt-2 text-sm font-medium text-slate-900">“{entry.prompt}”</p>
 										<p className="mt-1 line-clamp-2 text-xs text-slate-600">{entry.response}</p>
 										<p className="mt-2 text-[11px] text-slate-500">
-											by {entry.user} · {entry.capturedAt} · {entry.modelVersion}
+											by {entry.user} · {formatTimestamp(entry.capturedAt)}
 										</p>
 									</div>
 									<div className="flex flex-col items-end gap-2">
-										<label className="flex items-center gap-2 text-xs text-slate-600">
-											<input
-												type="checkbox"
-												checked={entry.includeInRetraining}
-												onChange={() => toggleRetraining(entry.id)}
-											/>
-											Retrain
-										</label>
 										<div className="flex flex-wrap justify-end gap-2">
 											<button
 												type="button"
@@ -282,7 +302,7 @@ function AiResponsePage() {
 								</div>
 							</article>
 						))}
-						{filtered.length === 0 && (
+						{!loading && filtered.length === 0 && (
 							<p className="pt-6 text-center text-sm text-slate-500">No responses match the current filter.</p>
 						)}
 					</div>
@@ -300,9 +320,9 @@ function AiResponsePage() {
 					<div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl sm:p-6">
 						<div className="mb-4 flex items-start justify-between gap-2">
 							<div>
-								<h2 className="text-xl font-semibold text-slate-900">Response {selected.id}</h2>
+								<h2 className="text-xl font-semibold text-slate-900 truncate max-w-[380px]">{selected.sessionTitle}</h2>
 								<p className="text-sm text-slate-500">
-									{selected.vegetable} · by {selected.user} · {selected.capturedAt}
+									by {selected.user} · {formatTimestamp(selected.capturedAt)} · {selected.provider}
 								</p>
 							</div>
 							<button
@@ -331,26 +351,10 @@ function AiResponsePage() {
 									value={draft.response}
 									readOnly={!isEditing}
 									onChange={(event) => setDraft({ ...draft, response: event.target.value })}
-									rows={5}
+									rows={6}
 									className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-700"
 								/>
 							</label>
-							<div className="grid gap-3 sm:grid-cols-3">
-								<div className="rounded-xl bg-slate-50 p-3">
-									<p className="text-[11px] uppercase text-slate-500">Confidence</p>
-									<p className={`mt-1 font-semibold ${confidenceClass(selected.confidence)}`}>
-										{(selected.confidence * 100).toFixed(0)}%
-									</p>
-								</div>
-								<div className="rounded-xl bg-slate-50 p-3">
-									<p className="text-[11px] uppercase text-slate-500">Model</p>
-									<p className="mt-1 text-sm font-medium text-slate-700">{selected.modelVersion}</p>
-								</div>
-								<div className="rounded-xl bg-slate-50 p-3">
-									<p className="text-[11px] uppercase text-slate-500">Tags</p>
-									<p className="mt-1 text-sm font-medium text-slate-700">{selected.tags.join(', ')}</p>
-								</div>
-							</div>
 						</div>
 
 						<div className="mt-5 flex flex-wrap items-center justify-between gap-3">

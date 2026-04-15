@@ -34,9 +34,10 @@ function MultiBBoxCanvas({ imageUrl, boxes, onBoxesChange, readOnly = false }) {
   const imgRef     = useRef(null)
   const [imgLoaded, setImgLoaded] = useState(false)
   const [localBoxes, setLocalBoxes] = useState(boxes)
+  const localBoxesRef = useRef(boxes)
   const drag = useRef({ active: false, type: null, boxId: null, handle: null, startX: 0, startY: 0, orig: null })
 
-  useEffect(() => { setLocalBoxes(boxes) }, [boxes])
+  useEffect(() => { setLocalBoxes(boxes); localBoxesRef.current = boxes }, [boxes])
 
   const H = 10 // handle half-size px
 
@@ -132,7 +133,7 @@ function MultiBBoxCanvas({ imageUrl, boxes, onBoxesChange, readOnly = false }) {
     const { x, y } = relPos(e)
     const d = drag.current
     const dx = (x-d.startX)/c.width, dy = (y-d.startY)/c.height
-    setLocalBoxes(prev => prev.map(b => {
+    const next = localBoxesRef.current.map(b => {
       if (b.id !== d.boxId) return b
       let nb = { ...d.orig }
       if (d.type === 'move') {
@@ -148,11 +149,13 @@ function MultiBBoxCanvas({ imageUrl, boxes, onBoxesChange, readOnly = false }) {
         if (h==='br'){ nb.right=Math.min(1,Math.max(nb.left+0.05,nb.right+dx)); nb.bottom=Math.min(1,Math.max(nb.top+0.05,nb.bottom+dy)) }
       }
       return nb
-    }))
+    })
+    localBoxesRef.current = next
+    setLocalBoxes(next)
   }
 
   function onUp() {
-    if (drag.current.active && onBoxesChange) onBoxesChange(localBoxes)
+    if (drag.current.active && onBoxesChange) onBoxesChange(localBoxesRef.current)
     drag.current.active = false
   }
 
@@ -196,8 +199,12 @@ function rawDetectionsToBoxes(detections, fallback) {
 }
 
 function ReviewModal({ capture, onClose, onSave }) {
+  // If this capture was already reviewed, reopen with the reviewed boxes so
+  // previously-added/moved boxes persist across review sessions.
   const [boxes, setBoxes] = useState(() =>
-    rawDetectionsToBoxes(capture.detections, capture)
+    capture.reviewedDetections?.length > 0
+      ? rawDetectionsToBoxes(capture.reviewedDetections, capture)
+      : rawDetectionsToBoxes(capture.detections, capture)
   )
   const [notes, setNotes]   = useState(capture.reviewNotes || '')
   const [saving, setSaving] = useState(false)
@@ -339,12 +346,22 @@ function ReviewModal({ capture, onClose, onSave }) {
 // ─── Capture Card ─────────────────────────────────────────────────────────────
 function CaptureCard({ capture, isSelected, onToggle, onReview }) {
   const imageUrl = capture.scannedImageUrl || capture.scannedImagePath
-  const detCount = capture.detections?.length ?? (
-    capture.boxRight != null && (capture.boxRight - capture.boxLeft) > 0.01 ? 1 : 0
-  )
+  // Prefer reviewed detections so the count reflects boxes added/removed in review.
+  const detCount = capture.reviewedDetections?.length
+    || capture.detections?.length
+    || (capture.boxRight != null && (capture.boxRight - capture.boxLeft) > 0.01 ? 1 : 0)
 
-  // Build SVG boxes for thumbnail overlay
+  // Build SVG boxes for thumbnail overlay.
+  // Prefer reviewed detections so approved edits (added/moved boxes) show up.
   const svgBoxes = useMemo(() => {
+    const reviewed = capture.reviewedDetections
+    if (reviewed?.length > 0) {
+      return reviewed.map((d, i) => ({
+        left: d.boxLeft, top: d.boxTop,
+        w: d.boxRight - d.boxLeft, h: d.boxBottom - d.boxTop,
+        color: LABEL_COLORS[i % LABEL_COLORS.length],
+      }))
+    }
     if (capture.detections?.length > 0) {
       return capture.detections.map((d, i) => ({
         left: d.boxLeft, top: d.boxTop,
@@ -497,7 +514,7 @@ function DatasetRetrievalPage() {
       .from('scan_history')
       .update({
         review_status:        reviewStatus,
-        reviewed_detections:  JSON.stringify(reviewedDetections),
+        reviewed_detections:  reviewedDetections,
         reviewed_class_label: reviewedClassLabel,
         reviewed_box_left:    reviewedBoxLeft,
         reviewed_box_top:     reviewedBoxTop,

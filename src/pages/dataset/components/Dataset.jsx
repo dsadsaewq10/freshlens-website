@@ -1,9 +1,10 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useMemo } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import Header from '../../landingpage/components/Header'
 import Footer from '../../landingpage/components/Footer'
 import BackToTop from '../../../components/BackToTop'
 import { supabase } from '../../../lib/supabase'
+import JSZip from 'jszip'
 
 // Color palette
 const COLORS = {
@@ -340,8 +341,270 @@ function HeroSection() {
   )
 }
 
+// ── Release helpers (shared with admin-db/dataset-release) ────────────────────
+function releaseVegFromLabel(label) {
+  if (!label) return 'Unknown'
+  return label.split('_').slice(1).join(' ')
+}
+function releaseFreshFromLabel(label) {
+  return (label ?? '').startsWith('Fresh')
+}
+function releaseParseJson(v) {
+  if (v == null) return null
+  if (Array.isArray(v) || typeof v === 'object') return v
+  try { return JSON.parse(v) } catch { return null }
+}
+function captureDetections(cap) {
+  const dets = releaseParseJson(cap.reviewed_detections) || releaseParseJson(cap.detections)
+  if (Array.isArray(dets) && dets.length) return dets
+  const l = cap.reviewed_box_left ?? cap.box_left
+  const t = cap.reviewed_box_top  ?? cap.box_top
+  const r = cap.reviewed_box_right ?? cap.box_right
+  const b = cap.reviewed_box_bottom ?? cap.box_bottom
+  if (r == null || (r - l) <= 0.01) return []
+  return [{
+    classLabel: cap.reviewed_class_label || cap.class_label,
+    boxLeft: l, boxTop: t, boxRight: r, boxBottom: b,
+  }]
+}
+function captureToYoloText(cap, classMap) {
+  return captureDetections(cap)
+    .filter(d => d.classLabel && d.boxRight != null && (d.boxRight - d.boxLeft) > 0.01)
+    .map(d => {
+      const cx = ((d.boxLeft + d.boxRight) / 2).toFixed(6)
+      const cy = ((d.boxTop + d.boxBottom) / 2).toFixed(6)
+      const w  = (d.boxRight - d.boxLeft).toFixed(6)
+      const h  = (d.boxBottom - d.boxTop).toFixed(6)
+      return `${classMap[d.classLabel] ?? 0} ${cx} ${cy} ${w} ${h}`
+    }).join('\n')
+}
+
+function useApprovedCaptures(vegetables) {
+  const [captures, setCaptures] = useState([])
+  const [loading, setLoading]   = useState(false)
+  useEffect(() => {
+    let cancelled = false
+    if (!vegetables?.length) return
+    queueMicrotask(() => { if (!cancelled) setLoading(true) })
+    supabase
+      .from('scan_history')
+      .select(
+        'id, class_label, is_fresh, scanned_image_path, detections,' +
+        'box_left, box_top, box_right, box_bottom,' +
+        'reviewed_class_label, reviewed_detections,' +
+        'reviewed_box_left, reviewed_box_top, reviewed_box_right, reviewed_box_bottom'
+      )
+      .eq('review_status', 'approved')
+      .then(({ data }) => {
+        if (cancelled) return
+        const rows = (data ?? []).filter(r => {
+          const veg = releaseVegFromLabel(r.reviewed_class_label || r.class_label)
+          return vegetables.includes(veg)
+        })
+        setCaptures(rows)
+        setLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [vegetables])
+  return { captures, loading }
+}
+
+async function buildReleaseZip(release, captures, onProgress) {
+  const zip = new JSZip()
+  const root = zip.folder(`${release.name.replace(/\s+/g, '_')}_v${release.version}`)
+  // data.yaml
+  const labelSet = new Set()
+  captures.forEach(c => captureDetections(c).forEach(d => labelSet.add(d.classLabel)))
+  const classList = [...labelSet].sort()
+  const classMap  = Object.fromEntries(classList.map((c, i) => [c, i]))
+  const names = classList.map((c, i) => `  ${i}: ${c}`).join('\n')
+  root.file('data.yaml',
+    `path: ./\ntrain: images/train\nval:   images/val\n\nnc: ${classList.length}\nnames:\n${names}\n`)
+
+  // 80/20 split
+  const split = Math.round(captures.length * 0.8)
+  const groups = { train: captures.slice(0, split), val: captures.slice(split) }
+  let done = 0
+  const total = captures.length
+  for (const [splitName, caps] of Object.entries(groups)) {
+    const imgDir = root.folder(`images/${splitName}`)
+    const lblDir = root.folder(`labels/${splitName}`)
+    for (let i = 0; i < caps.length; i++) {
+      const cap = caps[i]
+      const stem = `img_${splitName}_${String(i + 1).padStart(4, '0')}`
+      try {
+        const res = await fetch(cap.scanned_image_path)
+        if (res.ok) {
+          const blob = await res.blob()
+          const ext  = (blob.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg')
+          imgDir.file(`${stem}.${ext}`, blob)
+        }
+      } catch { /* skip missing */ }
+      lblDir.file(`${stem}.txt`, captureToYoloText(cap, classMap))
+      done++
+      onProgress?.(done, total)
+    }
+  }
+  return zip.generateAsync({ type: 'blob' }, (meta) =>
+    onProgress?.(done, total, meta.percent)
+  )
+}
+
+function triggerDownload(blob, filename) {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url; a.download = filename
+  document.body.appendChild(a); a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
+// ── Release preview modal ─────────────────────────────────────────────────────
+function ReleasePreviewModal({ release, onClose }) {
+  const { captures, loading } = useApprovedCaptures(release.vegetables)
+  const [downloading, setDownloading] = useState(false)
+  const [progress, setProgress] = useState(0)
+
+  async function handleDownload() {
+    if (!captures.length || downloading) return
+    setDownloading(true); setProgress(0)
+    try {
+      const blob = await buildReleaseZip(release, captures, (done, total, zipPct) => {
+        const filePct = total ? (done / total) * 80 : 0
+        const zpct    = (zipPct ?? 0) * 0.2
+        setProgress(Math.min(99, Math.round(filePct + zpct)))
+      })
+      triggerDownload(blob, `${release.name.replace(/\s+/g, '_')}_v${release.version}.zip`)
+      setProgress(100)
+    } finally {
+      setTimeout(() => { setDownloading(false); setProgress(0) }, 800)
+    }
+  }
+
+  // group captures by vegetable for folder tree view
+  const byVeg = useMemo(() => {
+    const g = {}
+    for (const c of captures) {
+      const veg = releaseVegFromLabel(c.reviewed_class_label || c.class_label)
+      if (!g[veg]) g[veg] = []
+      g[veg].push(c)
+    }
+    return g
+  }, [captures])
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/60 p-4" onClick={onClose}>
+      <div
+        className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="sticky top-0 flex items-start justify-between gap-4 border-b border-slate-100 bg-white/95 px-6 py-4 backdrop-blur">
+          <div>
+            <h3 className="text-lg font-bold" style={{ color: COLORS.primary }}>{release.name}</h3>
+            <p className="text-xs text-slate-500">
+              v{release.version} · {captures.length} images · {release.vegetables?.join(', ')}
+            </p>
+          </div>
+          <button type="button" onClick={onClose} className="rounded-full p-1.5 text-slate-400 hover:bg-slate-100">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="space-y-5 px-6 py-5">
+          {release.changelog && (
+            <p className="rounded-xl bg-slate-50 p-3 text-xs text-slate-600">{release.changelog}</p>
+          )}
+
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <div className="w-8 h-8 rounded-full border-2 border-current border-t-transparent animate-spin" style={{ color: COLORS.primary }} />
+            </div>
+          ) : captures.length === 0 ? (
+            <p className="py-8 text-center text-sm text-slate-400">No approved captures in this release yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {Object.entries(byVeg).map(([veg, caps]) => (
+                <div key={veg}>
+                  <p className="mb-2 text-xs font-semibold text-slate-500">
+                    📁 {veg.replace(' ', '_')}/ <span className="text-slate-400">({caps.length} images)</span>
+                  </p>
+                  <div className="grid grid-cols-6 gap-2 sm:grid-cols-8">
+                    {caps.slice(0, 24).map((cap) => {
+                      const label = cap.reviewed_class_label || cap.class_label
+                      const fresh = releaseFreshFromLabel(label)
+                      const dets  = captureDetections(cap)
+                      return (
+                        <div key={cap.id} className="relative aspect-square">
+                          <img
+                            src={cap.scanned_image_path}
+                            alt={label}
+                            className="h-full w-full rounded-lg border border-slate-200 object-cover"
+                            loading="lazy"
+                          />
+                          {dets.length > 0 && (
+                            <svg viewBox="0 0 1 1" preserveAspectRatio="none"
+                                 className="pointer-events-none absolute inset-0 h-full w-full rounded-lg">
+                              {dets.map((d, i) => {
+                                if (d.boxRight == null || (d.boxRight - d.boxLeft) <= 0.01) return null
+                                const isF = releaseFreshFromLabel(d.classLabel)
+                                return (
+                                  <rect key={i}
+                                    x={d.boxLeft} y={d.boxTop}
+                                    width={d.boxRight - d.boxLeft} height={d.boxBottom - d.boxTop}
+                                    fill="none" stroke={isF ? '#10b981' : '#ef4444'}
+                                    strokeWidth={0.025} vectorEffect="non-scaling-stroke" />
+                                )
+                              })}
+                            </svg>
+                          )}
+                          <span className={`absolute bottom-0.5 right-0.5 rounded px-1 text-[8px] font-bold text-white ${fresh ? 'bg-emerald-500' : 'bg-rose-500'}`}>
+                            {fresh ? 'F' : 'R'}
+                          </span>
+                        </div>
+                      )
+                    })}
+                    {caps.length > 24 && (
+                      <div className="flex aspect-square items-center justify-center rounded-lg border border-dashed border-slate-300 text-[10px] text-slate-400">
+                        +{caps.length - 24}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex items-center gap-3 border-t border-slate-100 pt-4">
+            <button
+              type="button"
+              disabled={!captures.length || downloading}
+              onClick={handleDownload}
+              className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+              style={{ background: COLORS.primary }}
+            >
+              {downloading ? (
+                <>Building ZIP… {progress}%</>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download .zip ({captures.length} imgs)
+                </>
+              )}
+            </button>
+            <p className="text-xs text-slate-400">Bundled in YOLO format — data.yaml + images/ + labels/</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Dataset grid section — animations replay
-function DatasetGridSection({ publishedReleases = [], loadingReleases = false }) {
+function DatasetGridSection({ publishedReleases = [], loadingReleases = false, onPreview }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: false, amount: 0.15 })
 
@@ -388,15 +651,24 @@ function DatasetGridSection({ publishedReleases = [], loadingReleases = false })
                   initial={{ opacity: 0, y: 30 }}
                   animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                   transition={{ delay: 0.08 + i * 0.08, duration: 0.6 }}
-                  className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-lg transition-all group"
+                  onClick={() => onPreview?.(release)}
+                  className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-lg transition-all group cursor-pointer"
                 >
                   <div className="flex items-start gap-4">
-                    <div
-                      className="w-16 h-16 rounded-xl flex items-center justify-center shrink-0 text-white font-bold text-lg"
-                      style={{ background: COLORS.primary }}
-                    >
-                      {(release.name || 'R').slice(0, 2).toUpperCase()}
-                    </div>
+                    {release.thumbnail_url ? (
+                      <img
+                        src={release.thumbnail_url}
+                        alt={release.name}
+                        className="w-16 h-16 rounded-xl object-cover shrink-0 border border-slate-200"
+                      />
+                    ) : (
+                      <div
+                        className="w-16 h-16 rounded-xl flex items-center justify-center shrink-0 text-white font-bold text-lg"
+                        style={{ background: COLORS.primary }}
+                      >
+                        {(release.name || 'R').slice(0, 2).toUpperCase()}
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <h3 className="text-base font-bold truncate" style={{ color: COLORS.primary }}>{release.name}</h3>
@@ -426,27 +698,20 @@ function DatasetGridSection({ publishedReleases = [], loadingReleases = false })
                           <span>{release.vegetables.join(', ')}</span>
                         )}
                       </div>
-                      {release.public_url ? (
-                        <motion.a
-                          href={release.public_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.97 }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white"
-                          style={{ background: COLORS.primary }}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                          </svg>
-                          Download
-                        </motion.a>
-                      ) : (
-                        <span className="inline-block px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-400">
-                          Link unavailable
-                        </span>
-                      )}
+                      <motion.button
+                        type="button"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.97 }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white"
+                        style={{ background: COLORS.primary }}
+                        onClick={(e) => { e.stopPropagation(); onPreview?.(release) }}
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Preview & download
+                      </motion.button>
                     </div>
                     <span className="shrink-0 self-start mt-1">
                       <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700">
@@ -780,17 +1045,33 @@ function FormatSection() {
 export default function DatasetPage() {
   const [publishedReleases, setPublishedReleases] = useState([])
   const [loadingReleases, setLoadingReleases] = useState(true)
+  const [previewRelease, setPreviewRelease] = useState(null)
 
   useEffect(() => {
-    supabase
-      .from('dataset_releases')
-      .select('id, name, version, vegetables, sample_count, fresh_ratio, changelog, public_url, updated_at')
-      .eq('status', 'Published')
-      .order('updated_at', { ascending: false })
-      .then(({ data }) => {
-        setPublishedReleases(data ?? [])
-        setLoadingReleases(false)
-      })
+    (async () => {
+      const { data: releases } = await supabase
+        .from('dataset_releases')
+        .select('id, name, version, vegetables, sample_count, fresh_ratio, changelog, public_url, updated_at')
+        .eq('status', 'Published')
+        .order('updated_at', { ascending: false })
+      const rows = releases ?? []
+      // Attach first-image thumbnail per release
+      await Promise.all(rows.map(async (r) => {
+        if (!r.vegetables?.length) return
+        const { data: sample } = await supabase
+          .from('scan_history')
+          .select('scanned_image_path, class_label, reviewed_class_label')
+          .eq('review_status', 'approved')
+          .limit(10)
+        const match = (sample ?? []).find(s => {
+          const veg = releaseVegFromLabel(s.reviewed_class_label || s.class_label)
+          return r.vegetables.includes(veg)
+        })
+        r.thumbnail_url = match?.scanned_image_path ?? null
+      }))
+      setPublishedReleases(rows)
+      setLoadingReleases(false)
+    })()
   }, [])
 
   useEffect(() => {
@@ -813,7 +1094,14 @@ export default function DatasetPage() {
       <DatasetGridSection
         publishedReleases={publishedReleases}
         loadingReleases={loadingReleases}
+        onPreview={setPreviewRelease}
       />
+      {previewRelease && (
+        <ReleasePreviewModal
+          release={previewRelease}
+          onClose={() => setPreviewRelease(null)}
+        />
+      )}
       <FormatSection />
       <div className="snap-section-footer">
         <Footer />

@@ -272,8 +272,16 @@ function PoolPopup({ title, captures, vegetables, onClose }) {
                                           const imgUrl = cap.scannedImageUrl || cap.scannedImagePath
                                           const label  = cap.reviewedClassLabel || cap.classLabel
                                           const fresh  = freshFromLabel(label)
+                                          const rawDets = parseJson(cap.reviewedDetections) || parseJson(cap.detections)
+                                          const overlayBoxes = (Array.isArray(rawDets) && rawDets.length > 0)
+                                            ? rawDets
+                                            : (cap.boxRight != null ? [{
+                                                classLabel: label,
+                                                boxLeft: cap.boxLeft, boxTop: cap.boxTop,
+                                                boxRight: cap.boxRight, boxBottom: cap.boxBottom,
+                                              }] : [])
                                           return (
-                                            <div key={cap.id} className="relative group/img">
+                                            <div key={cap.id} className="relative group/img w-14 h-14">
                                               {imgUrl ? (
                                                 <img
                                                   src={imgUrl}
@@ -284,6 +292,31 @@ function PoolPopup({ title, captures, vegetables, onClose }) {
                                                 <div className="w-14 h-14 rounded-lg border border-slate-200 bg-slate-200 flex items-center justify-center text-slate-400 text-[9px] text-center leading-tight px-1">
                                                   no img
                                                 </div>
+                                              )}
+                                              {imgUrl && overlayBoxes.length > 0 && (
+                                                <svg
+                                                  viewBox="0 0 1 1"
+                                                  preserveAspectRatio="none"
+                                                  className="pointer-events-none absolute inset-0 w-full h-full rounded-lg"
+                                                >
+                                                  {overlayBoxes.map((d, i) => {
+                                                    if (d.boxRight == null || (d.boxRight - d.boxLeft) <= 0.01) return null
+                                                    const isF = freshFromLabel(d.classLabel)
+                                                    return (
+                                                      <rect
+                                                        key={i}
+                                                        x={d.boxLeft}
+                                                        y={d.boxTop}
+                                                        width={d.boxRight - d.boxLeft}
+                                                        height={d.boxBottom - d.boxTop}
+                                                        fill="none"
+                                                        stroke={isF ? '#10b981' : '#ef4444'}
+                                                        strokeWidth={0.025}
+                                                        vectorEffect="non-scaling-stroke"
+                                                      />
+                                                    )
+                                                  })}
+                                                </svg>
                                               )}
                                               <span className={`absolute bottom-0.5 right-0.5 text-[8px] font-bold px-1 rounded ${fresh ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
                                                 {fresh ? 'F' : 'R'}
@@ -352,64 +385,6 @@ function PoolPopup({ title, captures, vegetables, onClose }) {
   )
 }
 
-// ── Composer modal ────────────────────────────────────────────────────────────
-function ComposerModal({ onClose, onSave, suggestedVegetable = '', suggestedVersion = '1.0' }) {
-  const vegName = suggestedVegetable || ''
-  const [form, setForm] = useState({
-    name:       vegName ? `FreshLens ${vegName} v${suggestedVersion}` : '',
-    version:    suggestedVersion,
-    vegetables: vegName,
-    changelog:  '',
-  })
-  function save() {
-    if (!form.name.trim() || !form.version.trim()) return
-    onSave(form)
-    onClose()
-  }
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-        <div className="mb-4 flex items-start justify-between">
-          <div>
-            <h2 className="text-lg font-semibold">New dataset release</h2>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Saved as Draft — publish when ready to make it public.
-            </p>
-          </div>
-          <button type="button" onClick={onClose}
-            className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold hover:bg-slate-100">Close</button>
-        </div>
-        <div className="space-y-3">
-          {[
-            ['Release name', 'name', 'FreshLens Tomato v1.0'],
-            ['Version', 'version', '1.0'],
-            ['Vegetables (comma separated)', 'vegetables', 'Tomato'],
-          ].map(([label, key, ph]) => (
-            <label key={key} className="block text-sm">
-              <span className="mb-1 block text-slate-500">{label}</span>
-              <input type="text" value={form[key]} placeholder={ph}
-                onChange={e => setForm({ ...form, [key]: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-700 outline-none focus:border-cyan-400" />
-            </label>
-          ))}
-          <label className="block text-sm">
-            <span className="mb-1 block text-slate-500">Changelog / notes</span>
-            <textarea value={form.changelog} rows={3}
-              onChange={e => setForm({ ...form, changelog: e.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-700 outline-none focus:border-cyan-400" />
-          </label>
-        </div>
-        <div className="mt-5 flex justify-end gap-2">
-          <button type="button" onClick={onClose}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100">Cancel</button>
-          <button type="button" onClick={save}
-            className="rounded-lg bg-slate-800 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-900">Save as Draft</button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 // ── Confirm modal ─────────────────────────────────────────────────────────────
 function ConfirmModal({ release, action, onClose, onConfirm }) {
   return (
@@ -422,6 +397,7 @@ function ConfirmModal({ release, action, onClose, onConfirm }) {
           {action === 'delete'   && `Permanently delete "${release.name}"? This cannot be undone.`}
           {action === 'review'   && `Move "${release.name}" to review stage?`}
           {action === 'unpublish'&& `Unpublish "${release.name}"? It will be hidden from the landing page.`}
+          {action === 'reject'   && `Reject "${release.name}"? It will go back to Draft so the owner can fix it and resubmit.`}
         </p>
         <div className="mt-5 flex justify-end gap-2">
           <button type="button" onClick={onClose}
@@ -489,7 +465,13 @@ function ReleaseCard({ release, approvedCount, onAction, onViewPool }) {
           {(release.status === 'Draft' || release.status === 'Review') && (
             <button type="button" onClick={() => onAction('publish')}
               className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700">
-              Publish
+              {release.status === 'Review' ? 'Approve & publish' : 'Publish'}
+            </button>
+          )}
+          {release.status === 'Review' && (
+            <button type="button" onClick={() => onAction('reject')}
+              className="rounded-lg border border-rose-300 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-100">
+              Reject (back to draft)
             </button>
           )}
           {release.status === 'Published' && (
@@ -509,7 +491,7 @@ function ReleaseCard({ release, approvedCount, onAction, onViewPool }) {
 }
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
-const STATUS_OPTIONS = ['All', 'Draft', 'Review', 'Published', 'Archived']
+const STATUS_OPTIONS = ['Draft', 'Review', 'Published', 'Archived', 'All']
 
 export default function DatasetReleasePage() {
   const [releases, setReleases]           = useState([])
@@ -518,10 +500,8 @@ export default function DatasetReleasePage() {
   const [loadingPool, setLoadingPool]     = useState(true)
 
   const [search, setSearch]               = useState('')
-  const [statusFilter, setStatusFilter]   = useState('All')
+  const [statusFilter, setStatusFilter]   = useState('Draft')
 
-  const [composerOpen, setComposerOpen]   = useState(false)
-  const [composerSeed, setComposerSeed]   = useState({})    // { suggestedVegetable, suggestedVersion }
   const [confirm, setConfirm]             = useState(null)   // { release, action }
   const [poolPopup, setPoolPopup]         = useState(null)   // { title, vegetables }
   const [toast, setToast]                 = useState('')
@@ -589,14 +569,31 @@ export default function DatasetReleasePage() {
     const vegsInPool = Object.keys(groups)
     if (!vegsInPool.length) { showToast('No approved captures in pool yet.'); setAutoCreating(false); return }
 
+    // Re-fetch so we don't rely on possibly-stale local state after the user
+    // deletes drafts directly in the DB.
+    const { data: freshReleases, error: fetchErr } = await supabase
+      .from('dataset_releases')
+      .select('*')
+      .order('updated_at', { ascending: false })
+    if (fetchErr) {
+      showToast(`Failed to load releases: ${fetchErr.message}`)
+      setAutoCreating(false)
+      return
+    }
+    setReleases(freshReleases ?? [])
+    const currentReleases = freshReleases ?? []
+
     let created = 0
+    let skipped = 0
+    let failed = 0
+    let lastError = null
     for (const veg of vegsInPool) {
       // Check if a Draft already exists for this vegetable
-      const existingDraft = releases.find(r =>
+      const existingDraft = currentReleases.find(r =>
         (r.status === 'Draft' || r.status === 'Review') &&
         r.vegetables?.includes(veg)
       )
-      if (existingDraft) continue // already has a draft, skip
+      if (existingDraft) { skipped++; continue } // already has a draft, skip
 
       // Find highest published version for this vegetable to bump from
       const publishedVersions = releases
@@ -620,38 +617,30 @@ export default function DatasetReleasePage() {
         })
         .select()
         .single()
-      if (!error && data) { setReleases(prev => [data, ...prev]); created++ }
+      if (!error && data) {
+        setReleases(prev => [data, ...prev])
+        created++
+      } else if (error) {
+        failed++
+        lastError = error
+        console.error('[autoCreateDrafts] insert failed for', veg, error)
+      }
     }
-    showToast(created > 0 ? `${created} draft(s) created. Review and publish when ready.` : 'All vegetables already have a draft.')
+    if (created > 0) {
+      showToast(`${created} draft(s) created. Review and publish when ready.`)
+    } else if (failed > 0) {
+      showToast(`Failed to create drafts: ${lastError?.message ?? 'unknown error'}`)
+    } else {
+      showToast(`All ${skipped} vegetable(s) already have a draft.`)
+    }
     setAutoCreating(false)
-  }
-
-  // ── Create release in Supabase ──
-  async function createRelease(form) {
-    const vegs = form.vegetables.split(',').map(v => v.trim()).filter(Boolean)
-    const { data, error } = await supabase
-      .from('dataset_releases')
-      .insert({
-        name:         form.name.trim(),
-        version:      form.version.trim(),
-        vegetables:   vegs,
-        changelog:    form.changelog.trim(),
-        sample_count: approvedCountFor(vegs),
-        fresh_ratio:  0,
-        status:       'Draft',
-        public_url:   '',
-      })
-      .select()
-      .single()
-    if (error) { showToast('Error creating release: ' + error.message); return }
-    setReleases(prev => [data, ...prev])
-    showToast(`Draft "${data.name}" created.`)
   }
 
   // ── Run a lifecycle action on a release ──
   async function runAction(release, action) {
     const updates = { updated_at: new Date().toISOString() }
     if (action === 'review')    updates.status = 'Review'
+    if (action === 'reject')    updates.status = 'Draft'
     if (action === 'publish') {
       updates.status     = 'Published'
       updates.public_url = `https://${import.meta.env.VITE_SUPABASE_URL?.match(/([^/]+\.supabase\.co)/)?.[1] ?? '<project>.supabase.co'}/storage/v1/object/public/datasets/${release.id}.zip`
@@ -710,10 +699,6 @@ export default function DatasetReleasePage() {
                 disabled={autoCreating || loadingPool || approvedCaptures.length === 0}
                 className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50">
                 {autoCreating ? 'Creating…' : 'Auto-create from pool'}
-              </button>
-              <button type="button" onClick={() => { setComposerSeed({}); setComposerOpen(true) }}
-                className="rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-white hover:opacity-90">
-                New release
               </button>
             </div>
           </div>
@@ -789,15 +774,6 @@ export default function DatasetReleasePage() {
       </section>
 
       {/* Modals */}
-      {composerOpen && (
-        <ComposerModal
-          onClose={() => setComposerOpen(false)}
-          onSave={createRelease}
-          suggestedVegetable={composerSeed.suggestedVegetable ?? ''}
-          suggestedVersion={composerSeed.suggestedVersion ?? '1.0'}
-        />
-      )}
-
       {confirm && (
         <ConfirmModal release={confirm.release} action={confirm.action}
           onClose={() => setConfirm(null)}
