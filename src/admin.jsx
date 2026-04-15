@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import DashboardPage from './pages/admin-db/dashboard'
 import DatasetPage from './pages/admin-db/dataset'
 import UserPage from './pages/admin-db/user'
 import AiResponsePage from './pages/admin-db/ai-response'
 import DatasetRetrievalPage from './pages/admin-db/dataset-retrieval'
 import DatasetReleasePage from './pages/admin-db/dataset-release'
+import { supabase } from './lib/supabase'
 
 const navItems = [
   'Dashboard',
@@ -15,7 +17,7 @@ const navItems = [
   'Dataset Release',
 ]
 
-function Sidebar({ activeNav, onNavChange }) {
+function Sidebar({ activeNav, onNavChange, onLogout, signingOut }) {
   return (
     <aside className="fixed left-0 top-0 hidden h-screen w-72 shrink-0 border-r border-surface bg-white/90 p-6 backdrop-blur-xl lg:flex lg:flex-col">
       <div className="flex items-center gap-3 pb-8">
@@ -43,6 +45,14 @@ function Sidebar({ activeNav, onNavChange }) {
       <div className="mt-auto rounded-2xl bg-surface p-4">
         <p className="text-sm font-semibold text-accent">Emily Jonson</p>
         <p className="text-xs text-accent/70">jonson@bress.com</p>
+        <button
+          type="button"
+          onClick={onLogout}
+          disabled={signingOut}
+          className="mt-3 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {signingOut ? 'Signing out...' : 'Log out'}
+        </button>
       </div>
     </aside>
   )
@@ -51,10 +61,29 @@ function Sidebar({ activeNav, onNavChange }) {
 function AdminDashboard() {
   const [activeNav, setActiveNav] = useState('Dashboard')
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  const [signingOut, setSigningOut] = useState(false)
+  const navigate = useNavigate()
 
   function handleNavChange(nextNav) {
     setActiveNav(nextNav)
     setIsMobileSidebarOpen(false)
+  }
+
+  async function handleLogout() {
+    if (signingOut) return
+
+    setSigningOut(true)
+    setIsMobileSidebarOpen(false)
+
+    const { error } = await supabase.auth.signOut({ scope: 'local' })
+
+    if (error) {
+      console.error('Failed to sign out:', error.message)
+      setSigningOut(false)
+      return
+    }
+
+    navigate('/login', { replace: true })
   }
 
   return (
@@ -117,6 +146,14 @@ function AdminDashboard() {
               <div className="mt-auto rounded-2xl bg-surface p-4">
                 <p className="text-sm font-semibold text-accent">Emily Jonson</p>
                 <p className="text-xs text-accent/70">jonson@bress.com</p>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={signingOut}
+                  className="mt-3 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {signingOut ? 'Signing out...' : 'Log out'}
+                </button>
               </div>
             </aside>
           </>
@@ -124,7 +161,12 @@ function AdminDashboard() {
       </div>
 
       <div className="flex min-h-screen w-full gap-5">
-        <Sidebar activeNav={activeNav} onNavChange={handleNavChange} />
+        <Sidebar
+          activeNav={activeNav}
+          onNavChange={handleNavChange}
+          onLogout={handleLogout}
+          signingOut={signingOut}
+        />
 
         <main className="flex-1 space-y-5 p-4 pt-20 sm:p-6 sm:pt-24 lg:ml-72 lg:p-8 lg:pt-8">
           <header className="rounded-3xl border border-surface bg-white/90 p-4 shadow-[0_12px_32px_rgba(15,23,42,0.08)] backdrop-blur-sm sm:p-5">

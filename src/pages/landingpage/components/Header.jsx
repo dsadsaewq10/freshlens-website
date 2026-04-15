@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { supabase } from '../../../lib/supabase'
+import { useAuth } from '../../../auth/useAuth'
 
 // currentPage prop: 'home' | 'technology' | 'dataset'
 function Header({ isLoaded = true, currentPage }) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [logoutError, setLogoutError] = useState('')
   const navigate = useNavigate()
   const location = useLocation()
+  const { user, role, loading } = useAuth()
 
   // Derive active page from prop or route
   const activePage = currentPage || (
@@ -42,6 +47,32 @@ function Header({ isLoaded = true, currentPage }) {
     } else {
       navigate(item.path)
     }
+  }
+
+  const roleLabel = role
+    ? role.charAt(0).toUpperCase() + role.slice(1)
+    : 'User'
+
+  const userLabel = user?.user_metadata?.username || user?.email || 'Signed in user'
+
+  const handleLogout = async ({ closeMobile } = {}) => {
+    setLogoutError('')
+    setIsLoggingOut(true)
+
+    const { error } = await supabase.auth.signOut()
+
+    if (closeMobile) {
+      setIsMobileMenuOpen(false)
+    }
+
+    if (error) {
+      setLogoutError(error.message)
+      setIsLoggingOut(false)
+      return
+    }
+
+    setIsLoggingOut(false)
+    navigate('/login', { replace: true })
   }
 
   // Active indicator styles
@@ -102,18 +133,42 @@ function Header({ isLoaded = true, currentPage }) {
 
           {/* Auth Actions */}
           <div className="hidden md:flex items-center gap-3">
-            <button
-              onClick={() => navigate('/login')}
-              className="border border-primary text-primary hover:bg-primary/5 px-5 py-2.5 rounded-lg font-semibold transition-colors"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => navigate('/signup')}
-              className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg font-semibold transition-colors"
-            >
-              Sign Up
-            </button>
+            {loading ? (
+              <p className="text-sm font-medium text-accent/70">Checking account...</p>
+            ) : user ? (
+              <>
+                <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-1.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-primary/70">
+                    {roleLabel}
+                  </p>
+                  <p className="max-w-48 truncate text-sm font-semibold text-primary">
+                    Signed in as {userLabel}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleLogout()}
+                  disabled={isLoggingOut}
+                  className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {isLoggingOut ? 'Logging out...' : 'Logout'}
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="border border-primary text-primary hover:bg-primary/5 px-5 py-2.5 rounded-lg font-semibold transition-colors"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => navigate('/signup')}
+                  className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg font-semibold transition-colors"
+                >
+                  Sign Up
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -161,20 +216,46 @@ function Header({ isLoaded = true, currentPage }) {
                 {item.label}
               </button>
             ))}
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              <button
-                onClick={() => { setIsMobileMenuOpen(false); navigate('/login'); }}
-                className="border border-primary text-primary hover:bg-primary/5 px-4 py-2.5 rounded-lg font-semibold transition-colors text-center"
-              >
-                Login
-              </button>
-              <button
-                onClick={() => { setIsMobileMenuOpen(false); navigate('/signup'); }}
-                className="bg-primary hover:bg-primary/90 text-white px-4 py-2.5 rounded-lg font-semibold transition-colors text-center"
-              >
-                Sign Up
-              </button>
-            </div>
+            {user ? (
+              <div className="mt-2 space-y-2">
+                <div className="rounded-xl border border-primary/20 bg-primary/5 px-3 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-primary/70">
+                    {roleLabel}
+                  </p>
+                  <p className="text-sm font-semibold text-primary break-all">
+                    Signed in as {userLabel}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleLogout({ closeMobile: true })}
+                  disabled={isLoggingOut}
+                  className="w-full bg-primary hover:bg-primary/90 text-white px-4 py-2.5 rounded-lg font-semibold transition-colors text-center disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {isLoggingOut ? 'Logging out...' : 'Logout'}
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <button
+                  onClick={() => { setIsMobileMenuOpen(false); navigate('/login'); }}
+                  className="border border-primary text-primary hover:bg-primary/5 px-4 py-2.5 rounded-lg font-semibold transition-colors text-center"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => { setIsMobileMenuOpen(false); navigate('/signup'); }}
+                  className="bg-primary hover:bg-primary/90 text-white px-4 py-2.5 rounded-lg font-semibold transition-colors text-center"
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
+
+            {logoutError && (
+              <p className="text-xs font-medium text-rose-600">
+                {logoutError}
+              </p>
+            )}
           </div>
         </div>
       </div>
