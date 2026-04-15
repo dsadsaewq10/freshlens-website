@@ -45,11 +45,6 @@ function statusPill(s) {
 }
 
 // ── YOLO helpers ──────────────────────────────────────────────────────────────
-function buildDataYaml(classesInRelease) {
-  const names = classesInRelease.map((c, i) => `  ${i}: ${c}`).join('\n')
-  return `path: ./dataset\ntrain: images/train\nval:   images/val\n\nnc: ${classesInRelease.length}\nnames:\n${names}`
-}
-
 function captureToYoloLines(capture, classMap) {
   const dets = parseJson(capture.reviewedDetections) ||
     (capture.reviewedClassLabel
@@ -92,9 +87,24 @@ function groupCaptures(captures) {
 // ── Pool Details Popup ────────────────────────────────────────────────────────
 // Shows the approved captures relevant to one release (or all if vegetables=[])
 // The YOLO folder tree is interactive: click a vegetable folder to see captures.
+// Deterministic 70/20/10 train/val/test split sizes so the preview matches
+// what the real YOLO export will produce at publish time.
+function splitCounts(total) {
+  const train = Math.round(total * 0.7)
+  const val   = Math.round(total * 0.2)
+  const test  = Math.max(0, total - train - val)
+  return { train, val, test }
+}
+
+function sliceForSplit(arr, split) {
+  const { train, val } = splitCounts(arr.length)
+  if (split === 'train') return arr.slice(0, train)
+  if (split === 'val')   return arr.slice(train, train + val)
+  return arr.slice(train + val)
+}
+
 function PoolPopup({ title, captures, vegetables, onClose }) {
   const [expandedNodes, setExpandedNodes] = useState({}) // key: "type/split/veg" → bool
-  const [activeTab, setActiveTab] = useState('tree') // 'tree' | 'yaml'
 
   // Filter by vegetable if specified
   const relevant = useMemo(() => {
@@ -129,41 +139,12 @@ function PoolPopup({ title, captures, vegetables, onClose }) {
     return m
   }, [classesInPool])
 
-  const dataYaml = useMemo(() => buildDataYaml(classesInPool), [classesInPool])
-
   function toggleNode(key) {
     setExpandedNodes(prev => ({ ...prev, [key]: !prev[key] }))
   }
 
-  function downloadManifest() {
-    const lines = relevant.map(c => {
-      const label = c.reviewedClassLabel || c.classLabel
-      return JSON.stringify({
-        image_url:   c.scannedImageUrl || c.scannedImagePath,
-        vegetable:   vegFromLabel(label).replace(' ', '_'),
-        label_txt:   captureToYoloLines(c, classMap),
-        class_label: label,
-        is_fresh:    freshFromLabel(label),
-        reviewed_at: c.reviewedAt,
-        source_id:   c.id,
-      })
-    }).join('\n')
-    const a = Object.assign(document.createElement('a'), {
-      href: URL.createObjectURL(new Blob([lines], { type: 'application/jsonl' })),
-      download: 'approved_captures.jsonl',
-    })
-    a.click()
-  }
-
-  function downloadDataYaml() {
-    const a = Object.assign(document.createElement('a'), {
-      href: URL.createObjectURL(new Blob([dataYaml], { type: 'text/yaml' })),
-      download: 'data.yaml',
-    })
-    a.click()
-  }
-
   const vegList = Object.keys(groups).sort()
+  const hasSmallGroup = vegList.some(v => groups[v].total < 10)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm overflow-y-auto">
@@ -184,7 +165,7 @@ function PoolPopup({ title, captures, vegetables, onClose }) {
           {relevant.length === 0 ? (
             <p className="text-center text-sm text-slate-400 py-8">
               No approved captures match this release's vegetables yet.
-              <br />Approve images in Dataset Retrieval first.
+              <br />Approve images in the Review Queue first.
             </p>
           ) : (
             <>
@@ -209,42 +190,38 @@ function PoolPopup({ title, captures, vegetables, onClose }) {
                 })}
               </div>
 
-              {/* Tab bar */}
-              <div className="flex gap-2 border-b border-slate-100">
-                {[['tree','YOLO Folder Tree'],['yaml','data.yaml']].map(([tab, label]) => (
-                  <button key={tab} type="button" onClick={() => setActiveTab(tab)}
-                    className={`pb-2 text-xs font-semibold border-b-2 transition-colors ${
-                      activeTab === tab
-                        ? 'border-cyan-500 text-cyan-600'
-                        : 'border-transparent text-slate-400 hover:text-slate-600'}`}>
-                    {label}
-                  </button>
-                ))}
+              {/* Section header */}
+              <div className="flex items-baseline justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Preview · YOLO folder layout</p>
+                <p className="text-[11px] text-slate-400">Split 70 / 20 / 10 (train / val / test)</p>
               </div>
 
-              {/* YOLO folder tree (interactive) */}
-              {activeTab === 'tree' && (
-                <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 font-mono text-xs text-slate-600 space-y-0.5">
+              {hasSmallGroup && (
+                <p className="rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                  Some vegetables have fewer than 10 approved captures. The split will still work but
+                  val/test folders may be empty — approve more captures in the Review Queue for a balanced release.
+                </p>
+              )}
+
+              {/* YOLO folder tree (interactive, view-only) */}
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 font-mono text-xs text-slate-600 space-y-0.5">
                   {/* Root */}
                   <p>📁 dataset/</p>
                   <p className="pl-4 text-yellow-600">📄 data.yaml</p>
 
                   {['images','labels'].map(type => (
                     <div key={type}>
-                      {['train','val'].map(split => (
+                      {['train','val','test'].map(split => (
                         <div key={split}>
                           <p className="pl-4 text-blue-500">📁 {type}/{split}/</p>
                           {vegList.map(veg => {
                             const nodeKey = `${type}/${split}/${veg}`
                             const isOpen  = expandedNodes[nodeKey]
-                            const count   = split === 'train'
-                              ? Math.round(groups[veg].total * 0.8)
-                              : Math.round(groups[veg].total * 0.2)
+                            const sc      = splitCounts(groups[veg].total)
+                            const count   = sc[split]
                             // only show captures for the images/ type (labels are derived)
                             const vegCaptures = capturesByVeg[veg] ?? []
-                            const slicedCaps  = split === 'train'
-                              ? vegCaptures.slice(0, Math.round(vegCaptures.length * 0.8))
-                              : vegCaptures.slice(Math.round(vegCaptures.length * 0.8))
+                            const slicedCaps  = sliceForSplit(vegCaptures, split)
 
                             return (
                               <div key={veg}>
@@ -351,32 +328,6 @@ function PoolPopup({ title, captures, vegetables, onClose }) {
                     </div>
                   ))}
                 </div>
-              )}
-
-              {/* data.yaml preview */}
-              {activeTab === 'yaml' && (
-                <pre className="overflow-x-auto rounded-2xl border border-slate-100 bg-slate-900 px-5 py-4 text-[11px] text-emerald-300 leading-relaxed">
-                  {dataYaml}
-                </pre>
-              )}
-
-              {/* Downloads */}
-              <div className="flex flex-wrap gap-3">
-                <button type="button" onClick={downloadManifest}
-                  className="rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-white hover:opacity-90">
-                  Download approved_captures.jsonl
-                </button>
-                <button type="button" onClick={downloadDataYaml}
-                  className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
-                  Download data.yaml
-                </button>
-              </div>
-
-              <p className="rounded-xl border border-amber-100 bg-amber-50 p-3 text-xs text-amber-700 leading-relaxed">
-                <strong>How to retrain:</strong> Download the JSONL, fetch each <code className="font-mono mx-0.5">image_url</code>,
-                save each <code className="font-mono mx-0.5">label_txt</code> as a <code className="font-mono mx-0.5">.txt</code> file
-                alongside the image, then point YOLOv8 at <code className="font-mono mx-0.5">data.yaml</code>.
-              </p>
             </>
           )}
         </div>

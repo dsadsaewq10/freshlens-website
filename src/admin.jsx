@@ -11,7 +11,7 @@ const navItems = [
   'Dataset',
   'User Management',
   'AI Responses',
-  'Dataset Retrieval',
+  'Review Queue',
   'Dataset Release',
 ]
 
@@ -138,7 +138,7 @@ function AdminDashboard() {
           {activeNav === 'Dataset' && <DatasetPage />}
           {activeNav === 'User Management' && <UserPage />}
           {activeNav === 'AI Responses' && <AiResponsePage />}
-          {activeNav === 'Dataset Retrieval' && <DatasetRetrievalPage />}
+          {activeNav === 'Review Queue' && <DatasetRetrievalPage />}
           {activeNav === 'Dataset Release' && <DatasetReleasePage />}
         </main>
       </div>
