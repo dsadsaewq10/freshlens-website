@@ -260,7 +260,7 @@ function AiResponsePage() {
 								<div className="flex flex-wrap items-start justify-between gap-3">
 									<div className="min-w-0 flex-1">
 										<div className="flex flex-wrap items-center gap-2">
-											<span className="text-xs font-mono text-slate-500 truncate max-w-[260px]">{entry.sessionTitle}</span>
+											<span className="text-xs font-mono text-slate-500 truncate max-w-65">{entry.sessionTitle}</span>
 											<span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass(entry.status)}`}>
 												{entry.status}
 											</span>
@@ -320,7 +320,7 @@ function AiResponsePage() {
 					<div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl sm:p-6">
 						<div className="mb-4 flex items-start justify-between gap-2">
 							<div>
-								<h2 className="text-xl font-semibold text-slate-900 truncate max-w-[380px]">{selected.sessionTitle}</h2>
+								<h2 className="text-xl font-semibold text-slate-900 truncate max-w-95">{selected.sessionTitle}</h2>
 								<p className="text-sm text-slate-500">
 									by {selected.user} · {formatTimestamp(selected.capturedAt)} · {selected.provider}
 								</p>

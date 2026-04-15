@@ -367,7 +367,7 @@ function ConfirmModal({ release, action, onClose, onConfirm }) {
 }
 
 // ── Release Card ──────────────────────────────────────────────────────────────
-function ReleaseCard({ release, approvedCount, onAction, onViewPool }) {
+function ReleaseCard({ release, approvedCount, onAction, onViewPool, publishingReleaseId }) {
   return (
     <article className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -415,8 +415,17 @@ function ReleaseCard({ release, approvedCount, onAction, onViewPool }) {
           )}
           {(release.status === 'Draft' || release.status === 'Review') && (
             <button type="button" onClick={() => onAction('publish')}
-              className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700">
-              {release.status === 'Review' ? 'Approve & publish' : 'Publish'}
+              disabled={publishingReleaseId === release.id}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium text-white transition ${
+                publishingReleaseId === release.id
+                  ? 'bg-emerald-400 cursor-not-allowed'
+                  : 'bg-emerald-600 hover:bg-emerald-700'
+              }`}>
+              {publishingReleaseId === release.id
+                ? '⟳ Building dataset...'
+                : release.status === 'Review'
+                ? 'Approve & publish'
+                : 'Publish'}
             </button>
           )}
           {release.status === 'Review' && (
@@ -457,6 +466,7 @@ export default function DatasetReleasePage() {
   const [poolPopup, setPoolPopup]         = useState(null)   // { title, vegetables }
   const [toast, setToast]                 = useState('')
   const [autoCreating, setAutoCreating]   = useState(false)
+  const [publishingReleaseId, setPublishingId] = useState(null) // Track publishing state
 
   function showToast(msg) { setToast(msg); setTimeout(() => setToast(''), 4000) }
 
@@ -589,16 +599,63 @@ export default function DatasetReleasePage() {
 
   // ── Run a lifecycle action on a release ──
   async function runAction(release, action) {
+    // Special handling for publish: call Edge Function to build YOLO dataset
+    if (action === 'publish') {
+      setPublishingId(release.id)
+      showToast(`Building dataset for ${release.name}...`)
+
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/build-release`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({ releaseId: release.id }),
+          }
+        )
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          showToast(`Build failed: ${errorData.error || 'Unknown error'}`)
+          setPublishingId(null)
+          return
+        }
+
+        const result = await response.json()
+
+        // Refresh the release data from database to get the updated values
+        const { data, error } = await supabase
+          .from('dataset_releases')
+          .select('*')
+          .eq('id', release.id)
+          .single()
+
+        if (error) {
+          showToast('Refresh failed: ' + error.message)
+          setPublishingId(null)
+          return
+        }
+
+        setReleases(prev => prev.map(r => r.id === release.id ? data : r))
+        showToast(`✓ ${release.name} published! ${result.sampleCount} samples, ${result.freshRatio}% fresh.`)
+      } catch (error) {
+        showToast(`Build error: ${error.message}`)
+      } finally {
+        setPublishingId(null)
+      }
+      return
+    }
+
+    // Handle other actions
     const updates = { updated_at: new Date().toISOString() }
     if (action === 'review')    updates.status = 'Review'
     if (action === 'reject')    updates.status = 'Draft'
-    if (action === 'publish') {
-      updates.status     = 'Published'
-      updates.public_url = `https://${import.meta.env.VITE_SUPABASE_URL?.match(/([^/]+\.supabase\.co)/)?.[1] ?? '<project>.supabase.co'}/storage/v1/object/public/datasets/${release.id}.zip`
-      updates.sample_count = approvedCountFor(release.vegetables)
-    }
     if (action === 'unpublish') { updates.status = 'Draft'; updates.public_url = '' }
     if (action === 'archive')   updates.status = 'Archived'
+
     if (action === 'delete') {
       const { error } = await supabase.from('dataset_releases').delete().eq('id', release.id)
       if (error) { showToast('Delete failed: ' + error.message); return }
@@ -606,6 +663,7 @@ export default function DatasetReleasePage() {
       showToast(`Deleted ${release.name}.`)
       return
     }
+
     const { data, error } = await supabase
       .from('dataset_releases').update(updates).eq('id', release.id).select().single()
     if (error) { showToast('Update failed: ' + error.message); return }
@@ -702,6 +760,7 @@ export default function DatasetReleasePage() {
                   <ReleaseCard key={r.id} release={r}
                     approvedCount={approvedCountFor(r.vegetables)}
                     onAction={action => setConfirm({ release: r, action })}
+                    publishingReleaseId={publishingReleaseId}
                     onViewPool={() => setPoolPopup({
                       title: `${r.name} — approved pool`,
                       vegetables: r.vegetables ?? [],

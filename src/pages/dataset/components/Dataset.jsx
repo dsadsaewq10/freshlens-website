@@ -493,7 +493,7 @@ function ReleasePreviewModal({ release, onClose }) {
   }, [captures])
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/60 p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-70 flex items-center justify-center bg-slate-900/60 p-4" onClick={onClose}>
       <div
         className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
