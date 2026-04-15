@@ -57,6 +57,11 @@ const analyticsByPeriod = {
 
 const vegetableLabels = ['Tomato', 'Carrot', 'Cabbage', 'Pepper', 'Cucumber']
 
+function formatNumber(value) {
+  if (value == null) return '0'
+  return Number(value).toLocaleString()
+}
+
 function buildCoordinates(values, width = 420, height = 180, padding = 16) {
   const max = Math.max(...values)
   const min = Math.min(...values)
@@ -82,7 +87,14 @@ function buildAreaPath(values, width = 420, height = 180, padding = 16) {
   return `M ${firstPoint.x} ${height - padding} L ${linePath} L ${lastPoint.x} ${height - padding} Z`
 }
 
-function InteractiveLineChart({ values, secondaryValues, areaValues, width = 420, height = 180 }) {
+function InteractiveLineChart({
+  values,
+  secondaryValues,
+  areaValues,
+  width = 420,
+  height = 180,
+  chartClassName = 'mt-4 h-32 w-full text-primary sm:h-36',
+}) {
   const [activeIndex, setActiveIndex] = useState(null)
   const mainPoints = useMemo(() => buildPolylinePoints(values, width, height), [values, width, height])
   const coords = useMemo(() => buildCoordinates(values, width, height), [values, width, height])
@@ -96,7 +108,7 @@ function InteractiveLineChart({ values, secondaryValues, areaValues, width = 420
   )
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="mt-4 h-32 w-full text-primary sm:h-36">
+    <svg viewBox={`0 0 ${width} ${height}`} className={chartClassName}>
       {areaValues && <path d={areaPath} fill="currentColor" fillOpacity="0.12" />}
       {secondaryValues && (
         <polyline
@@ -142,6 +154,184 @@ function InteractiveLineChart({ values, secondaryValues, areaValues, width = 420
         </g>
       )}
     </svg>
+  )
+}
+
+function buildDateLabels(count, selectedPeriod) {
+  const today = new Date()
+  const formatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' })
+  const totalDays = selectedPeriod === '1D' ? 1 : selectedPeriod === '7D' ? 7 : 30
+
+  return Array.from({ length: count }, (_, index) => {
+    const stepRatio = count <= 1 ? 0 : (count - 1 - index) / (count - 1)
+    const dayOffset = Math.round(stepRatio * (totalDays - 1))
+    const day = new Date(today)
+    day.setDate(today.getDate() - dayOffset)
+    return formatter.format(day)
+  })
+}
+
+function DauMauBarChart({ dauValues, mauValues, selectedPeriod }) {
+  const dauCounts = dauValues.map((value) => Math.round(value * 1000))
+  const mauCounts = mauValues.map((value) => Math.round(value * 1000))
+  const dateLabels = useMemo(
+    () => buildDateLabels(dauCounts.length, selectedPeriod),
+    [dauCounts.length, selectedPeriod],
+  )
+
+  const baseMax = Math.max(...dauCounts, ...mauCounts, 3000)
+  const tickStep = baseMax <= 10000 ? 1000 : baseMax <= 20000 ? 2000 : baseMax <= 50000 ? 5000 : 10000
+  const yMax = Math.ceil(baseMax / tickStep) * tickStep
+  const yTicks = Array.from({ length: yMax / tickStep + 1 }, (_, index) => index * tickStep)
+
+  const width = 860
+  const height = 370
+  const leftPadding = 60
+  const rightPadding = 18
+  const topPadding = 20
+  const bottomPadding = 62
+  const chartWidth = width - leftPadding - rightPadding
+  const chartHeight = height - topPadding - bottomPadding
+  const groupWidth = chartWidth / Math.max(dauCounts.length, 1)
+  const barWidth = Math.max(5, Math.min(16, groupWidth * 0.22))
+  const groupGap = Math.max(2, Math.min(10, groupWidth * 0.1))
+
+  const toY = (value) => topPadding + chartHeight - (value / yMax) * chartHeight
+  const axisBottomY = topPadding + chartHeight
+
+  const shouldRotateXLabels = dateLabels.length > 8
+
+  return (
+    <>
+      <svg viewBox={`0 0 ${width} ${height}`} className="mt-4 h-72 w-full">
+        <line
+          x1={leftPadding}
+          y1={topPadding}
+          x2={leftPadding}
+          y2={axisBottomY}
+          stroke="rgba(100,116,139,0.6)"
+          strokeWidth="1"
+        />
+        <line
+          x1={leftPadding}
+          y1={axisBottomY}
+          x2={leftPadding + chartWidth}
+          y2={axisBottomY}
+          stroke="rgba(100,116,139,0.6)"
+          strokeWidth="1"
+        />
+
+        {yTicks.map((tick) => {
+          const y = toY(tick)
+          return (
+            <g key={tick}>
+              <line
+                x1={leftPadding}
+                y1={y}
+                x2={leftPadding + chartWidth}
+                y2={y}
+                stroke="rgba(148,163,184,0.25)"
+                strokeWidth="1"
+              />
+              <text
+                x={leftPadding - 8}
+                y={y + 3}
+                textAnchor="end"
+                fontSize="10"
+                fill="rgba(71,85,105,0.9)"
+              >
+                {formatNumber(tick)}
+              </text>
+            </g>
+          )
+        })}
+
+        {dauCounts.map((dauValue, index) => {
+          const mauValue = mauCounts[index] ?? 0
+          const groupStartX = leftPadding + index * groupWidth
+          const dauX = groupStartX + groupWidth / 2 - barWidth - groupGap / 2
+          const mauX = groupStartX + groupWidth / 2 + groupGap / 2
+          const dauY = toY(dauValue)
+          const mauY = toY(mauValue)
+          const labelX = groupStartX + groupWidth / 2
+
+          return (
+            <g key={index}>
+              <rect
+                x={dauX}
+                y={dauY}
+                width={barWidth}
+                height={Math.max(2, axisBottomY - dauY)}
+                rx="3"
+                fill="rgba(15,109,118,0.95)"
+              />
+              <rect
+                x={mauX}
+                y={mauY}
+                width={barWidth}
+                height={Math.max(2, axisBottomY - mauY)}
+                rx="3"
+                fill="rgba(15,109,118,0.35)"
+              />
+
+              {shouldRotateXLabels ? (
+                <text
+                  x={labelX}
+                  y={axisBottomY + 20}
+                  textAnchor="end"
+                  fontSize="10"
+                  fill="rgba(51,65,85,0.95)"
+                  transform={`rotate(-35 ${labelX} ${axisBottomY + 20})`}
+                >
+                  {dateLabels[index]}
+                </text>
+              ) : (
+                <text
+                  x={labelX}
+                  y={axisBottomY + 16}
+                  textAnchor="middle"
+                  fontSize="10"
+                  fill="rgba(51,65,85,0.95)"
+                >
+                  {dateLabels[index]}
+                </text>
+              )}
+            </g>
+          )
+        })}
+
+        <text
+          x={leftPadding + chartWidth / 2}
+          y={height - 6}
+          textAnchor="middle"
+          fontSize="10"
+          fill="rgba(71,85,105,0.95)"
+        >
+          Date (X-axis)
+        </text>
+        <text
+          x="16"
+          y={topPadding + chartHeight / 2}
+          textAnchor="middle"
+          fontSize="10"
+          fill="rgba(71,85,105,0.95)"
+          transform={`rotate(-90 16 ${topPadding + chartHeight / 2})`}
+        >
+          Users (Y-axis)
+        </text>
+      </svg>
+
+      <div className="mt-3 flex items-center justify-center gap-6 text-xs font-medium text-[rgba(50,52,62,0.8)]">
+        <div className="flex items-center gap-2">
+          <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+          <span>DAU</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="h-2.5 w-2.5 rounded-full bg-primary/35" />
+          <span>MAU</span>
+        </div>
+      </div>
+    </>
   )
 }
 
@@ -217,6 +407,12 @@ function DashboardPage() {
     }))
   }, [analytics.popularity])
 
+  const totalDownloadCount = useMemo(
+    () => analytics.downloads.reduce((sum, value) => sum + value, 0),
+    [analytics.downloads],
+  )
+  const maxDownloadCount = Math.max(...analytics.downloads, 1)
+
   return (
     <section ref={dashboardPanelRef} className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-[rgba(226,232,240,0.8)] bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] sm:p-7">
@@ -247,74 +443,29 @@ function DashboardPage() {
               </button>
             ))}
           </div>
+          <p className="rounded-xl bg-surface px-3 py-2 text-xs font-medium text-accent/80">Tuesday, 9th March</p>
         </div>
         {exportError && <p className="w-full text-xs font-medium text-[rgb(220,38,38)]">{exportError}</p>}
       </div>
 
       <div className="grid auto-rows-[minmax(220px,auto)] gap-4 sm:grid-cols-2 xl:grid-cols-12">
-          <article className="rounded-2xl bg-primary p-4 text-white sm:col-span-2 xl:col-span-5">
-            <p className="text-xs font-semibold uppercase tracking-wide opacity-80">Analytics Overview</p>
-            <p className="mt-2 text-3xl font-semibold">{analytics.overviewTotal} total</p>
-            <p className="mt-1 text-sm opacity-85">KPI cards show correct totals</p>
-            <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {[68, 82, 74, 91].map((value, index) => (
-                <div key={index} className="rounded-xl bg-[rgba(255,255,255,0.15)] p-2">
-                  <div className="h-16 rounded-lg bg-[rgba(255,255,255,0.2)]">
-                    <div className="rounded-lg bg-white" style={{ height: `${value}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </article>
-
-          <article className="rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-7">
+          <article className="rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-8 xl:min-h-130">
             <p className="text-xs font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">DAU / MAU Metrics</p>
             <p className="mt-2 text-3xl font-semibold">{analytics.dau}k / {analytics.mau}k</p>
             <p className="mt-1 text-sm text-[rgba(50,52,62,0.7)]">Daily and monthly active users</p>
-            <InteractiveLineChart values={analytics.dauSeries} secondaryValues={analytics.mauSeries} />
+            <DauMauBarChart dauValues={analytics.dauSeries} mauValues={analytics.mauSeries} selectedPeriod={selectedPeriod} />
           </article>
 
-          <article className="rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">New User Trend</p>
+          <article className="rounded-2xl bg-primary p-4 text-white sm:col-span-2 xl:col-span-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-white/80">New User Trend</p>
             <p className="mt-2 text-3xl font-semibold">+{analytics.newUsers}%</p>
-            <p className="mt-1 text-sm text-[rgba(50,52,62,0.7)]">Registration trend accuracy</p>
-            <InteractiveLineChart values={analytics.newUserSeries} areaValues={analytics.newUserSeries} />
-          </article>
-
-          <article className="flex min-h-80 flex-col rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">User Retention</p>
-            <p className="mt-2 text-3xl font-semibold">D1 {analytics.retention[0]}% · D7 {analytics.retention[1]}%</p>
-            <p className="mt-1 text-sm text-[rgba(50,52,62,0.7)]">Retention cohorts</p>
-            <div className="mt-4 flex flex-1 flex-col items-center justify-center gap-4 text-center sm:flex-row sm:justify-center sm:text-left">
-              <svg viewBox="0 0 120 120" className="h-28 w-28 -rotate-90 sm:h-36 sm:w-36">
-                {analytics.retention.map((value, index) => {
-                  const radius = 40 - index * 7
-                  const circumference = 2 * Math.PI * radius
-                  const dash = `${(value / 100) * circumference} ${circumference}`
-                  const strokeOpacity = index === 0 ? 1 : index === 1 ? 0.45 : 0.25
-                  return (
-                    <circle
-                      key={index}
-                      cx="60"
-                      cy="60"
-                      r={radius}
-                      fill="none"
-                      className="text-primary"
-                      strokeWidth="7"
-                      strokeLinecap="round"
-                      strokeDasharray={dash}
-                      stroke="currentColor"
-                      strokeOpacity={strokeOpacity}
-                    />
-                  )
-                })}
-              </svg>
-              <div className="space-y-2 text-sm text-[rgba(50,52,62,0.75)]">
-                <p>D1: {analytics.retention[0]}%</p>
-                <p>D7: {analytics.retention[1]}%</p>
-                <p>D30: {analytics.retention[2]}%</p>
-              </div>
-            </div>
+            <p className="mt-1 text-sm text-white/80">Registration trend accuracy</p>
+            <InteractiveLineChart
+              values={analytics.newUserSeries}
+              areaValues={analytics.newUserSeries}
+              height={370}
+              chartClassName="mt-4 h-72 w-full text-white"
+            />
           </article>
 
           <article className="rounded-2xl bg-surface p-4 text-accent sm:col-span-2 xl:col-span-4">
@@ -324,40 +475,7 @@ function DashboardPage() {
             <InteractiveLineChart values={analytics.dailySeries} areaValues={analytics.dailySeries} />
           </article>
 
-          <article className="flex min-h-80 flex-col rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-4 xl:row-span-2">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">Fresh vs Not Fresh</p>
-            <p className="mt-2 text-4xl font-semibold">{analytics.freshness.fresh}% / {analytics.freshness.notFresh}%</p>
-            <p className="mt-1 text-base text-[rgba(50,52,62,0.7)]">Classification distribution</p>
-            <div className="flex flex-1 items-center justify-center">
-              <svg viewBox="0 0 180 180" className="h-44 w-44 text-primary sm:h-52 sm:w-52">
-                <circle cx="90" cy="90" r="62" fill="none" stroke="currentColor" strokeOpacity="0.18" strokeWidth="28" />
-                <circle
-                  cx="90"
-                  cy="90"
-                  r="62"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="28"
-                  strokeDasharray={`${(analytics.freshness.fresh / 100) * 390} 390`}
-                  strokeDashoffset="65"
-                  strokeLinecap="round"
-                  transform="rotate(-90 90 90)"
-                />
-              </svg>
-            </div>
-            <div className="mt-2 flex items-center justify-center gap-6 text-sm font-medium">
-              <div className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full bg-primary" />
-                <span className="text-[rgba(50,52,62,0.85)]">Fresh ({analytics.freshness.fresh}%)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full bg-[rgba(40,90,83,0.3)]" />
-                <span className="text-[rgba(50,52,62,0.85)]">Not Fresh ({analytics.freshness.notFresh}%)</span>
-              </div>
-            </div>
-          </article>
-
-          <article className="rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-4">
+          <article className="rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-8">
             <p className="text-xs font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">Vegetable Popularity</p>
             <p className="mt-2 text-3xl font-semibold">Top scanned vegetables</p>
             <p className="mt-1 text-sm text-[rgba(50,52,62,0.7)]">Tomato, Carrot, Cabbage</p>
@@ -373,51 +491,25 @@ function DashboardPage() {
             </div>
           </article>
 
-          <article className="rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">Confidence Distribution</p>
-            <p className="mt-2 text-3xl font-semibold">0.82 avg</p>
-            <p className="mt-1 text-sm text-[rgba(50,52,62,0.7)]">Histogram / confidence bins</p>
-            <div className="mt-4 flex h-36 items-end gap-2">
-              {analytics.confidence.map((value, index) => (
-                <div key={index} className="flex-1 rounded-t-lg bg-[rgba(40,90,83,0.35)]" style={{ height: `${value}%` }} />
-              ))}
-            </div>
-          </article>
-
-          <article className="rounded-2xl bg-primary p-4 text-white sm:col-span-2 xl:col-span-8 xl:col-start-5">
+          <article className="rounded-2xl bg-primary p-4 text-white sm:col-span-2 xl:col-span-12">
             <p className="text-xs font-semibold uppercase tracking-wide opacity-80">Dataset Download Analytics</p>
-            <p className="mt-2 text-3xl font-semibold">1.9k downloads</p>
+            <p className="mt-2 text-3xl font-semibold">{formatNumber(totalDownloadCount)} downloads</p>
             <p className="mt-1 text-sm opacity-85">Counts per dataset</p>
             <div className="mt-4 space-y-3">
               {analytics.downloads.map((item, index) => (
                 <div key={index}>
                   <div className="mb-1 flex items-center justify-between text-xs">
                     <span>{vegetableLabels[index]}</span>
-                    <span>{item}%</span>
+                    <span>{formatNumber(item)}</span>
                   </div>
                   <div className="h-2 rounded-full bg-[rgba(255,255,255,0.15)]">
-                    <div className="h-2 rounded-full bg-white" style={{ width: `${item}%` }} />
+                    <div className="h-2 rounded-full bg-white" style={{ width: `${(item / maxDownloadCount) * 100}%` }} />
                   </div>
                 </div>
               ))}
             </div>
           </article>
 
-          <article className="rounded-2xl border border-surface bg-white p-4 text-accent sm:col-span-2 xl:col-span-4 xl:col-start-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[rgba(50,52,62,0.7)]">Data Consistency</p>
-            <p className="mt-2 text-3xl font-semibold">{analytics.consistency}</p>
-            <p className="mt-1 text-sm text-[rgba(50,52,62,0.7)]">Totals match database report</p>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-xl bg-surface p-3">
-                <p className="text-xs text-[rgba(50,52,62,0.7)]">Analytics</p>
-                <p className="mt-1 font-semibold">{analytics.overviewTotal} total</p>
-              </div>
-              <div className="rounded-xl bg-surface p-3">
-                <p className="text-xs text-[rgba(50,52,62,0.7)]">Database</p>
-                <p className="mt-1 font-semibold">{analytics.overviewTotal} total</p>
-              </div>
-            </div>
-          </article>
       </div>
     </section>
   )

@@ -60,10 +60,6 @@ function UserPage() {
 	const [selectedUser, setSelectedUser] = useState(null)
 	const [userToDelete, setUserToDelete] = useState(null)
 	const [statusToConfirm, setStatusToConfirm] = useState(null)
-	const [isSaveConfirmOpen, setIsSaveConfirmOpen] = useState(false)
-	const [modalForm, setModalForm] = useState(null)
-	const [isEditing, setIsEditing] = useState(false)
-	const [successMessage, setSuccessMessage] = useState('')
 	const [updateLogs, setUpdateLogs] = useState([])
 
 	const filteredUsers = useMemo(() => {
@@ -79,20 +75,6 @@ function UserPage() {
 		})
 	}, [users, userSearch, roleFilter])
 
-	function openUserModal(user) {
-		setSelectedUser(user)
-		setModalForm(user)
-		setIsEditing(false)
-	}
-
-	function closeUserModal() {
-		setSelectedUser(null)
-		setModalForm(null)
-		setIsEditing(false)
-		setStatusToConfirm(null)
-		setIsSaveConfirmOpen(false)
-	}
-
 	function updateUserStatusById(userId, nextStatus) {
 		setUsers((prevUsers) =>
 			prevUsers.map((user) =>
@@ -106,43 +88,14 @@ function UserPage() {
 		)
 	}
 
-	function updateAccountStatus(nextStatus) {
-		if (!selectedUser) {
-			return
-		}
-
-		updateUserStatusById(selectedUser.id, nextStatus)
-
-		setSelectedUser((prevSelectedUser) => {
-			if (!prevSelectedUser) {
-				return null
-			}
-			return {
-				...prevSelectedUser,
-				status: nextStatus,
-			}
-		})
-
-		setModalForm((prevForm) => {
-			if (!prevForm) {
-				return null
-			}
-			return {
-				...prevForm,
-				status: nextStatus,
-			}
-		})
-	}
-
-	function openStatusConfirm(nextStatus) {
-		if (!selectedUser) {
-			return
-		}
+	function openStatusConfirm(user, nextStatus) {
+		setSelectedUser(user)
 		setStatusToConfirm(nextStatus)
 	}
 
 	function closeStatusConfirm() {
 		setStatusToConfirm(null)
+		setSelectedUser(null)
 	}
 
 	function confirmStatusChange() {
@@ -150,91 +103,20 @@ function UserPage() {
 			return
 		}
 
-		updateAccountStatus(statusToConfirm)
-		setSuccessMessage(`Account status updated to ${statusToConfirm}.`)
-		setStatusToConfirm(null)
-	}
-
-	function handleModalInputChange(field, value) {
-		setModalForm((prevForm) => {
-			if (!prevForm) {
-				return null
-			}
-			return {
-				...prevForm,
-				[field]: value,
-			}
-		})
-	}
-
-	function confirmSaveEdit() {
-		if (!selectedUser || !modalForm) {
-			return
-		}
-
-		setUsers((prevUsers) =>
-			prevUsers.map((user) =>
-				user.id === selectedUser.id
-					? {
-						...user,
-						username: modalForm.username,
-						email: modalForm.email,
-						password: modalForm.password,
-					}
-					: user,
-			),
-		)
-
-		setSelectedUser({
-			...selectedUser,
-			username: modalForm.username,
-			email: modalForm.email,
-			password: modalForm.password,
-		})
-
+		updateUserStatusById(selectedUser.id, statusToConfirm)
 		setUpdateLogs((prevLogs) => [
 			{
 				id: Date.now(),
-				message: `Updated ${selectedUser.name}: ${modalForm.username} / ${modalForm.email}`,
+				message: `Set ${selectedUser.username} to ${statusToConfirm}`,
 			},
 			...prevLogs,
 		])
-		setSuccessMessage('User profile updated successfully.')
-		setIsEditing(false)
-		setIsSaveConfirmOpen(false)
-	}
-
-	function handleEditOrSave() {
-		if (!selectedUser || !modalForm) {
-			return
-		}
-
-		if (!isEditing) {
-			setIsEditing(true)
-			return
-		}
-
-		setIsSaveConfirmOpen(true)
-	}
-
-	function closeSaveConfirm() {
-		setIsSaveConfirmOpen(false)
-	}
-
-	function handleCancelEdit() {
-		if (!selectedUser) {
-			return
-		}
-
-		setModalForm(selectedUser)
-		setSuccessMessage('')
-		setIsEditing(false)
-		setIsSaveConfirmOpen(false)
+		setStatusToConfirm(null)
+		setSelectedUser(null)
 	}
 
 	function openDeleteConfirm(user) {
-		setStatusToConfirm(null)
-		setIsSaveConfirmOpen(false)
+		closeStatusConfirm()
 		setUserToDelete(user)
 	}
 
@@ -256,12 +138,8 @@ function UserPage() {
 			...prevLogs,
 		])
 
-		if (selectedUser && selectedUser.id === userToDelete.id) {
-			closeUserModal()
-		}
-
 		setStatusToConfirm(null)
-		setIsSaveConfirmOpen(false)
+		setSelectedUser(null)
 		setUserToDelete(null)
 	}
 
@@ -315,10 +193,12 @@ function UserPage() {
 							<div className="mt-4 flex flex-wrap gap-2">
 								<button
 									type="button"
-									onClick={() => openUserModal(user)}
-									className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
+									onClick={() => openStatusConfirm(user, user.status === 'Active' ? 'Deactivated' : 'Active')}
+									className={`rounded-lg px-3 py-1.5 text-xs font-medium text-white ${
+										user.status === 'Active' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-emerald-600 hover:bg-emerald-700'
+									}`}
 								>
-									View profile
+									{user.status === 'Active' ? 'Deactivate' : 'Reactivate'}
 								</button>
 								<button
 									type="button"
@@ -360,10 +240,12 @@ function UserPage() {
 										<div className="flex flex-wrap gap-2">
 											<button
 												type="button"
-												onClick={() => openUserModal(user)}
-												className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
+												onClick={() => openStatusConfirm(user, user.status === 'Active' ? 'Deactivated' : 'Active')}
+												className={`rounded-lg px-3 py-1.5 text-xs font-medium text-white ${
+													user.status === 'Active' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-emerald-600 hover:bg-emerald-700'
+												}`}
 											>
-												View profile
+												{user.status === 'Active' ? 'Deactivate' : 'Reactivate'}
 											</button>
 											<button
 												type="button"
@@ -385,7 +267,7 @@ function UserPage() {
 
 				{updateLogs.length > 0 && (
 					<div className="mt-5 rounded-xl border border-emerald-100 bg-emerald-50/60 p-3">
-						<p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Recent profile updates</p>
+						<p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Recent account updates</p>
 						<ul className="mt-2 space-y-1 text-xs text-emerald-800">
 							{updateLogs.slice(0, 5).map((log) => (
 								<li key={log.id}>{log.message}</li>
@@ -395,98 +277,6 @@ function UserPage() {
 				)}
 			</div>
 			</section>
-
-			{selectedUser && modalForm && (
-				<div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4">
-					<div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl sm:p-6">
-						<div className="mb-5 flex items-start justify-between gap-2">
-							<div>
-								<h2 className="text-xl font-semibold text-slate-900">User information</h2>
-								<p className="text-sm text-slate-500">Manage account status and review credentials</p>
-							</div>
-							<button
-								type="button"
-								onClick={closeUserModal}
-								className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
-							>
-								Close
-							</button>
-						</div>
-
-						<div className="space-y-3">
-							<label className="block text-sm">
-								<span className="mb-1 block text-slate-500">Username</span>
-								<input
-									type="text"
-									value={modalForm.username}
-									onChange={(event) => handleModalInputChange('username', event.target.value)}
-									readOnly={!isEditing}
-									className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-700"
-								/>
-							</label>
-							<label className="block text-sm">
-								<span className="mb-1 block text-slate-500">Email</span>
-								<input
-									type="email"
-									value={modalForm.email}
-									onChange={(event) => handleModalInputChange('email', event.target.value)}
-									readOnly={!isEditing}
-									className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-700"
-								/>
-							</label>
-							<label className="block text-sm">
-								<span className="mb-1 block text-slate-500">Password</span>
-								<input
-									type="text"
-									value={modalForm.password}
-									onChange={(event) => handleModalInputChange('password', event.target.value)}
-									readOnly={!isEditing}
-									className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-700"
-								/>
-							</label>
-						</div>
-
-						<div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-							<span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass(modalForm.status)}`}>
-								{modalForm.status}
-							</span>
-							{successMessage && <p className="text-xs font-medium text-emerald-700">{successMessage}</p>}
-							<div className="flex w-full flex-wrap gap-2 sm:w-auto">
-								<button
-									type="button"
-									onClick={handleEditOrSave}
-									className="rounded-lg bg-slate-800 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-900"
-								>
-									{isEditing ? 'Save' : 'Edit'}
-								</button>
-								{isEditing && (
-									<button
-										type="button"
-										onClick={handleCancelEdit}
-										className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
-									>
-										Cancel
-									</button>
-								)}
-								<button
-									type="button"
-									onClick={() => openStatusConfirm('Active')}
-									className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
-								>
-									Activate
-								</button>
-								<button
-									type="button"
-									onClick={() => openStatusConfirm('Deactivated')}
-									className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-semibold text-white hover:bg-rose-700"
-								>
-									Deactivate
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			)}
 
 			{statusToConfirm && selectedUser && (
 				<div className="fixed inset-0 z-60 flex items-center justify-center bg-slate-900/45 p-4">
@@ -512,33 +302,6 @@ function UserPage() {
 								}`}
 							>
 								Yes, confirm
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
-
-			{isSaveConfirmOpen && selectedUser && modalForm && (
-				<div className="fixed inset-0 z-60 flex items-center justify-center bg-slate-900/45 p-4">
-					<div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl sm:p-6">
-						<h2 className="text-lg font-semibold text-slate-900">Confirm profile update</h2>
-						<p className="mt-2 text-sm text-slate-600">
-							Save changes for <span className="font-semibold">{selectedUser.username}</span>?
-						</p>
-						<div className="mt-5 flex justify-end gap-2">
-							<button
-								type="button"
-								onClick={closeSaveConfirm}
-								className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
-							>
-								Cancel
-							</button>
-							<button
-								type="button"
-								onClick={confirmSaveEdit}
-								className="rounded-lg bg-slate-800 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-900"
-							>
-								Yes, save
 							</button>
 						</div>
 					</div>

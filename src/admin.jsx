@@ -198,13 +198,6 @@ function AdminDashboard() {
         />
 
         <main className="flex-1 space-y-5 p-4 pt-20 sm:p-6 sm:pt-24 lg:ml-72 lg:p-8 lg:pt-8">
-          <header className="rounded-3xl border border-surface bg-white/90 p-4 shadow-[0_12px_32px_rgba(15,23,42,0.08)] backdrop-blur-sm sm:p-5">
-            <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-              <p className="rounded-xl border border-surface bg-white px-3 py-2 font-medium text-accent">{activeNav}</p>
-              <p className="rounded-xl bg-surface px-3 py-2 font-medium text-accent/80">Tuesday, 9th March</p>
-            </div>
-          </header>
-
           {activeNav === 'Dashboard'       && <DashboardPage />}
           {activeNav === 'Dataset'         && <DatasetPage />}
           {activeNav === 'User Management' && <UserPage />}

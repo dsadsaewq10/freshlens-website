@@ -13,6 +13,9 @@ const signupSchema = loginSchema.extend({
   name: z.string().min(1, 'Username is required.'),
 })
 
+const forgotCodeSchema = z.string().regex(/^\d{6}$/, 'Please enter a valid 6-digit code.')
+const resetPasswordSchema = z.string().min(6, 'Password must be at least 6 characters long.')
+
 function withTimeout(promise, timeoutMs, timeoutMessage) {
   return new Promise((resolve, reject) => {
     const timeoutId = setTimeout(() => {
@@ -33,8 +36,17 @@ function withTimeout(promise, timeoutMs, timeoutMessage) {
 
 function AuthScreen({ mode }) {
   const [showPassword, setShowPassword] = useState(false)
+  const [showResetPassword, setShowResetPassword] = useState(false)
+  const [showConfirmResetPassword, setShowConfirmResetPassword] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', password: '' })
+  const [rememberMe, setRememberMe] = useState(false)
+  const [authView, setAuthView] = useState('auth')
+  const [forgotEmail, setForgotEmail] = useState('')
+  const [forgotCode, setForgotCode] = useState('')
+  const [resetPassword, setResetPassword] = useState('')
+  const [confirmResetPassword, setConfirmResetPassword] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
   const [loading, setLoading] = useState(false)
   
   const { authMode } = useParams()
@@ -47,6 +59,7 @@ function AuthScreen({ mode }) {
       : 'login'
 
   const isLogin = resolvedMode === 'login'
+  const isForgotFlow = authView !== 'auth'
   const title = isLogin ? 'Welcome to FreshLens' : 'Create your FreshLens account'
   const subtitle = isLogin
     ? 'Start your experience by signing in.'
@@ -81,7 +94,7 @@ function AuthScreen({ mode }) {
         data: { session },
       } = await supabase.auth.getSession()
 
-      if (!mounted || !session?.user) {
+      if (!mounted || !session?.user || isForgotFlow) {
         return
       }
 
@@ -95,7 +108,27 @@ function AuthScreen({ mode }) {
     return () => {
       mounted = false
     }
-  }, [navigate])
+  }, [isForgotFlow, navigate])
+
+  useEffect(() => {
+    if (!isLogin) {
+      return
+    }
+
+    const rememberedEmail = localStorage.getItem('freshlens_remembered_email')
+    if (!rememberedEmail) {
+      return
+    }
+
+    setRememberMe(true)
+    setFormData((prev) => ({ ...prev, email: rememberedEmail }))
+  }, [isLogin])
+
+  useEffect(() => {
+    setAuthView('auth')
+    setErrorMsg('')
+    setSuccessMsg('')
+  }, [resolvedMode])
 
   const fields = useMemo(() => {
     if (isLogin) {
@@ -132,6 +165,29 @@ function AuthScreen({ mode }) {
       ...prev,
       [e.target.id]: e.target.value,
     }))
+  }
+
+  const resetForgotPasswordFlow = () => {
+    setAuthView('auth')
+    setForgotCode('')
+    setResetPassword('')
+    setConfirmResetPassword('')
+    setShowResetPassword(false)
+    setShowConfirmResetPassword(false)
+    setErrorMsg('')
+    setSuccessMsg('')
+  }
+
+  const handleOpenForgotPassword = () => {
+    setAuthView('forgot-email')
+    setForgotEmail(formData.email || '')
+    setForgotCode('')
+    setResetPassword('')
+    setConfirmResetPassword('')
+    setShowResetPassword(false)
+    setShowConfirmResetPassword(false)
+    setErrorMsg('')
+    setSuccessMsg('')
   }
 
   const handleSubmit = async (e) => {
@@ -178,6 +234,13 @@ function AuthScreen({ mode }) {
 
         const { error } = loginResult
         if (error) throw error
+
+        if (rememberMe) {
+          localStorage.setItem('freshlens_remembered_email', formData.email.trim())
+        } else {
+          localStorage.removeItem('freshlens_remembered_email')
+        }
+
         navigate('/admin')
       } else {
         const { error } = await supabase.auth.signUp({
@@ -198,6 +261,113 @@ function AuthScreen({ mode }) {
     }
   }
 
+  const handleForgotEmailSubmit = async (e) => {
+    e.preventDefault()
+    setErrorMsg('')
+    setSuccessMsg('')
+
+    try {
+      loginSchema.shape.email.parse(forgotEmail)
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        setErrorMsg(err.errors[0].message)
+        return
+      }
+    }
+
+    setLoading(true)
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+        redirectTo: `${window.location.origin}/login`,
+      })
+
+      if (error) throw error
+
+      setAuthView('forgot-code')
+      setSuccessMsg('We sent a 6-digit code to your email. Enter it to continue.')
+    } catch (err) {
+      setErrorMsg(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleForgotCodeSubmit = async (e) => {
+    e.preventDefault()
+    setErrorMsg('')
+    setSuccessMsg('')
+
+    try {
+      forgotCodeSchema.parse(forgotCode)
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        setErrorMsg(err.errors[0].message)
+        return
+      }
+    }
+
+    setLoading(true)
+
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email: forgotEmail,
+        token: forgotCode,
+        type: 'recovery',
+      })
+
+      if (error) throw error
+
+      setAuthView('forgot-reset')
+      setSuccessMsg('Code confirmed. Set your new password below.')
+    } catch (err) {
+      setErrorMsg(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleResetPasswordSubmit = async (e) => {
+    e.preventDefault()
+    setErrorMsg('')
+    setSuccessMsg('')
+
+    try {
+      resetPasswordSchema.parse(resetPassword)
+      resetPasswordSchema.parse(confirmResetPassword)
+
+      if (resetPassword !== confirmResetPassword) {
+        setErrorMsg('New password and confirm password do not match.')
+        return
+      }
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        setErrorMsg(err.errors[0].message)
+        return
+      }
+    }
+
+    setLoading(true)
+
+    try {
+      const { error } = await supabase.auth.updateUser({ password: resetPassword })
+      if (error) throw error
+
+      await supabase.auth.signOut()
+      setSuccessMsg('Password updated successfully. Please sign in with your new password.')
+      setForgotCode('')
+      setResetPassword('')
+      setConfirmResetPassword('')
+      setShowResetPassword(false)
+      setShowConfirmResetPassword(false)
+      setAuthView('auth')
+    } catch (err) {
+      setErrorMsg(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="h-screen w-full overflow-hidden bg-[#f3f6f6]">
       <div className="grid h-full w-full overflow-hidden bg-white lg:grid-cols-2">
@@ -205,9 +375,9 @@ function AuthScreen({ mode }) {
           <div className="flex items-center justify-between gap-3">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-base font-semibold text-primary transition hover:bg-slate-50"
+              className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-base font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
             >
-              <span aria-hidden="true" className="text-2xl leading-none">&lt;</span>
+              <span aria-hidden="true" className="text-sm font-bold tracking-wide">BACK</span>
             </Link>
             <div className="flex items-center gap-2.5 text-primary font-semibold text-lg sm:text-xl">
               <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="h-8 w-8 object-contain sm:h-9 sm:w-9" />
@@ -222,99 +392,306 @@ function AuthScreen({ mode }) {
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className="mx-auto mt-7 w-full max-w-lg sm:mt-9"
           >
-            <h1 className="min-h-20 text-center text-3xl font-bold text-[#0f4143] sm:text-4xl">{title}</h1>
-            <p className="min-h-12 text-center text-sm text-slate-500 sm:text-base">{subtitle}</p>
+            <h1 className="min-h-20 text-center text-3xl font-bold text-[#0f4143] sm:text-4xl">
+              {authView === 'forgot-email' && 'Forgot Password'}
+              {authView === 'forgot-code' && 'Confirm Verification Code'}
+              {authView === 'forgot-reset' && 'Create New Password'}
+              {authView === 'auth' && title}
+            </h1>
+            <p className="min-h-12 text-center text-sm text-slate-500 sm:text-base">
+              {authView === 'forgot-email' && 'Enter your email to receive a password reset code.'}
+              {authView === 'forgot-code' && `We sent a 6-digit code to ${forgotEmail || 'your email'}.`}
+              {authView === 'forgot-reset' && 'Set a new password for your account.'}
+              {authView === 'auth' && subtitle}
+            </p>
 
-            <div className="mt-8 grid grid-cols-2 rounded-2xl bg-slate-100 p-1.5">
-              <Link
-                to="/login"
-                className={`rounded-xl py-3 text-center text-base font-semibold transition-colors ${
-                  isLogin ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:text-primary'
-                }`}
-              >
-                Sign In
-              </Link>
-              <Link
-                to="/signup"
-                className={`rounded-xl py-3 text-center text-base font-semibold transition-colors ${
-                  !isLogin ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:text-primary'
-                }`}
-              >
-                Sign Up
-              </Link>
-            </div>
-
-            <form className="mx-auto mt-7 w-full max-w-md min-h-84 space-y-4" onSubmit={handleSubmit}>
-              {errorMsg && (
-                <div className="rounded-xl bg-red-50 p-3 text-sm text-red-500">
-                  {errorMsg}
-                </div>
-              )}
-              {fields.map((field) => (
-                <label
-                  key={field.id}
-                  className="block"
+            {authView === 'auth' && (
+              <div className="mt-8 grid grid-cols-2 rounded-2xl bg-slate-100 p-1.5">
+                <Link
+                  to="/login"
+                  className={`rounded-xl py-3 text-center text-base font-semibold transition-colors ${
+                    isLogin ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:text-primary'
+                  }`}
                 >
-                  <span className="mb-2 block text-base font-medium text-[#1f4f52]">{field.label} <span className="text-primary">*</span></span>
+                  Sign In
+                </Link>
+                <Link
+                  to="/signup"
+                  className={`rounded-xl py-3 text-center text-base font-semibold transition-colors ${
+                    !isLogin ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:text-primary'
+                  }`}
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
+
+            {authView === 'auth' && (
+              <form className="mx-auto mt-7 w-full max-w-md min-h-84 space-y-4" onSubmit={handleSubmit}>
+                {errorMsg && (
+                  <div className="rounded-xl bg-red-50 p-3 text-sm text-red-500">
+                    {errorMsg}
+                  </div>
+                )}
+                {successMsg && (
+                  <div className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-600">
+                    {successMsg}
+                  </div>
+                )}
+                {fields.map((field) => (
+                  <label
+                    key={field.id}
+                    className="block"
+                  >
+                    <span className="mb-2 block text-base font-medium text-[#1f4f52]">{field.label} <span className="text-primary">*</span></span>
+                    <div className="relative">
+                      <input
+                        id={field.id}
+                        type={field.type}
+                        value={formData[field.id] || ''}
+                        onChange={handleChange}
+                        placeholder={field.placeholder}
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
+                        required
+                      />
+                      {field.id === 'password' && (
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((value) => !value)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-500"
+                        >
+                          {showPassword ? 'Hide' : 'Show'}
+                        </button>
+                      )}
+                    </div>
+                  </label>
+                ))}
+
+                {isLogin && (
+                  <div className="flex items-center justify-between gap-3">
+                    <label className="inline-flex items-center gap-2 text-sm text-slate-600">
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary/20"
+                      />
+                      <span>Remember Me</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleOpenForgotPassword}
+                      className="text-sm font-semibold text-primary hover:underline"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="mt-2 w-full rounded-2xl bg-primary px-5 py-4 text-base font-semibold text-white transition hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Processing...' : submitLabel}
+                </button>
+              </form>
+            )}
+
+            {authView === 'forgot-email' && (
+              <form className="mx-auto mt-7 w-full max-w-md min-h-84 space-y-4" onSubmit={handleForgotEmailSubmit}>
+                {errorMsg && (
+                  <div className="rounded-xl bg-red-50 p-3 text-sm text-red-500">
+                    {errorMsg}
+                  </div>
+                )}
+                {successMsg && (
+                  <div className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-600">
+                    {successMsg}
+                  </div>
+                )}
+                <label className="block">
+                  <span className="mb-2 block text-base font-medium text-[#1f4f52]">Email Address <span className="text-primary">*</span></span>
+                  <input
+                    type="email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    placeholder="Enter your email address"
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
+                    required
+                  />
+                </label>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="mt-2 w-full rounded-2xl bg-primary px-5 py-4 text-base font-semibold text-white transition hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Sending...' : 'Send Code'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={resetForgotPasswordFlow}
+                  className="w-full text-center text-sm font-semibold text-slate-500 hover:text-primary"
+                >
+                  Back to Sign In
+                </button>
+              </form>
+            )}
+
+            {authView === 'forgot-code' && (
+              <form className="mx-auto mt-7 w-full max-w-md min-h-84 space-y-4" onSubmit={handleForgotCodeSubmit}>
+                {errorMsg && (
+                  <div className="rounded-xl bg-red-50 p-3 text-sm text-red-500">
+                    {errorMsg}
+                  </div>
+                )}
+                {successMsg && (
+                  <div className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-600">
+                    {successMsg}
+                  </div>
+                )}
+                <label className="block">
+                  <span className="mb-2 block text-base font-medium text-[#1f4f52]">6-Digit Code <span className="text-primary">*</span></span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]{6}"
+                    maxLength={6}
+                    value={forgotCode}
+                    onChange={(e) => setForgotCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="Enter the 6-digit code"
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-base tracking-[0.24em] outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
+                    required
+                  />
+                </label>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="mt-2 w-full rounded-2xl bg-primary px-5 py-4 text-base font-semibold text-white transition hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Verifying...' : 'Verify Code'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthView('forgot-email')
+                    setErrorMsg('')
+                    setSuccessMsg('')
+                  }}
+                  className="w-full text-center text-sm font-semibold text-slate-500 hover:text-primary"
+                >
+                  Change Email
+                </button>
+              </form>
+            )}
+
+            {authView === 'forgot-reset' && (
+              <form className="mx-auto mt-7 w-full max-w-md min-h-84 space-y-4" onSubmit={handleResetPasswordSubmit}>
+                {errorMsg && (
+                  <div className="rounded-xl bg-red-50 p-3 text-sm text-red-500">
+                    {errorMsg}
+                  </div>
+                )}
+                {successMsg && (
+                  <div className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-600">
+                    {successMsg}
+                  </div>
+                )}
+                <label className="block">
+                  <span className="mb-2 block text-base font-medium text-[#1f4f52]">New Password <span className="text-primary">*</span></span>
                   <div className="relative">
                     <input
-                      id={field.id}
-                      type={field.type}
-                      value={formData[field.id] || ''}
-                      onChange={handleChange}
-                      placeholder={field.placeholder}
+                      type={showResetPassword ? 'text' : 'password'}
+                      value={resetPassword}
+                      onChange={(e) => setResetPassword(e.target.value)}
+                      placeholder="Create a new password"
                       className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
                       required
                     />
-                    {field.id === 'password' && (
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((value) => !value)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-500"
-                      >
-                        {showPassword ? 'Hide' : 'Show'}
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => setShowResetPassword((value) => !value)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-500"
+                    >
+                      {showResetPassword ? 'Hide' : 'Show'}
+                    </button>
                   </div>
                 </label>
-              ))}
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="mt-2 w-full rounded-2xl bg-primary px-5 py-4 text-base font-semibold text-white transition hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Processing...' : submitLabel}
-              </button>
-            </form>
+                <label className="block">
+                  <span className="mb-2 block text-base font-medium text-[#1f4f52]">Confirm Password <span className="text-primary">*</span></span>
+                  <div className="relative">
+                    <input
+                      type={showConfirmResetPassword ? 'text' : 'password'}
+                      value={confirmResetPassword}
+                      onChange={(e) => setConfirmResetPassword(e.target.value)}
+                      placeholder="Re-enter your new password"
+                      className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmResetPassword((value) => !value)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-500"
+                    >
+                      {showConfirmResetPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                </label>
 
-            <div className="mt-7 flex items-center gap-3">
-              <div className="h-px flex-1 bg-slate-200" />
-              <span className="text-sm text-slate-500">Or continue with</span>
-              <div className="h-px flex-1 bg-slate-200" />
-            </div>
-
-            <div className="mt-5 flex items-center justify-center gap-4">
-              {[
-                { id: 'google', name: 'Google', icon: '/assets/icons/logo_google.png' },
-                { id: 'facebook', name: 'Facebook', icon: '/assets/icons/logo_facebook.png' },
-                { id: 'github', name: 'Github', icon: '/assets/icons/logo_github.png' },
-              ].map((provider) => (
                 <button
-                  key={provider.name}
-                  type="button"
-                  onClick={() => supabase.auth.signInWithOAuth({ provider: provider.id })}
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white transition hover:border-primary"
-                  aria-label={`Continue with ${provider.name}`}
+                  type="submit"
+                  disabled={loading}
+                  className="mt-2 w-full rounded-2xl bg-primary px-5 py-4 text-base font-semibold text-white transition hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  <img
-                    src={provider.icon}
-                    alt={provider.name}
-                    className="h-6 w-6 object-contain"
-                  />
+                  {loading ? 'Updating...' : 'Update Password'}
                 </button>
-              ))}
-            </div>
+
+                <button
+                  type="button"
+                  onClick={resetForgotPasswordFlow}
+                  className="w-full text-center text-sm font-semibold text-slate-500 hover:text-primary"
+                >
+                  Back to Sign In
+                </button>
+              </form>
+            )}
+
+            {authView === 'auth' && (
+              <>
+                <div className="mt-7 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-slate-200" />
+                  <span className="text-sm text-slate-500">Or continue with</span>
+                  <div className="h-px flex-1 bg-slate-200" />
+                </div>
+
+                <div className="mt-5 flex items-center justify-center gap-4">
+                  {[
+                    { id: 'google', name: 'Google', icon: '/assets/icons/logo_google.png' },
+                    { id: 'facebook', name: 'Facebook', icon: '/assets/icons/logo_facebook.png' },
+                    { id: 'github', name: 'Github', icon: '/assets/icons/logo_github.png' },
+                  ].map((provider) => (
+                    <button
+                      key={provider.name}
+                      type="button"
+                      onClick={() => supabase.auth.signInWithOAuth({ provider: provider.id })}
+                      className="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white transition hover:border-primary"
+                      aria-label={`Continue with ${provider.name}`}
+                    >
+                      <img
+                        src={provider.icon}
+                        alt={provider.name}
+                        className="h-6 w-6 object-contain"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </motion.div>
 
           <div className="mt-6 pt-1 text-center text-xs text-slate-500 sm:mt-auto sm:pt-5 lg:pt-6">
@@ -362,7 +739,7 @@ function AuthScreen({ mode }) {
             </div>
 
             <div className="relative flex h-full flex-col items-center justify-end text-center">
-              <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="mb-6 h-16 w-16 rounded-2xl bg-white/20 p-2" />
+              <img src="/assets/logo/freshlens_logo.png" alt="FreshLens" className="mb-6 h-16 w-16 rounded-2xl bg-white p-2" />
               <h2 className="max-w-lg text-4xl font-bold leading-tight text-white xl:text-5xl">
                 An Open-Source Platform for Datasets
               </h2>
