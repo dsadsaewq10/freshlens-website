@@ -2,11 +2,12 @@ import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Landingpage from './auth/Landingpage'
 import TechnologyPage from './pages/technology/components/Technology'
-import DatasetPage from './pages/dataset/components/Dataset'
+import DatasetListPage from './pages/dataset/DatasetListPage'
+import DatasetDetailPage from './pages/dataset/DatasetDetailPage'
 import AuthScreen from './pages/login/AuthScreen'
 import AdminDashboard from './admin'
 import { AuthProvider } from './auth/AuthProvider'
-import { RequireAuth, RequireRole } from './auth/ProtectedRoutes'
+import { RequireRole } from './auth/ProtectedRoutes'
 
 function AdminGuard() {
   return (
@@ -23,14 +24,8 @@ export default function AppRoutes() {
         <Routes>
           <Route path="/" element={<Landingpage />} />
           <Route path="/technology" element={<TechnologyPage />} />
-          <Route
-            path="/dataset"
-            element={(
-              <RequireAuth>
-                <DatasetPage />
-              </RequireAuth>
-            )}
-          />
+          <Route path="/datasets" element={<DatasetListPage />} />
+          <Route path="/datasets/:id" element={<DatasetDetailPage />} />
           {/* Redirect bare /admin to the default tab */}
           <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="/admin/:tab" element={<AdminGuard />} />

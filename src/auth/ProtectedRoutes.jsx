@@ -40,7 +40,7 @@ export function RequireRole({ allowedRoles = [], children }) {
   const allowed = allowedRoles.map((value) => value.toLowerCase())
 
   if (!allowed.includes(normalizedRole)) {
-    return <Navigate to="/dataset" replace />
+    return <Navigate to="/datasets" replace />
   }
 
   return children

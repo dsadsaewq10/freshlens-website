@@ -198,8 +198,12 @@ function AuthScreen({ mode }) {
       const schema = isLogin ? loginSchema : signupSchema
       schema.parse(formData)
     } catch (err) {
-      if (err instanceof z.ZodError) {
+      if (err instanceof z.ZodError && err.errors?.[0]) {
         setErrorMsg(err.errors[0].message)
+        return
+      }
+      if (err instanceof z.ZodError) {
+        setErrorMsg('Validation error')
         return
       }
     }
@@ -269,8 +273,12 @@ function AuthScreen({ mode }) {
     try {
       loginSchema.shape.email.parse(forgotEmail)
     } catch (err) {
-      if (err instanceof z.ZodError) {
+      if (err instanceof z.ZodError && err.errors?.[0]) {
         setErrorMsg(err.errors[0].message)
+        return
+      }
+      if (err instanceof z.ZodError) {
+        setErrorMsg('Invalid email address')
         return
       }
     }
@@ -301,8 +309,12 @@ function AuthScreen({ mode }) {
     try {
       forgotCodeSchema.parse(forgotCode)
     } catch (err) {
-      if (err instanceof z.ZodError) {
+      if (err instanceof z.ZodError && err.errors?.[0]) {
         setErrorMsg(err.errors[0].message)
+        return
+      }
+      if (err instanceof z.ZodError) {
+        setErrorMsg('Please enter a valid 6-digit code')
         return
       }
     }
@@ -341,8 +353,12 @@ function AuthScreen({ mode }) {
         return
       }
     } catch (err) {
-      if (err instanceof z.ZodError) {
+      if (err instanceof z.ZodError && err.errors?.[0]) {
         setErrorMsg(err.errors[0].message)
+        return
+      }
+      if (err instanceof z.ZodError) {
+        setErrorMsg('Password must be at least 6 characters long')
         return
       }
     }

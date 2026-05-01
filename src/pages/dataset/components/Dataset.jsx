@@ -1,9 +1,11 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import Header from '../../landingpage/components/Header'
 import Footer from '../../landingpage/components/Footer'
 import BackToTop from '../../../components/BackToTop'
 import { supabase } from '../../../lib/supabase'
+import { useAuth } from '../../../auth/useAuth'
 import JSZip from 'jszip'
 
 // Color palette
@@ -15,6 +17,89 @@ const COLORS = {
   white: '#FFFFFF',
   dark: '#1B413B',
 }
+
+// Login prompt modal for guest users
+function LoginPromptModal({ isOpen, onClose, onLoginClick }) {
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-110 flex items-center justify-center p-4"
+          onClick={onClose}
+        >
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center"
+          >
+            {/* Lock Icon */}
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
+              style={{ background: `${COLORS.primary}15` }}
+            >
+              <svg className="w-8 h-8" style={{ color: COLORS.primary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+
+            {/* Title */}
+            <h3 className="text-2xl font-bold mb-2" style={{ color: COLORS.primary }}>
+              Login to Download
+            </h3>
+
+            {/* Message */}
+            <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+              You need to be logged in to download datasets. Sign in with your account to get started.
+            </p>
+
+            {/* Buttons */}
+            <div className="flex flex-col gap-3">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  onClose()
+                  onLoginClick()
+                }}
+                className="w-full py-3 px-4 rounded-xl text-white font-semibold transition-all shadow-lg hover:shadow-xl"
+                style={{ background: COLORS.primary }}
+              >
+                Go to Login
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={onClose}
+                className="w-full py-3 px-4 rounded-xl text-gray-700 font-semibold bg-gray-100 hover:bg-gray-200 transition-all"
+              >
+                Cancel
+              </motion.button>
+            </div>
+
+            {/* Close button */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            >
+              <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
 
 // Dataset information
 const datasets = [
@@ -94,7 +179,7 @@ const totalClasses = [...new Set(datasets.flatMap((d) => d.classes))].length
 const totalVegetables = datasets.length
 
 // Dataset preview modal
-function DatasetModal({ dataset, isOpen, onClose }) {
+function DatasetModal({ dataset, isOpen, onClose, onDownloadClick }) {
   if (!dataset) return null
 
   return (
@@ -229,8 +314,8 @@ function DatasetModal({ dataset, isOpen, onClose }) {
               </div>
 
               {/* Download button */}
-              <motion.a
-                href={dataset.downloadUrl}
+              <motion.button
+                onClick={() => onDownloadClick?.(dataset)}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="flex items-center justify-center gap-2.5 w-full py-3 rounded-xl text-white font-bold text-base shadow-lg hover:shadow-xl transition-shadow"
@@ -240,7 +325,7 @@ function DatasetModal({ dataset, isOpen, onClose }) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
                 Download Dataset
-              </motion.a>
+              </motion.button>
             </div>
           </motion.div>
         </motion.div>
@@ -459,23 +544,23 @@ function triggerDownload(blob, filename) {
   URL.revokeObjectURL(url)
 }
 
-// ── Release preview modal ─────────────────────────────────────────────────────
-function ReleasePreviewModal({ release, onClose }) {
-  const { captures, loading } = useApprovedCaptures(release.vegetables)
+// ── Release detail modal ─────────────────────────────────────────────────────
+function ReleaseDetailModal({ release, onClose, onDownloadClick }) {
+  const [activeTab, setActiveTab] = useState('data-card')
   const [downloading, setDownloading] = useState(false)
   const [progress, setProgress] = useState(0)
+  const { captures, loading } = useApprovedCaptures(release.vegetables)
 
-  // True once loading finishes and we got zero rows — means the user's account
-  // cannot read the scan_history rows (RLS restricts non-owners).
   const previewUnavailable = !loading && captures.length === 0
 
   async function handleDownload() {
     if (!captures.length || downloading) return
-    setDownloading(true); setProgress(0)
+    setDownloading(true)
+    setProgress(0)
     try {
       const blob = await buildReleaseZip(release, captures, (done, total, zipPct) => {
         const filePct = total ? (done / total) * 80 : 0
-        const zpct    = (zipPct ?? 0) * 0.2
+        const zpct = (zipPct ?? 0) * 0.2
         setProgress(Math.min(99, Math.round(filePct + zpct)))
       })
       triggerDownload(blob, `${release.name.replace(/\s+/g, '_')}_v${release.version}.zip`)
@@ -485,7 +570,6 @@ function ReleasePreviewModal({ release, onClose }) {
     }
   }
 
-  // group captures by vegetable for folder tree view
   const byVeg = useMemo(() => {
     const g = {}
     for (const c of captures) {
@@ -499,137 +583,293 @@ function ReleasePreviewModal({ release, onClose }) {
   const imageCount = captures.length || release.sample_count || 0
 
   return (
-    <div className="fixed inset-0 z-70 flex items-center justify-center bg-slate-900/60 p-4" onClick={onClose}>
-      <div
-        className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="sticky top-0 flex items-start justify-between gap-4 border-b border-slate-100 bg-white/95 px-6 py-4 backdrop-blur">
-          <div>
-            <h3 className="text-lg font-bold" style={{ color: COLORS.primary }}>{release.name}</h3>
-            <p className="text-xs text-slate-500">
-              v{release.version} · {imageCount} images · {release.vegetables?.join(', ')}
-            </p>
-          </div>
-          <button type="button" onClick={onClose} className="rounded-full p-1.5 text-slate-400 hover:bg-slate-100">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+    <AnimatePresence>
+      {true && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-110 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-6xl my-6"
+          >
+            {/* Close button */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors z-10"
+            >
+              <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
 
-        <div className="space-y-5 px-6 py-5">
-          {release.changelog && (
-            <p className="rounded-xl bg-slate-50 p-3 text-xs text-slate-600">{release.changelog}</p>
-          )}
-
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <div className="w-8 h-8 rounded-full border-2 border-current border-t-transparent animate-spin" style={{ color: COLORS.primary }} />
-            </div>
-          ) : previewUnavailable ? (
-            <div className="py-8 text-center space-y-1">
-              <p className="text-sm font-medium text-slate-600">Preview images are not available for this account.</p>
-              <p className="text-xs text-slate-400">You can still download the published dataset zip below.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {Object.entries(byVeg).map(([veg, caps]) => (
-                <div key={veg}>
-                  <p className="mb-2 text-xs font-semibold text-slate-500">
-                    📁 {veg.replace(' ', '_')}/ <span className="text-slate-400">({caps.length} images)</span>
-                  </p>
-                  <div className="grid grid-cols-6 gap-2 sm:grid-cols-8">
-                    {caps.slice(0, 24).map((cap) => {
-                      const label = cap.reviewed_class_label || cap.class_label
-                      const fresh = releaseFreshFromLabel(label)
-                      const dets  = captureDetections(cap)
-                      return (
-                        <div key={cap.id} className="relative aspect-square">
-                          <img
-                            src={cap.scanned_image_path}
-                            alt={label}
-                            className="h-full w-full rounded-lg border border-slate-200 object-cover"
-                            loading="lazy"
-                          />
-                          {dets.length > 0 && (
-                            <svg viewBox="0 0 1 1" preserveAspectRatio="none"
-                                 className="pointer-events-none absolute inset-0 h-full w-full rounded-lg">
-                              {dets.map((d, i) => {
-                                if (d.boxRight == null || (d.boxRight - d.boxLeft) <= 0.01) return null
-                                const isF = releaseFreshFromLabel(d.classLabel)
-                                return (
-                                  <rect key={i}
-                                    x={d.boxLeft} y={d.boxTop}
-                                    width={d.boxRight - d.boxLeft} height={d.boxBottom - d.boxTop}
-                                    fill="none" stroke={isF ? '#10b981' : '#ef4444'}
-                                    strokeWidth={0.025} vectorEffect="non-scaling-stroke" />
-                                )
-                              })}
-                            </svg>
-                          )}
-                          <span className={`absolute bottom-0.5 right-0.5 rounded px-1 text-[8px] font-bold text-white ${fresh ? 'bg-emerald-500' : 'bg-rose-500'}`}>
-                            {fresh ? 'F' : 'R'}
-                          </span>
-                        </div>
-                      )
-                    })}
-                    {caps.length > 24 && (
-                      <div className="flex aspect-square items-center justify-center rounded-lg border border-dashed border-slate-300 text-[10px] text-slate-400">
-                        +{caps.length - 24}
+            {/* Main content - two column layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 md:p-8">
+              {/* Left column - Primary content */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Header section */}
+                <div className="border-b border-gray-200 pb-6">
+                  <h1 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: COLORS.primary }}>
+                    {release.name}
+                  </h1>
+                  <div className="flex items-center justify-between flex-wrap gap-3">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                        style={{ background: COLORS.primary }}
+                      >
+                        {(release.name || 'D').slice(0, 2).toUpperCase()}
                       </div>
-                    )}
+                      <div>
+                        <p className="text-sm font-semibold text-gray-800">FreshLens Team</p>
+                        <p className="text-xs text-gray-500">
+                          Updated {release.updated_at ? new Date(release.updated_at).toLocaleDateString() : 'recently'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-3 py-1 rounded-lg text-sm font-mono" style={{ background: `${COLORS.primary}15`, color: COLORS.medium }}>
+                        v{release.version}
+                      </span>
+                      <span className="px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-100 text-emerald-700">
+                        Published
+                      </span>
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
 
-          <div className="flex items-center gap-3 border-t border-slate-100 pt-4">
-            {previewUnavailable && release.public_url ? (
-              <>
-                <a
-                  href={release.public_url}
-                  download
-                  className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white"
-                  style={{ background: COLORS.primary }}
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Download published .zip ({imageCount} imgs)
-                </a>
-                <p className="text-xs text-slate-400">Downloads the published release from Supabase Storage.</p>
-              </>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  disabled={!captures.length || downloading}
-                  onClick={handleDownload}
-                  className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
-                  style={{ background: COLORS.primary }}
-                >
-                  {downloading ? (
-                    <>Building ZIP… {progress}%</>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                      Download .zip ({captures.length} imgs)
-                    </>
+                {/* Tabs */}
+                <div className="flex gap-6 border-b border-gray-200">
+                  {[
+                    { id: 'data-card', label: 'Data Card' },
+                    { id: 'code', label: 'Code' },
+                    { id: 'comment', label: 'Comment' },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`pb-3 font-semibold transition-all ${
+                        activeTab === tab.id
+                          ? `text-base border-b-2`
+                          : 'text-gray-600 hover:text-gray-800 border-b-2 border-transparent'
+                      }`}
+                      style={{
+                        color: activeTab === tab.id ? COLORS.primary : undefined,
+                        borderColor: activeTab === tab.id ? COLORS.primary : 'transparent',
+                      }}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Content area */}
+                <div className="min-h-96 space-y-4">
+                  {activeTab === 'data-card' && (
+                    <div className="space-y-5">
+                      {release.changelog && (
+                        <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
+                          <p className="text-sm text-blue-900">{release.changelog}</p>
+                        </div>
+                      )}
+
+                      {loading ? (
+                        <div className="flex justify-center py-12">
+                          <div className="w-8 h-8 rounded-full border-2 border-current border-t-transparent animate-spin" style={{ color: COLORS.primary }} />
+                        </div>
+                      ) : previewUnavailable ? (
+                        <div className="py-8 text-center space-y-2 bg-gray-50 rounded-lg">
+                          <p className="text-sm font-medium text-gray-700">Preview images not available</p>
+                          <p className="text-xs text-gray-500">This account cannot access preview data</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-5">
+                          {Object.entries(byVeg).map(([veg, caps]) => (
+                            <div key={veg}>
+                              <p className="text-sm font-semibold text-gray-700 mb-3">
+                                📁 {veg.replace(' ', '_')}/ <span className="text-gray-500 font-normal">({caps.length} images)</span>
+                              </p>
+                              <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
+                                {caps.slice(0, 24).map((cap) => {
+                                  const label = cap.reviewed_class_label || cap.class_label
+                                  const fresh = releaseFreshFromLabel(label)
+                                  const dets = captureDetections(cap)
+                                  return (
+                                    <div key={cap.id} className="relative aspect-square">
+                                      <img
+                                        src={cap.scanned_image_path}
+                                        alt={label}
+                                        className="h-full w-full rounded-lg border border-gray-200 object-cover"
+                                        loading="lazy"
+                                      />
+                                      {dets.length > 0 && (
+                                        <svg viewBox="0 0 1 1" preserveAspectRatio="none"
+                                             className="pointer-events-none absolute inset-0 h-full w-full rounded-lg">
+                                          {dets.map((d, i) => {
+                                            if (d.boxRight == null || (d.boxRight - d.boxLeft) <= 0.01) return null
+                                            const isF = releaseFreshFromLabel(d.classLabel)
+                                            return (
+                                              <rect key={i}
+                                                x={d.boxLeft} y={d.boxTop}
+                                                width={d.boxRight - d.boxLeft} height={d.boxBottom - d.boxTop}
+                                                fill="none" stroke={isF ? '#10b981' : '#ef4444'}
+                                                strokeWidth={0.025} vectorEffect="non-scaling-stroke" />
+                                            )
+                                          })}
+                                        </svg>
+                                      )}
+                                      <span className={`absolute bottom-0.5 right-0.5 rounded px-1 text-[8px] font-bold text-white ${fresh ? 'bg-emerald-500' : 'bg-rose-500'}`}>
+                                        {fresh ? 'F' : 'R'}
+                                      </span>
+                                    </div>
+                                  )
+                                })}
+                                {caps.length > 24 && (
+                                  <div className="flex aspect-square items-center justify-center rounded-lg border border-dashed border-gray-300 text-[10px] text-gray-500 font-semibold">
+                                    +{caps.length - 24}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   )}
-                </button>
-                <p className="text-xs text-slate-400">Bundled in YOLO format — data.yaml + images/ + labels/</p>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+
+                  {activeTab === 'code' && (
+                    <div className="bg-gray-50 rounded-lg p-4 text-center text-gray-600">
+                      <p className="text-sm">Code content coming soon</p>
+                    </div>
+                  )}
+
+                  {activeTab === 'comment' && (
+                    <div className="bg-gray-50 rounded-lg p-4 text-center text-gray-600">
+                      <p className="text-sm">Discussion coming soon</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right column - Sidebar */}
+              <div className="lg:col-span-1 space-y-5">
+                {/* Preview image */}
+                <div className="rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 aspect-4/3">
+                  {release.thumbnail_url ? (
+                    <img
+                      src={release.thumbnail_url}
+                      alt={release.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <svg className="w-16 h-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex flex-col gap-2.5">
+                  <button
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-gray-300 font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                    Code
+                  </button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    disabled={downloading}
+                    onClick={() => onDownloadClick?.(release, captures)}
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-white font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ background: COLORS.primary }}
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    {downloading ? `Downloading ${progress}%` : 'Download'}
+                  </motion.button>
+                </div>
+
+                {/* Metadata */}
+                <div className="space-y-4 pt-4 border-t border-gray-200">
+                  {/* Usability */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Usability</p>
+                      <p className="text-lg font-bold" style={{ color: COLORS.primary }}>
+                        {release.fresh_ratio ? (release.fresh_ratio * 10).toFixed(1) : '8.5'}
+                      </p>
+                    </div>
+                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          background: COLORS.primary,
+                          width: `${(release.fresh_ratio ? release.fresh_ratio * 100 : 85)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* License */}
+                  <div>
+                    <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">License</p>
+                    <a href="#" className="text-sm text-blue-600 hover:underline">
+                      Attribution 4.0 International
+                    </a>
+                  </div>
+
+                  {/* Update frequency */}
+                  <div>
+                    <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Update Frequency</p>
+                    <p className="text-sm text-gray-700">Monthly</p>
+                  </div>
+
+                  {/* Tags */}
+                  {release.vegetables && release.vegetables.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Tags</p>
+                      <div className="flex flex-wrap gap-2">
+                        {release.vegetables.map((veg) => (
+                          <span
+                            key={veg}
+                            className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700"
+                          >
+                            {veg}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Download stats */}
+                  <div className="pt-2 border-t border-gray-200">
+                    <p className="text-xs text-gray-500">
+                      <span className="font-semibold text-gray-700">{imageCount.toLocaleString()}</span> images · v{release.version}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
+
 
 // Dataset grid section — animations replay
 function DatasetGridSection({ publishedReleases = [], loadingReleases = false, onPreview }) {
@@ -1071,9 +1311,60 @@ function FormatSection() {
 
 // Main Dataset Page
 export default function DatasetPage() {
+  const navigate = useNavigate()
+  const { user } = useAuth()
   const [publishedReleases, setPublishedReleases] = useState([])
   const [loadingReleases, setLoadingReleases] = useState(true)
   const [previewRelease, setPreviewRelease] = useState(null)
+  const [loginPromptOpen, setLoginPromptOpen] = useState(false)
+  const [lastDownloadAttempt, setLastDownloadAttempt] = useState(0)
+
+  // Debounce rapid download attempts (prevent multiple prompts)
+  const handleDownloadAttempt = (callback) => {
+    const now = Date.now()
+    if (now - lastDownloadAttempt < 300) {
+      return
+    }
+    setLastDownloadAttempt(now)
+    
+    if (!user) {
+      setLoginPromptOpen(true)
+      return
+    }
+    
+    callback?.()
+  }
+
+  // Handle guest user login redirect
+  const handleLoginRedirect = () => {
+    navigate('/login')
+  }
+
+  // Handle release download (after authentication check)
+  const handleReleaseDownload = async (release, captures) => {
+    try {
+      const blob = await buildReleaseZip(release, captures, () => {})
+      triggerDownload(blob, `${release.name.replace(/\s+/g, '_')}_v${release.version}.zip`)
+    } catch (error) {
+      console.error('Download failed:', error)
+    }
+  }
+
+  // Handle preview card click (opens preview modal after auth check)
+  const handlePreviewClick = (release) => {
+    const now = Date.now()
+    if (now - lastDownloadAttempt < 300) {
+      return
+    }
+    setLastDownloadAttempt(now)
+    
+    if (!user) {
+      setLoginPromptOpen(true)
+      return
+    }
+    
+    setPreviewRelease(release)
+  }
 
   useEffect(() => {
     (async () => {
@@ -1118,16 +1409,24 @@ export default function DatasetPage() {
   return (
     <div className="bg-background">
       <Header currentPage="dataset" />
+      <LoginPromptModal
+        isOpen={loginPromptOpen}
+        onClose={() => setLoginPromptOpen(false)}
+        onLoginClick={handleLoginRedirect}
+      />
       <HeroSection />
       <DatasetGridSection
         publishedReleases={publishedReleases}
         loadingReleases={loadingReleases}
-        onPreview={setPreviewRelease}
+        onPreview={handlePreviewClick}
       />
       {previewRelease && (
-        <ReleasePreviewModal
+        <ReleaseDetailModal
           release={previewRelease}
           onClose={() => setPreviewRelease(null)}
+          onDownloadClick={(release, captures) => 
+            handleDownloadAttempt(() => handleReleaseDownload(release, captures))
+          }
         />
       )}
       <FormatSection />

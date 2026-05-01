@@ -17,11 +17,12 @@ function Header({ isLoaded = true, currentPage }) {
   // Derive active page from prop or route
   const activePage = currentPage || (
     location.pathname === '/technology' ? 'technology'
-    : location.pathname === '/dataset' ? 'dataset'
+    : location.pathname.startsWith('/datasets') ? 'dataset'
     : 'home'
   )
 
   const isHome = activePage === 'home'
+  const isOnDatasetPage = activePage === 'dataset'
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
@@ -29,11 +30,11 @@ function Header({ isLoaded = true, currentPage }) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Navigation items
+  // Navigation items (Dataset tab only shown on home and technology pages)
   const navItems = [
     { label: 'Home', key: 'home' },
     { label: 'Technology', key: 'technology', path: '/technology' },
-    { label: 'Dataset', key: 'dataset', path: '/dataset' },
+    ...(isOnDatasetPage ? [] : [{ label: 'Dataset', key: 'dataset', path: '/datasets' }]),
   ]
 
   const handleNavClick = (item) => {
